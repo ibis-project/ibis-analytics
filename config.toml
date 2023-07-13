@@ -1,0 +1,54 @@
+[pypi]
+backfill = 365
+packages = [
+    "ibis-framework",
+    "polars",
+    "modin",
+    "pandas",
+    "pyspark",
+]
+
+[github]
+repos = [
+    "ibis-project/ibis",
+    "ibis-project/ibis-examples",
+    #"apache/arrow",
+    #"dagster-io/dagster",
+    #"PrefectHQ/prefect",
+    #"dbt-labs/dbt-core",
+    #"tobikodata/sqlmesh",
+    #"tobymao/sqlglot",
+    #"apache/airflow",
+    #"pandas-dev/pandas",
+    #"dask/dask",
+    #"pola-rs/polars",
+    #"duckdb/duckdb",
+    #"dmlc/xgboost",
+    #"microsoft/lightgbm",
+    #"catboost/catboost",
+    #"scikit-learn/scikit-learn",
+    #"tensorflow/tensorflow",
+    #"pytorch/pytorch",
+    #"Lightning-AI/lightning",
+    #"apache/spark",
+    #"modin-project/modin",
+    #"machow/siuba",
+    #"vaexio/vaex",
+    #"rapidsai/cudf",
+    #"h2oai/datatable",
+    #"wireservice/agate",
+    #"databricks/koalas",
+    #"Kotlin/dataframe",
+    #"JuliaData/DataFrames.jl",
+    #"Eventual-Inc/Daft",
+]
+endpoints = [
+    "repo",
+    "stargazers",
+    "subscribers",
+    "commits",
+    "releases",
+    "forks",
+    "issues",
+    "contributors",
+]

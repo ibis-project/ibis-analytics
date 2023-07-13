@@ -1,0 +1,15 @@
+# python
+python-dotenv
+
+# code
+black[jupyter]
+
+# data
+ibis-framework[duckdb,polars,deltalake,bigquery] @ git+https://github.com/ibis-project/ibis.git@master
+
+# viz
+matplotlib
+seaborn
+plotly
+streamlit
+

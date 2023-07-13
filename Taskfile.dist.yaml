@@ -1,0 +1,38 @@
+# https://taskfile.dev
+---
+version: '3'
+
+# version control variables
+dotenv: ['.env']
+
+tasks:
+
+  # ingest data
+  ingest-gh:
+    cmds:
+      - python src/ingest_gh.py
+  ingest-pypi:
+    cmds:
+      - python src/ingest_pypi.py
+  ingest:
+    cmds:
+      - task: ingest-gh
+      - task: ingest-pypi
+
+  # cleanup
+  clean-data:
+    cmds:
+      - cmd: rm -r data/system
+        ignore_error: true
+
+  # streamlit stuff
+  app:
+    cmds:
+      - streamlit run app.py
+  st:
+    cmds:
+      - cmd: app
+  streamlit:
+    cmds:
+      - cmd: app
+
