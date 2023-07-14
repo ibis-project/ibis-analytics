@@ -34,15 +34,15 @@ config = toml.load("config.toml")["pypi"]
 log.info(f"Packages: {config['packages']}")
 
 # configure lookback window
-backfill = config["backfill"] if config["backfill"] else DEFAULT_BACKFILL
+backfill = config["backfill"] if "backfill" in config else DEFAULT_BACKFILL
 log.info(f"Backfill: {backfill}")
 
-def main():
 
+def main():
     for package in config["packages"]:
         log.info(f"Package: {package}")
         # create output directory
-        output_dir = os.path.join("data", "raw", "pypi", package)
+        output_dir = os.path.join("data", "pypi", package)
         os.makedirs(output_dir, exist_ok=True)
 
         # construct query
@@ -55,25 +55,18 @@ def main():
         AND CURRENT_DATE()
         """.strip()
 
-
-    # define main function
+        # define main function
         # extract config variables
         con = ibis.connect(f"bigquery://{project_id}")
 
         log.info(f"Executing query: {query}")
         t = con.sql(query)
 
-        filename = "file_downloads"
+        filename = f"file_downloads.parquet"
         output_path = os.path.join(output_dir, filename)
         log.info(f"Writing to: {output_path}")
 
-        # yikes
-        t = t.mutate(timestamp=t.timestamp.cast(dt.Timestamp(timezone="UTC")))
-
-        t.to_delta(
-            output_path,
-            mode="append",
-        )
+        t.to_parquet(output_path)
 
 
 # if __name__ == "__main__":

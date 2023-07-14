@@ -39,6 +39,7 @@ queries = {
     "watchers": watchers_query,
 }
 
+
 # define main function
 def main():
     # extract config variables
@@ -97,16 +98,25 @@ def fetch_data(client, owner, repo, query_name, query, output_dir, num_items=100
         # extract data
         try:
             if query_name == "commits":
-                data = json_data["data"]["repository"]["defaultBranchRef"]["target"]["history"]["edges"]
+                data = json_data["data"]["repository"]["defaultBranchRef"]["target"][
+                    "history"
+                ]["edges"]
                 # get the next link
-                cursor = json_data["data"]["repository"]["defaultBranchRef"]["target"]["history"]["pageInfo"]["endCursor"]
-                has_next_page = json_data["data"]["repository"]["defaultBranchRef"]["target"]["history"]["pageInfo"]["hasNextPage"]
+                cursor = json_data["data"]["repository"]["defaultBranchRef"]["target"][
+                    "history"
+                ]["pageInfo"]["endCursor"]
+                has_next_page = json_data["data"]["repository"]["defaultBranchRef"][
+                    "target"
+                ]["history"]["pageInfo"]["hasNextPage"]
 
             else:
-
                 data = json_data["data"]["repository"][query_name]["edges"]
-                cursor = json_data["data"]["repository"][query_name]["pageInfo"]["endCursor"]
-                has_next_page = json_data["data"]["repository"][query_name]["pageInfo"]["hasNextPage"]
+                cursor = json_data["data"]["repository"][query_name]["pageInfo"][
+                    "endCursor"
+                ]
+                has_next_page = json_data["data"]["repository"][query_name]["pageInfo"][
+                    "hasNextPage"
+                ]
         except:
             breakpoint()
 

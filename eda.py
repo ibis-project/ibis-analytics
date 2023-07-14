@@ -12,7 +12,7 @@ from datetime import datetime, timedelta
 
 # options
 ## ibis config
-ibis.options.interactive = True
+# ibis.options.interactive = True
 
 ## matplotlib config
 plt.style.use("dark_background")
@@ -28,6 +28,7 @@ pio.templates.default = "plotly_dark"
 ## scratch
 def clean_data(t):
     t = t.relabel("snake_case")
+    t = t.mutate(s.across(s.of_type("timestamp"), lambda x: x.cast("timestamp('UTC')")))
     return t
 
 
@@ -36,63 +37,89 @@ timescales = ["D", "W", "M", "Q", "Y"]
 dfs = {timescale: {} for timescale in timescales}
 figs = {timescale: {} for timescale in timescales}
 
-downloads = clean_data(ibis.read_delta("data/raw/pypi/ibis-framework/file_downloads"))
+downloads = clean_data(ibis.read_parquet("data/pypi/ibis-framework/*.parquet"))
 downloads = downloads.drop("project").unpack("file").unpack("details")
-downloads = downloads.order_by(ibis._.timestamp.desc())
+downloads = (
+    downloads.group_by(
+        [
+            ibis._.timestamp.truncate("D").name("timestamp"),
+            ibis._.country_code,
+            ibis._.version,
+            ibis._.python,
+            ibis._.system["name"].name("system"),
+        ]
+    )
+    .agg(
+        ibis._.count().name("downloads"),
+    )
+    .order_by(ibis._.timestamp.desc())
+    .mutate(
+        total_downloads=ibis._.downloads.sum().over(
+            rows=(0, None),
+            group_by=["country_code", "version", "python", "system"],
+            order_by=ibis._.timestamp.desc(),
+        )
+    )
+    .order_by(ibis._.timestamp.desc())
+)
+
 
 stars = clean_data(
-    ibis.read_json("data/raw/github/ibis-project/ibis/2023-07-10/stargazers.*.json")
+    ibis.read_json("data/raw/github/ibis-project/ibis/2023-07-14/stargazers.*.json")
 )
 stars = clean_data(stars.unpack("node"))
 stars = stars.order_by(ibis._.starred_at.desc())
 stars = stars.mutate(total_stars=ibis._.count().over(rows=(0, None)))
 
 issues = clean_data(
-    ibis.read_json("data/raw/github/ibis-project/ibis/2023-07-10/issues.*.json")
+    ibis.read_json("data/raw/github/ibis-project/ibis/2023-07-14/issues.*.json")
 )
 issues = clean_data(issues.unpack("node"))
 issues = issues.order_by(ibis._.created_at.desc())
 issues = issues.mutate(total_issues=ibis._.count().over(rows=(0, None)))
 
 pulls = clean_data(
-    ibis.read_json("data/raw/github/ibis-project/ibis/2023-07-10/pullRequests.*.json")
+    ibis.read_json("data/raw/github/ibis-project/ibis/2023-07-14/pullRequests.*.json")
 )
 pulls = clean_data(pulls.unpack("node").unpack("author"))
 pulls = pulls.order_by(ibis._.created_at.desc())
 pulls = pulls.mutate(total_pulls=ibis._.count().over(rows=(0, None)))
 
 forks = clean_data(
-    ibis.read_json("data/raw/github/ibis-project/ibis/2023-07-10/forks.*.json")
+    ibis.read_json("data/raw/github/ibis-project/ibis/2023-07-14/forks.*.json")
 )
 forks = clean_data(forks.unpack("node").unpack("owner"))
 forks = forks.order_by(ibis._.created_at.desc())
 forks = forks.mutate(total_forks=ibis._.count().over(rows=(0, None)))
 
 watchers = clean_data(
-    ibis.read_json("data/raw/github/ibis-project/ibis/2023-07-10/watchers.*.json")
+    ibis.read_json("data/raw/github/ibis-project/ibis/2023-07-14/watchers.*.json")
 )
 watchers = clean_data(watchers.unpack("node"))
 # watchers = watchers.order_by(ibis._.updated_at.desc())
 # watchers = watchers.mutate(total_watchers=ibis._.count().over(rows=(0, None)))
 
 commits = clean_data(
-    ibis.read_json("data/raw/github/ibis-project/ibis/2023-07-10/commits.*.json")
+    ibis.read_json("data/raw/github/ibis-project/ibis/2023-07-14/commits.*.json")
 )
 commits = clean_data(commits.unpack("node").unpack("author"))
 commits = commits.order_by(ibis._.committed_date.desc())
 
+"""
 for timescale in timescales:
     dfs[timescale]["downloads"] = (
         downloads.group_by(
-            [ibis._.timestamp.truncate(timescale).name("timestamp"), ibis._.version]
+            [
+                ibis._.timestamp.truncate(timescale).name("timestamp"),
+                ibis._.version,
+                ibis._.country_code,
+            ]
         )
         .agg(
             downloads=ibis._.count(),
+            total_downloads=ibis._.total_downloads.sum()
         )
-        .order_by([ibis._.timestamp.desc(), ibis._.downloads.desc()])
-    )
-    dfs[timescale]["downloads"] = dfs[timescale]["downloads"].mutate(
-        total_downloads=ibis._.downloads.sum().over(group_by="version", rows=(0, None))
+        .order_by(ibis._.timestamp.desc())
     )
 
     figs[timescale]["downloads"] = px.line(
@@ -107,14 +134,13 @@ for timescale in timescales:
         dfs[timescale]["downloads"].to_pandas(),
         x="timestamp",
         y="total_downloads",
-        color="version",
-        title="Total downloads by version",
+        title="Total downloads",
     )
 
     dfs[timescale]["stars"] = (
         stars.group_by([ibis._.starred_at.truncate(timescale).name("starred_at")])
         .agg(
-            [ibis._.count().name("stars"), ibis._.total_stars.min().name("total_stars")]
+            [ibis._.count().name("stars"), ibis._.total_stars.max().name("total_stars")]
         )
         .order_by([ibis._.starred_at.desc()])
     )
@@ -133,3 +159,4 @@ for timescale in timescales:
         markers=True,
         title="Total stars",
     )
+"""

@@ -1,11 +1,11 @@
 [pypi]
-backfill = 365
+#backfill = 365
 packages = [
     "ibis-framework",
     "polars",
     "modin",
-    "pandas",
-    "pyspark",
+    #"pandas",
+    #"pyspark",
 ]
 
 [github]
@@ -21,7 +21,7 @@ repos = [
     #"apache/airflow",
     #"pandas-dev/pandas",
     #"dask/dask",
-    #"pola-rs/polars",
+    "pola-rs/polars",
     #"duckdb/duckdb",
     #"dmlc/xgboost",
     #"microsoft/lightgbm",
@@ -31,7 +31,7 @@ repos = [
     #"pytorch/pytorch",
     #"Lightning-AI/lightning",
     #"apache/spark",
-    #"modin-project/modin",
+    "modin-project/modin",
     #"machow/siuba",
     #"vaexio/vaex",
     #"rapidsai/cudf",
