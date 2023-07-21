@@ -19,6 +19,9 @@ con = ibis.connect("duckdb://metrics.ddb")
 ## plotly config
 pio.templates.default = "plotly_dark"
 
+# variables
+timescale = "M"
+
 
 # functions
 def compare_downloads(downloads):
@@ -41,9 +44,6 @@ def compare_downloads(downloads):
 
     return t
 
-
-# variables
-timescale = "M"
 
 # use precomputed data
 downloads = con.tables.downloads
