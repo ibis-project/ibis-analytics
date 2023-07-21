@@ -135,62 +135,6 @@ commits = clean_data(commits.unpack("node").unpack("author"))
 commits = commits.order_by(ibis._.committed_date.desc())
 commits = commits.mutate(total_commits=ibis._.count().over(rows=(0, None)))
 
-"""
-for timescale in timescales:
-    dfs[timescale]["downloads"] = (
-        downloads.group_by(
-            [
-                ibis._.timestamp.truncate(timescale).name("timestamp"),
-                ibis._.version,
-                ibis._.country_code,
-            ]
-        )
-        .agg(
-            downloads=ibis._.count(),
-            total_downloads=ibis._.total_downloads.sum()
-        )
-        .order_by(ibis._.timestamp.desc())
-    )
-
-    figs[timescale]["downloads"] = px.line(
-        dfs[timescale]["downloads"].to_pandas(),
-        x="timestamp",
-        y="downloads",
-        color="version",
-        title="Downloads by version",
-    )
-
-    figs[timescale]["total_downloads"] = px.line(
-        dfs[timescale]["downloads"].to_pandas(),
-        x="timestamp",
-        y="total_downloads",
-        title="Total downloads",
-    )
-
-    dfs[timescale]["stars"] = (
-        stars.group_by([ibis._.starred_at.truncate(timescale).name("starred_at")])
-        .agg(
-            [ibis._.count().name("stars"), ibis._.total_stars.max().name("total_stars")]
-        )
-        .order_by([ibis._.starred_at.desc()])
-    )
-
-    figs[timescale]["stars"] = px.line(
-        dfs[timescale]["stars"].to_pandas(),
-        x="starred_at",
-        y="stars",
-        title="Stars added",
-    )
-
-    figs[timescale]["total_stars"] = px.line(
-        dfs[timescale]["stars"].to_pandas(),
-        x="starred_at",
-        y="total_stars",
-        markers=True,
-        title="Total stars",
-    )
-"""
-
 if __name__ == "__main__":
     con.create_table("downloads", downloads.to_pyarrow(), overwrite=True)
     con.create_table("downloads_modin", downloads_modin.to_pyarrow(), overwrite=True)
