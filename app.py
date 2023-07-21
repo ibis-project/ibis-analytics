@@ -19,11 +19,16 @@ con = ibis.connect("duckdb://metrics.ddb")
 ## plotly config
 pio.templates.default = "plotly_dark"
 
+
 # functions
 def compare_downloads(downloads):
     t = (
-        downloads.filter(ibis._.system.contains("Windows") | ibis._.system.contains("Darwin"))
-        .group_by([ibis._.timestamp.truncate(timescale).name("timestamp"), ibis._.version])
+        downloads.filter(
+            ibis._.system.contains("Windows") | ibis._.system.contains("Darwin")
+        )
+        .group_by(
+            [ibis._.timestamp.truncate(timescale).name("timestamp"), ibis._.version]
+        )
         .agg(ibis._.downloads.sum().name("downloads"))
         .order_by(ibis._.timestamp.desc())
         .mutate(
@@ -37,7 +42,6 @@ def compare_downloads(downloads):
     return t
 
 
-
 # variables
 timescale = "M"
 
@@ -45,6 +49,8 @@ timescale = "M"
 downloads = con.tables.downloads
 downloads_modin = con.tables.downloads_modin
 downloads_polars = con.tables.downloads_polars
+downloads_siuba = con.tables.downloads_siuba
+downloads_fugue = con.tables.downloads_fugue
 issues = con.tables.issues
 pulls = con.tables.pulls
 stars = con.tables.stars
@@ -183,6 +189,24 @@ c4b = px.bar(
     title="Polars downloads for Windows/MacOS users by version",
 )
 st.plotly_chart(c4b, use_container_width=True)
+
+c4c = px.bar(
+    compare_downloads(downloads_siuba),
+    x="timestamp",
+    y="downloads",
+    color="version",
+    title="Siuba downloads for Windows/MacOS users by version",
+)
+st.plotly_chart(c4c, use_container_width=True)
+
+c4d = px.bar(
+    compare_downloads(downloads_fugue),
+    x="timestamp",
+    y="downloads",
+    color="version",
+    title="Fugue downloads for Windows/MacOS users by version",
+)
+st.plotly_chart(c4d, use_container_width=True)
 
 c5 = px.line(
     stars,

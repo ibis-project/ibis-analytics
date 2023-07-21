@@ -54,7 +54,6 @@ def main():
                 owner, repo_name = repo.split("/")
                 output_dir = os.path.join(
                     "data",
-                    "raw",
                     "github",
                     owner,
                     repo_name,

@@ -22,7 +22,7 @@ tasks:
   # cleanup
   clean-data:
     cmds:
-      - cmd: rm -r data/system
+      - cmd: rm -r data
         ignore_error: true
 
   # streamlit stuff
