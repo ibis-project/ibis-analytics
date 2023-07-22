@@ -19,11 +19,25 @@ tasks:
       - task: ingest-gh
       - task: ingest-pypi
 
+  # copy eda database to metrics database
+  metrics:
+    cmds:
+      - cp eda.ddb metrics.ddb
+
+
   # cleanup
   clean-data:
     cmds:
-      - cmd: rm -r data
+      - cmd: rm -r data/pypi
         ignore_error: true
+      - cmd: rm -r data/github
+        ignore_error: true
+
+  clean-dbs:
+    cmds:
+      - cmd: rm *.ddb*
+        ignore_error: true
+      
 
   # streamlit stuff
   app:
