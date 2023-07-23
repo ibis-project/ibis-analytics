@@ -34,19 +34,14 @@ watchers = con.tables.watchers
 """
 
 # variables
-with st.form(key="timescale"):
+with st.form(key="app"):
     days = st.number_input(
         "X days",
         min_value=1,
-        max_value=3650,
+        max_value=365,
         value=28,
-        step=7,
+        step=28,
         format="%d",
-    )
-    timescale = st.selectbox(
-        "timescale (plots)",
-        ["D", "W", "M", "Y"],
-        index=0,
     )
     update_button = st.form_submit_button(label="update")
 
@@ -178,7 +173,7 @@ with col1:
         delta=f"{total_stars - total_stars_prev:,}",
     )
     st.metric(
-        label="Total forks",
+        label="forks",
         value=f"{total_forks:,}",
         delta=f"{total_forks - total_forks_prev:,}",
     )
@@ -217,11 +212,11 @@ with col4:
     )
 
 f"""
-## plots (last {days} days)
+## data (last {days} days)
 """
 
 f"""
-### Downloads by system and version
+### downloads by system and version
 """
 c0 = px.bar(
     downloads.filter(ibis._.timestamp > datetime.now() - timedelta(days=days))
@@ -231,6 +226,61 @@ c0 = px.bar(
     x="version",
     y="downloads",
     color="system",
-    title=f"Downloads by system and version",
+    title=f"downloads by system and version",
 )
 st.plotly_chart(c0, use_container_width=True)
+
+f"""
+### stars by company
+"""
+st.dataframe(
+    stars.filter(ibis._.starred_at > datetime.now() - timedelta(days=days))
+    .group_by([ibis._.company])
+    .agg(ibis._.count().name("stars"))
+    .order_by(ibis._.stars.desc())
+    .to_pandas(),
+    use_container_width=True,
+)
+
+f"""
+### issues by login
+"""
+c1 = px.bar(
+    issues.filter(ibis._.created_at > datetime.now() - timedelta(days=days))
+    .group_by([ibis._.login, ibis._.state])
+    .agg(ibis._.count().name("issues"))
+    .order_by(ibis._.issues.desc()),
+    x="login",
+    y="issues",
+    color="state",
+    title=f"issues by login",
+)
+st.plotly_chart(c1, use_container_width=True)
+
+f"""
+### PRs by login
+"""
+c2 = px.bar(
+    pulls.filter(ibis._.created_at > datetime.now() - timedelta(days=days))
+    .group_by([ibis._.login, ibis._.state])
+    .agg(ibis._.count().name("pulls"))
+    .order_by(ibis._.pulls.desc()),
+    x="login",
+    y="pulls",
+    color="state",
+    title=f"PRs by login",
+)
+st.plotly_chart(c2, use_container_width=True)
+
+
+f"""
+### docs visits by path and referrer
+"""
+st.dataframe(
+    docs.filter(ibis._.timestamp > datetime.now() - timedelta(days=days))
+    .group_by([ibis._.path, ibis._.referrer])
+    .agg(ibis._.count().name("visits"))
+    # .mutate(ibis._.referrer.cast(str)[:20].name("referrer"))
+    .order_by(ibis._.visits.desc()),
+    use_container_width=True,
+)

@@ -11,19 +11,26 @@ tasks:
   ingest-gh:
     cmds:
       - python src/ingest_gh.py
+  ingest-ci:
+    cmds:
+      - python src/ingest_ci.py
   ingest-pypi:
     cmds:
       - python src/ingest_pypi.py
   ingest:
     cmds:
       - task: ingest-gh
+      - task: ingest-ci
       - task: ingest-pypi
 
   # copy eda database to metrics database
   metrics:
     cmds:
       - cp eda.ddb metrics.ddb
-
+      - python src/export_md.py
+  export:
+    cmds:
+      - task: metrics
 
   # cleanup
   clean-data:
@@ -37,7 +44,6 @@ tasks:
     cmds:
       - cmd: rm *.ddb*
         ignore_error: true
-      
 
   # streamlit stuff
   app:
@@ -49,4 +55,3 @@ tasks:
   streamlit:
     cmds:
       - cmd: app
-

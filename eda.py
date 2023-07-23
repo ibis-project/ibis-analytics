@@ -10,7 +10,7 @@ import plotly.express as px
 import ibis.selectors as s
 import matplotlib.pyplot as plt
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 
 # options
 ## ibis config
@@ -29,6 +29,8 @@ pio.templates.default = "plotly_dark"
 
 ## variables
 compare = False
+POETRY_MERGED_DATE = date(2021, 10, 15)
+TEAMIZATION_DATE = date(2022, 11, 28)
 
 if len(sys.argv) == 1:
     docs = con.table("docs")
@@ -44,6 +46,9 @@ if len(sys.argv) == 1:
     forks = con.table("forks")
     watchers = con.table("watchers")
     commits = con.table("commits")
+    jobs = con.table("jobs")
+    workflows = con.table("workflows")
+    analysis = con.table("analysis")
 else:
     ibis.options.interactive = False
 
@@ -120,35 +125,49 @@ else:
         downloads_fugue = agg_downloads(downloads_fugue)
 
     stars = clean_data(
-        con.read_json("data/github/ibis-project/ibis/2023-07-20/stargazers.*.json")
+        con.read_json("data/github/ibis-project/ibis/2023-07-22/stargazers.*.json")
     )
     stars = clean_data(stars.unpack("node"))
     stars = stars.order_by(ibis._.starred_at.desc())
+    stars = stars.mutate(ibis._.company.fillna("Unknown").name("company"))
     stars = stars.mutate(total_stars=ibis._.count().over(rows=(0, None)))
 
     issues = clean_data(
-        con.read_json("data/github/ibis-project/ibis/2023-07-20/issues.*.json")
+        con.read_json("data/github/ibis-project/ibis/2023-07-22/issues.*.json")
     )
-    issues = clean_data(issues.unpack("node"))
+    issues = clean_data(issues.unpack("node").unpack("author"))
     issues = issues.order_by(ibis._.created_at.desc())
-    issues = issues.mutate(total_issues=ibis._.count().over(rows=(0, None)))
+    issues = issues.mutate((ibis._.closed_at != None).name("is_closed"))
+    issues = issues.mutate(ibis._.count().over(rows=(0, None)).name("total_issues"))
+    issue_state = ibis.case().when(issues.is_closed, "closed").else_("open").end()
 
     pulls = clean_data(
-        con.read_json("data/github/ibis-project/ibis/2023-07-20/pullRequests.*.json")
+        con.read_json("data/github/ibis-project/ibis/2023-07-22/pullRequests.*.json")
     )
     pulls = clean_data(pulls.unpack("node").unpack("author"))
     pulls = pulls.order_by(ibis._.created_at.desc())
+    pulls = pulls.mutate((ibis._.merged_at != None).name("is_merged"))
+    pulls = pulls.mutate((ibis._.closed_at != None).name("is_closed"))
     pulls = pulls.mutate(total_pulls=ibis._.count().over(rows=(0, None)))
 
+    pull_state = (
+        ibis.case()
+        .when(pulls.is_merged, "merged")
+        .when(pulls.is_closed, "closed")
+        .else_("open")
+        .end()
+    )
+    pulls = pulls.mutate(pull_state.name("state"))
+
     forks = clean_data(
-        con.read_json("data/github/ibis-project/ibis/2023-07-20/forks.*.json")
+        con.read_json("data/github/ibis-project/ibis/2023-07-22/forks.*.json")
     )
     forks = clean_data(forks.unpack("node").unpack("owner"))
     forks = forks.order_by(ibis._.created_at.desc())
     forks = forks.mutate(total_forks=ibis._.count().over(rows=(0, None)))
 
     watchers = clean_data(
-        con.read_json("data/github/ibis-project/ibis/2023-07-20/watchers.*.json")
+        con.read_json("data/github/ibis-project/ibis/2023-07-22/watchers.*.json")
     )
     watchers = clean_data(watchers.unpack("node"))
     watchers = watchers.order_by(ibis._.updated_at.desc())
@@ -156,12 +175,20 @@ else:
     watchers = watchers.order_by(ibis._.updated_at.desc())
 
     commits = clean_data(
-        con.read_json("data/github/ibis-project/ibis/2023-07-20/commits.*.json")
+        con.read_json("data/github/ibis-project/ibis/2023-07-22/commits.*.json")
     )
     commits = clean_data(commits.unpack("node").unpack("author"))
     commits = commits.order_by(ibis._.committed_date.desc())
     commits = commits.mutate(total_commits=ibis._.count().over(rows=(0, None)))
 
+    ci_con = ibis.connect("duckdb://data/ci/ibis/raw.ddb")
+    jobs = ci_con.table("jobs")
+    workflows = ci_con.table("workflows")
+    analysis = ci_con.table("analysis")
+
+    con.create_table("jobs", jobs.to_pyarrow(), overwrite=True)
+    con.create_table("workflows", workflows.to_pyarrow(), overwrite=True)
+    con.create_table("analysis", analysis.to_pyarrow(), overwrite=True)
     con.create_table("docs", docs, overwrite=True)
     con.create_table("downloads", downloads, overwrite=True)
     if compare:
@@ -175,4 +202,3 @@ else:
     con.create_table("forks", forks, overwrite=True)
     con.create_table("watchers", watchers, overwrite=True)
     con.create_table("commits", commits, overwrite=True)
-

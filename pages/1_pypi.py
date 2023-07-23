@@ -18,93 +18,76 @@ con = ibis.connect("duckdb://metrics.ddb", read_only=str(True))
 ## plotly config
 pio.templates.default = "plotly_dark"
 
-# variables
-timescale = "M"
-
 # use precomputed data
-docs = con.tables.docs
 downloads = con.tables.downloads
-# downloads_modin = con.tables.downloads_modin
-# downloads_polars = con.tables.downloads_polars
-# downloads_siuba = con.tables.downloads_siuba
-# downloads_fugue = con.tables.downloads_fugue
-issues = con.tables.issues
-pulls = con.tables.pulls
-stars = con.tables.stars
-forks = con.tables.forks
-commits = con.tables.commits
-watchers = con.tables.watchers
 
-
-# functions
-def compare_downloads(downloads):
-    t = (
-        downloads.filter(
-            ibis._.system.contains("Windows") | ibis._.system.contains("Darwin")
-        )
-        .group_by(
-            [ibis._.timestamp.truncate(timescale).name("timestamp"), ibis._.version]
-        )
-        .agg(ibis._.downloads.sum().name("downloads"))
-        .order_by(ibis._.timestamp.desc())
-        .mutate(
-            ibis._.downloads.sum()
-            .over(rows=(0, None), group_by="version", order_by=ibis._.timestamp.desc())
-            .name("total_downloads")
-        )
-        .order_by([ibis._.timestamp.desc(), ibis._.downloads.desc()])
+# display metrics
+"""
+# PyPI metrics
+"""
+# variables
+with st.form(key="pypi"):
+    days = st.number_input(
+        "X days",
+        min_value=1,
+        max_value=3650,
+        value=365,
+        step=30,
+        format="%d",
     )
+    timescale = st.selectbox(
+        "timescale (plots)",
+        ["D", "W", "M", "Q", "Y"],
+        index=1,
+    )
+    grouper = st.selectbox(
+        "grouper",
+        ["version", "system", "country_code", "python"],
+        index=0,
+    )
+    exclude_linux = st.checkbox("exclude linux", value=True)
+    update_button = st.form_submit_button(label="update")
 
-    return t
-
+if exclude_linux:
+    downloads = downloads.filter(~ibis._.system.contains("Linux"))
 
 # viz
-c2 = px.bar(
-    downloads.group_by(
-        [ibis._.timestamp.truncate(timescale).name("timestamp"), ibis._.version]
-    )
+c0 = px.bar(
+    downloads.filter(ibis._.timestamp >= datetime.now() - timedelta(days=days))
+    .group_by([ibis._.timestamp.truncate(timescale).name("timestamp"), ibis._[grouper]])
     .agg(ibis._.downloads.sum().name("downloads"))
     .order_by(ibis._.timestamp.desc())
     .mutate(
         ibis._.downloads.sum()
-        .over(rows=(0, None), group_by="version", order_by=ibis._.timestamp.desc())
+        .over(rows=(0, None), group_by=grouper, order_by=ibis._.timestamp.desc())
         .name("total_downloads")
     )
     .order_by([ibis._.timestamp.desc(), ibis._.downloads.desc()]),
     x="timestamp",
     y="downloads",
-    color="version",
-    title="Downloads by version",
+    color=grouper,
+    title=f"downloads by {grouper}",
 )
-st.plotly_chart(c2, use_container_width=True)
+st.plotly_chart(c0, use_container_width=True)
 
-c3 = px.bar(
-    downloads.group_by(
-        [ibis._.timestamp.truncate(timescale).name("timestamp"), ibis._.system]
-    )
+c1 = px.line(
+    downloads.filter(ibis._.timestamp >= datetime.now() - timedelta(days=days))
+    .group_by([ibis._.timestamp.truncate(timescale).name("timestamp"), ibis._[grouper]])
     .agg(ibis._.downloads.sum().name("downloads"))
     .order_by(ibis._.timestamp.desc())
     .mutate(
         ibis._.downloads.sum()
-        .over(rows=(0, None), group_by="system", order_by=ibis._.timestamp.desc())
+        .over(rows=(0, None), group_by=grouper, order_by=ibis._.timestamp.desc())
         .name("total_downloads")
     )
     .order_by([ibis._.timestamp.desc(), ibis._.downloads.desc()]),
     x="timestamp",
-    y="downloads",
-    color="system",
-    title="Downloads by system",
+    y="total_downloads",
+    color=grouper,
+    title=f"cumulative downloads by {grouper}",
 )
-st.plotly_chart(c3, use_container_width=True)
+st.plotly_chart(c1, use_container_width=True)
 
-c4 = px.bar(
-    compare_downloads(downloads),
-    x="timestamp",
-    y="downloads",
-    color="version",
-    title="Downloads for Windows/MacOS users by version",
-)
-st.plotly_chart(c4, use_container_width=True)
 
 # c4a = px.bar(
 #    compare_downloads(downloads_modin),

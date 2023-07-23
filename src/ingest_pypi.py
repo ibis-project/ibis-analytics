@@ -2,11 +2,8 @@
 import os
 import ibis
 import toml
-import json
-import requests
 
 import logging as log
-import ibis.expr.datatypes as dt
 
 from ibis import _
 from dotenv import load_dotenv
@@ -20,9 +17,6 @@ BIGQUERY_DATASET = "bigquery-public-data.pypi.file_downloads"
 
 # configure logger
 log.basicConfig(level=log.INFO)
-
-# configure ibis
-ibis.options.interactive = True
 
 # load environment variables
 load_dotenv()
