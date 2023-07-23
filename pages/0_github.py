@@ -13,7 +13,7 @@ from datetime import datetime, timedelta
 st.set_page_config(layout="wide")
 
 ## ibis config
-con = ibis.connect("duckdb://metrics.ddb", read_only=str(True))
+con = ibis.connect("duckdb://md:metrics", read_only=str(True))
 
 ## plotly config
 pio.templates.default = "plotly_dark"

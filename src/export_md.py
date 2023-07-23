@@ -12,8 +12,8 @@ MD_TOKEN = os.getenv("MOTHERDUCK_TOKEN")
 MD_TOKEN = "dummy_token"
 
 # connect to motherduck
-#con = duckdb.connect(f"md:?[motherduck_token={MD_TOKEN}?saas_mode=true]")
-con = ibis.connect(f"duckdb://md:?[motherduck_token={MD_TOKEN}?saas_mode=true]")
+con = duckdb.connect(f"md:?[motherduck_token={MD_TOKEN}?saas_mode=true]")
+#con = ibis.connect(f"duckdb://md:?[motherduck_token={MD_TOKEN}?saas_mode=true]")
 
 # export metrics
 con.sql("DROP DATABASE IF EXISTS metrics CASCADE")

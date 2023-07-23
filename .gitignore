@@ -3,4 +3,5 @@
 venv
 data
 target
+.streamlit
 *.ddb*
