@@ -48,7 +48,7 @@ tasks:
   # streamlit stuff
   app:
     cmds:
-      - streamlit run app.py
+      - streamlit run metrics.py
   st:
     cmds:
       - cmd: app
