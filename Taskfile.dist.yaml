@@ -6,6 +6,10 @@ version: '3'
 dotenv: ['.env']
 
 tasks:
+  # run
+  run:
+    cmds:
+      - time python eda.py run
   # ingest data
   ingest-gh:
     cmds:
@@ -19,9 +23,9 @@ tasks:
   ingest:
     cmds:
       - task: ingest-gh
-      - task: ingest-ci
+      #- task: ingest-ci # broken
       - task: ingest-pypi
-  # copy eda database to metrics database
+  # copy local database to motherduck metrics database
   metrics:
     cmds:
       - python src/export_md.py

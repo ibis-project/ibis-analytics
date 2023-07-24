@@ -217,7 +217,7 @@ c0 = px.bar(
     downloads.filter(ibis._.timestamp > datetime.now() - timedelta(days=days))
     .group_by([ibis._.system, ibis._.version])
     .agg(ibis._.downloads.sum().name("downloads"))
-    .order_by(ibis._.downloads.desc()),
+    .order_by(ibis._.version.desc()),
     x="version",
     y="downloads",
     color="system",

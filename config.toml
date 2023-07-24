@@ -1,3 +1,5 @@
+[eda]
+database="cache.ddb"
 [ci]
 #backfill=365
 [pypi]

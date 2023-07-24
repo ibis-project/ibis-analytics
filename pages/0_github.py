@@ -255,7 +255,7 @@ c3 = px.line(
     forks.filter(ibis._.created_at > datetime.now() - timedelta(days=days)),
     x="created_at",
     y="total_forks",
-    title="total forks",
+    title="cumulative forks",
 )
 st.plotly_chart(c3, use_container_width=True)
 
@@ -263,7 +263,7 @@ c4 = px.line(
     pulls.filter(ibis._.created_at > datetime.now() - timedelta(days=days)),
     x="created_at",
     y="total_pulls",
-    title="total pull requests",
+    title="cumulative pull requests",
 )
 st.plotly_chart(c4, use_container_width=True)
 
@@ -271,7 +271,7 @@ c5 = px.line(
     issues.filter(ibis._.created_at > datetime.now() - timedelta(days=days)),
     x="created_at",
     y="total_issues",
-    title="total issues",
+    title="cumulative issues",
 )
 st.plotly_chart(c5, use_container_width=True)
 
@@ -279,6 +279,6 @@ c6 = px.line(
     commits.filter(ibis._.committed_date > datetime.now() - timedelta(days=days)),
     x="committed_date",
     y="total_commits",
-    title="total commits",
+    title="cumulative commits",
 )
 st.plotly_chart(c6, use_container_width=True)

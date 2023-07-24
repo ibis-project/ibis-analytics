@@ -31,6 +31,7 @@ log.info(f"Packages: {config['packages']}")
 backfill = config["backfill"] if "backfill" in config else DEFAULT_BACKFILL
 log.info(f"Backfill: {backfill}")
 
+
 # define main function
 def main():
     for package in config["packages"]:

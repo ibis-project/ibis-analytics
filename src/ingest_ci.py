@@ -32,6 +32,7 @@ config = toml.load("config.toml")["ci"]
 backfill = config["backfill"] if "backfill" in config else DEFAULT_BACKFILL
 log.info(f"Backfill: {backfill}")
 
+
 # define main function
 def main():
     os.makedirs("data/ci/ibis", exist_ok=True)
@@ -39,7 +40,6 @@ def main():
     bq_con = ibis.connect(f"bigquery://{project_id}/workflows")
 
     for table in bq_con.list_tables():
-
         log.info(f"Writing table: {table}")
         con.create_table(table, bq_con.table(table).to_pyarrow(), overwrite=True)
 

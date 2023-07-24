@@ -1,17 +1,24 @@
 # imports
 import os
 import sys
+import toml
 import ibis
-
+import ibis.selectors as s
+import logging as log
 import seaborn as sns
-
 import plotly.io as pio
 import plotly.express as px
-import ibis.selectors as s
 import matplotlib.pyplot as plt
 
 from dotenv import load_dotenv
 from datetime import datetime, timedelta, date
+
+# configuration
+## logger
+log.basicConfig(level=log.INFO)
+
+## config.toml
+config = toml.load("config.toml")["eda"]
 
 ## matplotlib config
 plt.style.use("dark_background")
@@ -27,9 +34,12 @@ pio.templates.default = "plotly_dark"
 POETRY_MERGED_DATE = date(2021, 10, 15)
 TEAMIZATION_DATE = date(2022, 11, 28)
 
+# load in
 if len(sys.argv) == 1:
     load_dotenv()
-    con = ibis.connect("duckdb://md:metrics")
+    database = config["database"]
+    log.info(f"database: {database}")
+    con = ibis.connect(f"duckdb://{database}")
     ibis.options.interactive = True
 
     docs = con.table("docs")
@@ -40,9 +50,9 @@ if len(sys.argv) == 1:
     forks = con.table("forks")
     watchers = con.table("watchers")
     commits = con.table("commits")
-    #jobs = con.table("jobs")
-    #workflows = con.table("workflows")
-    #analysis = con.table("analysis")
+    # jobs = con.table("jobs")
+    # workflows = con.table("workflows")
+    # analysis = con.table("analysis")
 else:
     con = ibis.connect("duckdb://cache.ddb")
     ibis.options.interactive = False
@@ -68,8 +78,7 @@ else:
             )
             .agg(
                 # TODO: fix this
-                ibis._.count()
-                .name("downloads"),
+                ibis._.count().name("downloads"),
             )
             .order_by(ibis._.timestamp.desc())
             .mutate(
@@ -113,7 +122,14 @@ else:
     pulls = pulls.mutate((ibis._.merged_at != None).name("is_merged"))
     pulls = pulls.mutate((ibis._.closed_at != None).name("is_closed"))
     pulls = pulls.mutate(total_pulls=ibis._.count().over(rows=(0, None)))
-
+    # to remove bots
+    # pulls = pulls.filter(
+    #    ~(
+    #        (ibis._.login == "ibis-squawk-bot")
+    #        | (ibis._.login == "pre-commit-ci")
+    #        | (ibis._.login == "renovate")
+    #    )
+    # )
     pull_state = (
         ibis.case()
         .when(pulls.is_merged, "merged")
@@ -141,13 +157,13 @@ else:
     commits = commits.order_by(ibis._.committed_date.desc())
     commits = commits.mutate(total_commits=ibis._.count().over(rows=(0, None)))
 
-    #ci_con = ibis.connect("duckdb://data/ci/ibis/raw.ddb")
-    #jobs = ci_con.table("jobs")
-    #workflows = ci_con.table("workflows")
-    #analysis = ci_con.table("analysis")
-    #con.create_table("jobs", jobs.to_pyarrow(), overwrite=True)
-    #con.create_table("workflows", workflows.to_pyarrow(), overwrite=True)
-    #con.create_table("analysis", analysis.to_pyarrow(), overwrite=True)
+    # ci_con = ibis.connect("duckdb://data/ci/ibis/raw.ddb")
+    # jobs = ci_con.table("jobs")
+    # workflows = ci_con.table("workflows")
+    # analysis = ci_con.table("analysis")
+    # con.create_table("jobs", jobs.to_pyarrow(), overwrite=True)
+    # con.create_table("workflows", workflows.to_pyarrow(), overwrite=True)
+    # con.create_table("analysis", analysis.to_pyarrow(), overwrite=True)
 
     con.create_table("docs", docs, overwrite=True)
     con.create_table("downloads", downloads, overwrite=True)

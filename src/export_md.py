@@ -13,5 +13,5 @@ con = duckdb.connect(f"md:")
 
 # export metrics
 con.sql("DROP DATABASE IF EXISTS metrics CASCADE")
-time.sleep(30) # MotherDuck issue, TODO: fix
+# time.sleep(30)  # MotherDuck issue if file is large TODO: fix
 con.sql("CREATE DATABASE metrics FROM 'cache.ddb'")
