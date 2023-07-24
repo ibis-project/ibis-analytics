@@ -36,14 +36,14 @@ with st.form(key="pypi"):
         "X days",
         min_value=1,
         max_value=3650,
-        value=3650,
-        step=30,
+        value=90,
+        step=7,
         format="%d",
     )
     timescale = st.selectbox(
         "timescale (plots)",
         ["D", "W", "M", "Q", "Y"],
-        index=2,
+        index=1,
     )
     exclude_voda = st.checkbox("exclude VoDa (TODO: implement)", value=False)
     update_button = st.form_submit_button(label="update")
@@ -79,8 +79,45 @@ total_forks_prev = (
     .count()
     .to_pandas()
 )
-total_issues = (
-    issues.filter(ibis._.created_at >= datetime.now() - timedelta(days=days))
+open_issues = (
+    issues.filter(ibis._.is_closed != True)
+    .select("number")
+    .distinct()
+    .count()
+    .to_pandas()
+)
+open_pulls = (
+    pulls.filter(ibis._.state == "open")
+    .select("number")
+    .distinct()
+    .count()
+    .to_pandas()
+)
+closed_issues = (
+    issues.filter(ibis._.closed_at >= datetime.now() - timedelta(days=days))
+    .select("number")
+    .distinct()
+    .count()
+    .to_pandas()
+)
+closed_issues_prev = (
+    issues.filter(ibis._.closed_at <= datetime.now() - timedelta(days=days))
+    .filter(ibis._.closed_at >= datetime.now() - timedelta(days=days * 2))
+    .select("number")
+    .distinct()
+    .count()
+    .to_pandas()
+)
+merged_pulls = (
+    pulls.filter(ibis._.merged_at >= datetime.now() - timedelta(days=days))
+    .select("number")
+    .distinct()
+    .count()
+    .to_pandas()
+)
+merged_pulls_prev = (
+    pulls.filter(ibis._.merged_at <= datetime.now() - timedelta(days=days))
+    .filter(ibis._.merged_at >= datetime.now() - timedelta(days=days * 2))
     .select("number")
     .distinct()
     .count()
@@ -142,11 +179,31 @@ total_watchers_prev = (
     .to_pandas()
 )
 
+st.metric(
+    label="open issues",
+    value=f"{open_issues:,}",
+)
+st.metric(
+    label="open pull requests",
+    value=f"{open_pulls:,}",
+)
+
 f"""
 ## totals (last {days} days)
 """
-col1, col2, col3 = st.columns(3)
-with col1:
+col2, col3, col4 = st.columns(3)
+with col2:
+    st.metric(
+        label="closed issues",
+        value=f"{closed_issues:,}",
+        delta=f"{closed_issues - closed_issues_prev:,}",
+    )
+    st.metric(
+        label="merged pull requests",
+        value=f"{merged_pulls:,}",
+        delta=f"{merged_pulls - merged_pulls_prev:,}",
+    )
+with col3:
     st.metric(
         label="stars",
         value=f"{total_stars:,}",
@@ -157,18 +214,7 @@ with col1:
         value=f"{total_forks:,}",
         delta=f"{total_forks - total_forks_prev:,}",
     )
-with col2:
-    st.metric(
-        label="issues",
-        value=f"{total_issues:,}",
-        delta=f"{total_issues - total_issues_prev:,}",
-    )
-    st.metric(
-        label="pull requests",
-        value=f"{total_pulls:,}",
-        delta=f"{total_pulls - total_pulls_prev:,}",
-    )
-with col3:
+with col4:
     st.metric(
         label="contributors",
         value=f"{total_contributors:,}",
@@ -213,7 +259,7 @@ st.dataframe(
 )
 
 c3 = px.line(
-    forks,
+    forks.filter(ibis._.created_at > datetime.now() - timedelta(days=days)),
     x="created_at",
     y="total_forks",
     title="total forks",

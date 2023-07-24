@@ -57,7 +57,6 @@ def main():
                     "github",
                     owner,
                     repo_name,
-                    datetime.now().strftime("%Y-%m-%d"),
                 )
                 os.makedirs(output_dir, exist_ok=True)
                 log.info(f"\tFetching data for {owner}/{repo_name} {query}...")

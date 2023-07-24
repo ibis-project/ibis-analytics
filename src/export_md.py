@@ -18,4 +18,4 @@ con = duckdb.connect(f"md:")
 # export metrics
 con.sql("DROP DATABASE IF EXISTS metrics CASCADE")
 time.sleep(30)
-con.sql("CREATE DATABASE metrics FROM 'metrics.ddb'")
+con.sql("CREATE DATABASE metrics FROM 'cache.ddb'")

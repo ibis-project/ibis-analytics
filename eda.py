@@ -14,7 +14,7 @@ from datetime import datetime, timedelta, date
 
 # options
 ## ibis config
-con = ibis.connect("duckdb://eda.ddb")
+con = ibis.connect("duckdb://cache.ddb")
 ibis.options.interactive = True
 
 ## matplotlib config
@@ -28,18 +28,12 @@ sns.set(rc={"figure.figsize": (12, 10)})
 pio.templates.default = "plotly_dark"
 
 ## variables
-compare = False
 POETRY_MERGED_DATE = date(2021, 10, 15)
 TEAMIZATION_DATE = date(2022, 11, 28)
 
 if len(sys.argv) == 1:
     docs = con.table("docs")
     downloads = con.table("downloads")
-    if compare:
-        downloads_modin = con.table("downloads_modin")
-        downloads_polars = con.table("downloads_polars")
-        downloads_siuba = con.table("downloads_siuba")
-        downloads_fugue = con.table("downloads_fugue")
     stars = con.table("stars")
     issues = con.table("issues")
     pulls = con.table("pulls")
@@ -99,33 +93,8 @@ else:
     downloads = downloads.drop("project").unpack("file").unpack("details")
     downloads = agg_downloads(downloads)
 
-    if compare:
-        downloads_modin = clean_data(con.read_parquet("data/pypi/modin/*.parquet"))
-        downloads_modin = (
-            downloads_modin.drop("project").unpack("file").unpack("details")
-        )
-        downloads_modin = agg_downloads(downloads_modin)
-
-        downloads_polars = clean_data(con.read_parquet("data/pypi/polars/*.parquet"))
-        downloads_polars = (
-            downloads_polars.drop("project").unpack("file").unpack("details")
-        )
-        downloads_polars = agg_downloads(downloads_polars)
-
-        downloads_siuba = clean_data(con.read_parquet("data/pypi/siuba/*.parquet"))
-        downloads_siuba = (
-            downloads_siuba.drop("project").unpack("file").unpack("details")
-        )
-        downloads_siuba = agg_downloads(downloads_siuba)
-
-        downloads_fugue = clean_data(con.read_parquet("data/pypi/fugue/*.parquet"))
-        downloads_fugue = (
-            downloads_fugue.drop("project").unpack("file").unpack("details")
-        )
-        downloads_fugue = agg_downloads(downloads_fugue)
-
     stars = clean_data(
-        con.read_json("data/github/ibis-project/ibis/2023-07-22/stargazers.*.json")
+        con.read_json("data/github/ibis-project/ibis/stargazers.*.json")
     )
     stars = clean_data(stars.unpack("node"))
     stars = stars.order_by(ibis._.starred_at.desc())
@@ -133,7 +102,7 @@ else:
     stars = stars.mutate(total_stars=ibis._.count().over(rows=(0, None)))
 
     issues = clean_data(
-        con.read_json("data/github/ibis-project/ibis/2023-07-22/issues.*.json")
+        con.read_json("data/github/ibis-project/ibis/issues.*.json")
     )
     issues = clean_data(issues.unpack("node").unpack("author"))
     issues = issues.order_by(ibis._.created_at.desc())
@@ -142,7 +111,7 @@ else:
     issue_state = ibis.case().when(issues.is_closed, "closed").else_("open").end()
 
     pulls = clean_data(
-        con.read_json("data/github/ibis-project/ibis/2023-07-22/pullRequests.*.json")
+        con.read_json("data/github/ibis-project/ibis/pullRequests.*.json")
     )
     pulls = clean_data(pulls.unpack("node").unpack("author"))
     pulls = pulls.order_by(ibis._.created_at.desc())
@@ -160,14 +129,14 @@ else:
     pulls = pulls.mutate(pull_state.name("state"))
 
     forks = clean_data(
-        con.read_json("data/github/ibis-project/ibis/2023-07-22/forks.*.json")
-    )
+            con.read_json("data/github/ibis-project/ibis/forks.*.json")
+            )
     forks = clean_data(forks.unpack("node").unpack("owner"))
     forks = forks.order_by(ibis._.created_at.desc())
     forks = forks.mutate(total_forks=ibis._.count().over(rows=(0, None)))
 
     watchers = clean_data(
-        con.read_json("data/github/ibis-project/ibis/2023-07-22/watchers.*.json")
+            con.read_json("data/github/ibis-project/ibis/watchers.*.json")
     )
     watchers = clean_data(watchers.unpack("node"))
     watchers = watchers.order_by(ibis._.updated_at.desc())
@@ -175,7 +144,7 @@ else:
     watchers = watchers.order_by(ibis._.updated_at.desc())
 
     commits = clean_data(
-        con.read_json("data/github/ibis-project/ibis/2023-07-22/commits.*.json")
+        con.read_json("data/github/ibis-project/ibis/commits.*.json")
     )
     commits = clean_data(commits.unpack("node").unpack("author"))
     commits = commits.order_by(ibis._.committed_date.desc())
@@ -191,11 +160,6 @@ else:
     con.create_table("analysis", analysis.to_pyarrow(), overwrite=True)
     con.create_table("docs", docs, overwrite=True)
     con.create_table("downloads", downloads, overwrite=True)
-    if compare:
-        con.create_table("downloads_modin", downloads_modin, overwrite=True)
-        con.create_table("downloads_polars", downloads_polars, overwrite=True)
-        con.create_table("downloads_siuba", downloads_siuba, overwrite=True)
-        con.create_table("downloads_fugue", downloads_fugue, overwrite=True)
     con.create_table("stars", stars, overwrite=True)
     con.create_table("issues", issues, overwrite=True)
     con.create_table("pulls", pulls, overwrite=True)

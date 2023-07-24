@@ -1,12 +1,10 @@
 # ibis-analytics
 
-This repository is intended to be an analytics project for [Ibis](https://github.com/ibis-project/ibis) to understand key metrics including:
-
-- GitHub interactions (stars, forks, issues, PRs, etc.)
-- Downloads (PyPI, Conda, etc.)
-- Documentation interactions
+This repository is intended to be an analytics project for [Ibis](https://github.com/ibis-project/ibis) to understand key metrics.
 
 ## Setup
+
+**Work in progress -- some manual setup/data upload required.**
 
 To run this project, you need to install clone and install dependencies:
 
@@ -19,27 +17,34 @@ pip install -r requirements.txt
 First, you need to create a `.env` file with the required variables:
 
 ```txt
+BQ_PROJECT_ID="ibis-gbq"
 GITHUB_TOKEN="github_pat_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-BQ_PROJECT_ID="voltrondata-demo"
+MOTHERDUCK_TOKEN="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 ```
 
-Then, you need to ingest the data (currently only GitHub and PyPI):
+Then ingest the data (some access and manual data needed):
 
 ```bash
 python src/ingest_gh.py
 python src/ingest_pypi.py
+python src/ingest_ci.py
 ```
 
-Use the `config.toml` to control ingestion settings.
-
-The `eda.py` file should be run to generate a `metrics.ddb` DuckDB file.
+Then transform and cache the data in a DuckDB database:
 
 ```bash
-python src/eda.py
+python eda.py run
 ```
 
-You can then use an Ibis connection to the DuckDB database to query data, as shown in `app.py`. You can run the app with `streamlit run app.py`.
+Then export the cached DuckDB database to MotherDuck:
 
-## Notes
+```bash
+python src/export_md.py
+```
 
-This is a work-in-progress and very manual to setup. 
+Finally, run the Streamlit app that connects to MotherDuck:
+
+```bash
+streamlit run metrics.py
+```
+

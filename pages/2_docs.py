@@ -43,7 +43,7 @@ with st.form(key="docs"):
     grouper = st.selectbox(
         "grouper",
         ["location", "browser", "referrer", "bot", "user_agent", "event"],
-        index=0,
+        index=2,
     )
     update_button = st.form_submit_button(label="update")
 
