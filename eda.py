@@ -10,12 +10,8 @@ import plotly.express as px
 import ibis.selectors as s
 import matplotlib.pyplot as plt
 
+from dotenv import load_dotenv
 from datetime import datetime, timedelta, date
-
-# options
-## ibis config
-con = ibis.connect("duckdb://cache.ddb")
-ibis.options.interactive = True
 
 ## matplotlib config
 plt.style.use("dark_background")
@@ -32,6 +28,11 @@ POETRY_MERGED_DATE = date(2021, 10, 15)
 TEAMIZATION_DATE = date(2022, 11, 28)
 
 if len(sys.argv) == 1:
+    load_dotenv()
+    con = ibis.connect("duckdb://md:metrics")
+    ibis.options.interactive = True
+
+
     docs = con.table("docs")
     downloads = con.table("downloads")
     stars = con.table("stars")
@@ -44,6 +45,7 @@ if len(sys.argv) == 1:
     workflows = con.table("workflows")
     analysis = con.table("analysis")
 else:
+    con = ibis.connect("duckdb://cache.ddb")
     ibis.options.interactive = False
 
     ## scratch
@@ -140,14 +142,14 @@ else:
     commits = commits.order_by(ibis._.committed_date.desc())
     commits = commits.mutate(total_commits=ibis._.count().over(rows=(0, None)))
 
-    ci_con = ibis.connect("duckdb://data/ci/ibis/raw.ddb")
-    jobs = ci_con.table("jobs")
-    workflows = ci_con.table("workflows")
-    analysis = ci_con.table("analysis")
+    #ci_con = ibis.connect("duckdb://data/ci/ibis/raw.ddb")
+    #jobs = ci_con.table("jobs")
+    #workflows = ci_con.table("workflows")
+    #analysis = ci_con.table("analysis")
+    #con.create_table("jobs", jobs.to_pyarrow(), overwrite=True)
+    #con.create_table("workflows", workflows.to_pyarrow(), overwrite=True)
+    #con.create_table("analysis", analysis.to_pyarrow(), overwrite=True)
 
-    con.create_table("jobs", jobs.to_pyarrow(), overwrite=True)
-    con.create_table("workflows", workflows.to_pyarrow(), overwrite=True)
-    con.create_table("analysis", analysis.to_pyarrow(), overwrite=True)
     con.create_table("docs", docs, overwrite=True)
     con.create_table("downloads", downloads, overwrite=True)
     con.create_table("stars", stars, overwrite=True)
