@@ -45,8 +45,140 @@ with st.form(key="pypi"):
         ["D", "W", "M", "Q", "Y"],
         index=2,
     )
-    exclude_voda = st.checkbox("exclude VoDa", value=False)
+    exclude_voda = st.checkbox("exclude VoDa (TODO: implement)", value=False)
     update_button = st.form_submit_button(label="update")
+
+# compute metrics
+total_stars = (
+    stars.filter(ibis._.starred_at >= datetime.now() - timedelta(days=days))
+    .select("login")
+    .distinct()
+    .count()
+    .to_pandas()
+)
+total_stars_prev = (
+    stars.filter(ibis._.starred_at <= datetime.now() - timedelta(days=days))
+    .filter(ibis._.starred_at >= datetime.now() - timedelta(days=days * 2))
+    .select("login")
+    .distinct()
+    .count()
+    .to_pandas()
+)
+total_forks = (
+    forks.filter(ibis._.created_at >= datetime.now() - timedelta(days=days))
+    .select("login")
+    .distinct()
+    .count()
+    .to_pandas()
+)
+total_forks_prev = (
+    forks.filter(ibis._.created_at <= datetime.now() - timedelta(days=days))
+    .filter(ibis._.created_at >= datetime.now() - timedelta(days=days * 2))
+    .select("login")
+    .distinct()
+    .count()
+    .to_pandas()
+)
+total_issues = (
+    issues.filter(ibis._.created_at >= datetime.now() - timedelta(days=days))
+    .select("number")
+    .distinct()
+    .count()
+    .to_pandas()
+)
+total_issues_prev = (
+    issues.filter(ibis._.created_at <= datetime.now() - timedelta(days=days))
+    .filter(ibis._.created_at >= datetime.now() - timedelta(days=days * 2))
+    .select("number")
+    .distinct()
+    .count()
+    .to_pandas()
+)
+total_pulls = (
+    pulls.filter(ibis._.created_at >= datetime.now() - timedelta(days=days))
+    .select("number")
+    .distinct()
+    .count()
+    .to_pandas()
+)
+total_pulls_prev = (
+    pulls.filter(ibis._.created_at <= datetime.now() - timedelta(days=days))
+    .filter(ibis._.created_at >= datetime.now() - timedelta(days=days * 2))
+    .select("number")
+    .distinct()
+    .count()
+    .to_pandas()
+)
+total_contributors = (
+    pulls.filter(ibis._.merged_at != None)
+    .filter(ibis._.merged_at >= datetime.now() - timedelta(days=days))
+    .select("login")
+    .distinct()
+    .count()
+    .to_pandas()
+)
+total_contributors_prev = (
+    pulls.filter(ibis._.merged_at != None)
+    .filter(ibis._.merged_at <= datetime.now() - timedelta(days=days))
+    .filter(ibis._.merged_at >= datetime.now() - timedelta(days=days * 2))
+    .select("login")
+    .distinct()
+    .count()
+    .to_pandas()
+)
+total_watchers = (
+    watchers.filter(ibis._.updated_at >= datetime.now() - timedelta(days=days))
+    .select("login")
+    .distinct()
+    .count()
+    .to_pandas()
+)
+total_watchers_prev = (
+    watchers.filter(ibis._.updated_at <= datetime.now() - timedelta(days=days))
+    .filter(ibis._.updated_at >= datetime.now() - timedelta(days=days * 2))
+    .select("login")
+    .distinct()
+    .count()
+    .to_pandas()
+)
+
+f"""
+## totals (last {days} days)
+"""
+col1, col2, col3 = st.columns(3)
+with col1:
+    st.metric(
+        label="stars",
+        value=f"{total_stars:,}",
+        delta=f"{total_stars - total_stars_prev:,}",
+    )
+    st.metric(
+        label="forks",
+        value=f"{total_forks:,}",
+        delta=f"{total_forks - total_forks_prev:,}",
+    )
+with col2:
+    st.metric(
+        label="issues",
+        value=f"{total_issues:,}",
+        delta=f"{total_issues - total_issues_prev:,}",
+    )
+    st.metric(
+        label="pull requests",
+        value=f"{total_pulls:,}",
+        delta=f"{total_pulls - total_pulls_prev:,}",
+    )
+with col3:
+    st.metric(
+        label="contributors",
+        value=f"{total_contributors:,}",
+        delta=f"{total_contributors - total_contributors_prev:,}",
+    )
+    st.metric(
+        label="watchers",
+        value=f"{total_watchers:,}",
+        delta=f"{total_watchers - total_watchers_prev:,}",
+    )
 
 # viz
 c0 = px.line(
