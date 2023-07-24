@@ -6,7 +6,6 @@ version: '3'
 dotenv: ['.env']
 
 tasks:
-
   # ingest data
   ingest-gh:
     cmds:
@@ -22,16 +21,13 @@ tasks:
       - task: ingest-gh
       - task: ingest-ci
       - task: ingest-pypi
-
   # copy eda database to metrics database
   metrics:
     cmds:
-      - cp eda.ddb metrics.ddb
       - python src/export_md.py
   export:
     cmds:
       - task: metrics
-
   # cleanup
   clean-data:
     cmds:
@@ -39,19 +35,17 @@ tasks:
         ignore_error: true
       - cmd: rm -r data/github
         ignore_error: true
-
   clean-dbs:
     cmds:
       - cmd: rm *.ddb*
         ignore_error: true
-
   # streamlit stuff
   app:
     cmds:
       - streamlit run metrics.py
   st:
     cmds:
-      - cmd: app
+      - task: app
   streamlit:
     cmds:
-      - cmd: app
+      - task: app

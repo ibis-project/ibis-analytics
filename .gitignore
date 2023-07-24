@@ -3,5 +3,5 @@
 venv
 data
 target
-.streamlit
+.streamlit/secrets.toml
 *.ddb*

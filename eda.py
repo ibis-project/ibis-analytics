@@ -68,7 +68,6 @@ else:
             .agg(
                 # TODO: fix this
                 ibis._.count()
-                .cast("int32")
                 .name("downloads"),
             )
             .order_by(ibis._.timestamp.desc())
@@ -79,7 +78,6 @@ else:
                     group_by=["country_code", "version", "python", "system"],
                     order_by=ibis._.timestamp.desc(),
                 )
-                .cast("int64")
                 .name("total_downloads")
             )
             .order_by(ibis._.timestamp.desc())
@@ -93,17 +91,13 @@ else:
     downloads = downloads.drop("project").unpack("file").unpack("details")
     downloads = agg_downloads(downloads)
 
-    stars = clean_data(
-        con.read_json("data/github/ibis-project/ibis/stargazers.*.json")
-    )
+    stars = clean_data(con.read_json("data/github/ibis-project/ibis/stargazers.*.json"))
     stars = clean_data(stars.unpack("node"))
     stars = stars.order_by(ibis._.starred_at.desc())
     stars = stars.mutate(ibis._.company.fillna("Unknown").name("company"))
     stars = stars.mutate(total_stars=ibis._.count().over(rows=(0, None)))
 
-    issues = clean_data(
-        con.read_json("data/github/ibis-project/ibis/issues.*.json")
-    )
+    issues = clean_data(con.read_json("data/github/ibis-project/ibis/issues.*.json"))
     issues = clean_data(issues.unpack("node").unpack("author"))
     issues = issues.order_by(ibis._.created_at.desc())
     issues = issues.mutate((ibis._.closed_at != None).name("is_closed"))
@@ -128,24 +122,20 @@ else:
     )
     pulls = pulls.mutate(pull_state.name("state"))
 
-    forks = clean_data(
-            con.read_json("data/github/ibis-project/ibis/forks.*.json")
-            )
+    forks = clean_data(con.read_json("data/github/ibis-project/ibis/forks.*.json"))
     forks = clean_data(forks.unpack("node").unpack("owner"))
     forks = forks.order_by(ibis._.created_at.desc())
     forks = forks.mutate(total_forks=ibis._.count().over(rows=(0, None)))
 
     watchers = clean_data(
-            con.read_json("data/github/ibis-project/ibis/watchers.*.json")
+        con.read_json("data/github/ibis-project/ibis/watchers.*.json")
     )
     watchers = clean_data(watchers.unpack("node"))
     watchers = watchers.order_by(ibis._.updated_at.desc())
     watchers = watchers.mutate(total_watchers=ibis._.count().over(rows=(0, None)))
     watchers = watchers.order_by(ibis._.updated_at.desc())
 
-    commits = clean_data(
-        con.read_json("data/github/ibis-project/ibis/commits.*.json")
-    )
+    commits = clean_data(con.read_json("data/github/ibis-project/ibis/commits.*.json"))
     commits = clean_data(commits.unpack("node").unpack("author"))
     commits = commits.order_by(ibis._.committed_date.desc())
     commits = commits.mutate(total_commits=ibis._.count().over(rows=(0, None)))

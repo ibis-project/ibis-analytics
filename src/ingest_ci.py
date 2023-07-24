@@ -16,7 +16,6 @@ from datetime import datetime, timedelta, date
 # set DEFAULT_BACKFILL to the number of days
 # since July 19th, 2015 until today
 DEFAULT_BACKFILL = (datetime.now() - datetime(2015, 7, 19)).days
-BQ_URL = "bigquery://ibis-gbq/workflows"
 
 # configure logger
 log.basicConfig(level=log.INFO)
@@ -37,7 +36,7 @@ log.info(f"Backfill: {backfill}")
 def main():
     os.makedirs("data/ci/ibis", exist_ok=True)
     con = ibis.connect("duckdb://data/ci/ibis/raw.ddb")
-    bq_con = ibis.connect(BQ_URL)
+    bq_con = ibis.connect(f"bigquery://{project_id}/workflows")
 
     for table in bq_con.list_tables():
 

@@ -13,10 +13,7 @@ from datetime import datetime, timedelta
 st.set_page_config(layout="wide")
 
 ## ibis config
-con = ibis.connect("duckdb://md:metrics", read_only=str(True))
-
-## plotly config
-pio.templates.default = "plotly_dark"
+con = ibis.connect("duckdb://md:metrics", read_only=True)
 
 # use precomputed data
 issues = con.tables.issues
@@ -87,11 +84,7 @@ open_issues = (
     .to_pandas()
 )
 open_pulls = (
-    pulls.filter(ibis._.state == "open")
-    .select("number")
-    .distinct()
-    .count()
-    .to_pandas()
+    pulls.filter(ibis._.state == "open").select("number").distinct().count().to_pandas()
 )
 closed_issues = (
     issues.filter(ibis._.closed_at >= datetime.now() - timedelta(days=days))

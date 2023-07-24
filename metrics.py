@@ -13,10 +13,7 @@ from datetime import datetime, timedelta
 st.set_page_config(layout="wide")
 
 ## ibis config
-con = ibis.connect("duckdb://md:metrics", read_only=str(True))
-
-## plotly config
-pio.templates.default = "plotly_dark"
+con = ibis.connect("duckdb://md:metrics", read_only=True)
 
 # use precomputed data
 docs = con.tables.docs
@@ -125,15 +122,13 @@ total_contributors_prev = (
 )
 total_downloads = (
     downloads.filter(ibis._.timestamp >= datetime.now() - timedelta(days=days))
-    .select("version")
-    .count()
+    .downloads.sum()
     .to_pandas()
 )
 total_downloads_prev = (
     downloads.filter(ibis._.timestamp <= datetime.now() - timedelta(days=days))
     .filter(ibis._.timestamp >= datetime.now() - timedelta(days=days * 2))
-    .select("version")
-    .count()
+    .downloads.sum()
     .to_pandas()
 )
 total_docs_visits = (

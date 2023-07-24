@@ -13,10 +13,7 @@ from datetime import datetime, timedelta
 st.set_page_config(layout="wide")
 
 ## ibis config
-con = ibis.connect("duckdb://md:metrics", read_only=str(True))
-
-## plotly config
-pio.templates.default = "plotly_dark"
+con = ibis.connect("duckdb://md:metrics", read_only=True)
 
 # use precomputed data
 downloads = con.tables.downloads
@@ -87,40 +84,3 @@ c1 = px.line(
     title=f"cumulative downloads by {grouper}",
 )
 st.plotly_chart(c1, use_container_width=True)
-
-
-# c4a = px.bar(
-#    compare_downloads(downloads_modin),
-#    x="timestamp",
-#    y="downloads",
-#    color="version",
-#    title="Modin downloads for Windows/MacOS users by version",
-# )
-# st.plotly_chart(c4a, use_container_width=True)
-#
-# c4b = px.bar(
-#    compare_downloads(downloads_polars),
-#    x="timestamp",
-#    y="downloads",
-#    color="version",
-#    title="Polars downloads for Windows/MacOS users by version",
-# )
-# st.plotly_chart(c4b, use_container_width=True)
-#
-# c4c = px.bar(
-#    compare_downloads(downloads_siuba),
-#    x="timestamp",
-#    y="downloads",
-#    color="version",
-#    title="Siuba downloads for Windows/MacOS users by version",
-# )
-# st.plotly_chart(c4c, use_container_width=True)
-#
-# c4d = px.bar(
-#    compare_downloads(downloads_fugue),
-#    x="timestamp",
-#    y="downloads",
-#    color="version",
-#    title="Fugue downloads for Windows/MacOS users by version",
-# )
-# st.plotly_chart(c4d, use_container_width=True)
