@@ -32,7 +32,6 @@ if len(sys.argv) == 1:
     con = ibis.connect("duckdb://md:metrics")
     ibis.options.interactive = True
 
-
     docs = con.table("docs")
     downloads = con.table("downloads")
     stars = con.table("stars")
@@ -41,9 +40,9 @@ if len(sys.argv) == 1:
     forks = con.table("forks")
     watchers = con.table("watchers")
     commits = con.table("commits")
-    jobs = con.table("jobs")
-    workflows = con.table("workflows")
-    analysis = con.table("analysis")
+    #jobs = con.table("jobs")
+    #workflows = con.table("workflows")
+    #analysis = con.table("analysis")
 else:
     con = ibis.connect("duckdb://cache.ddb")
     ibis.options.interactive = False
