@@ -30,6 +30,7 @@ headers = {
     "Authorization": f"Bearer {GH_TOKEN}",
 }
 
+# map queries
 queries = {
     "issues": issues_query,
     "pullRequests": pulls_query,

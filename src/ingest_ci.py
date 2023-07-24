@@ -32,7 +32,7 @@ config = toml.load("config.toml")["ci"]
 backfill = config["backfill"] if "backfill" in config else DEFAULT_BACKFILL
 log.info(f"Backfill: {backfill}")
 
-
+# define main function
 def main():
     os.makedirs("data/ci/ibis", exist_ok=True)
     con = ibis.connect("duckdb://data/ci/ibis/raw.ddb")
