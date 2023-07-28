@@ -1,5 +1,7 @@
 [eda]
-database="cache.ddb"
+#database="cache.ddb"
+database="md:metrics"
+ci_enabled=false
 [ci]
 #backfill=365
 [pypi]
@@ -22,3 +24,6 @@ endpoints = [
     "issues",
     "contributors",
 ]
+[motherduck]
+database="metrics"
+exclude_tables = ["penguins"]

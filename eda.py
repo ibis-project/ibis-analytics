@@ -50,9 +50,11 @@ if len(sys.argv) == 1:
     forks = con.table("forks")
     watchers = con.table("watchers")
     commits = con.table("commits")
-    # jobs = con.table("jobs")
-    # workflows = con.table("workflows")
-    # analysis = con.table("analysis")
+
+    if config["ci_enabled"]:
+        jobs = con.table("jobs")
+        workflows = con.table("workflows")
+        analysis = con.table("analysis")
 else:
     con = ibis.connect("duckdb://cache.ddb")
     ibis.options.interactive = False
@@ -157,13 +159,16 @@ else:
     commits = commits.order_by(ibis._.committed_date.desc())
     commits = commits.mutate(total_commits=ibis._.count().over(rows=(0, None)))
 
-    # ci_con = ibis.connect("duckdb://data/ci/ibis/raw.ddb")
-    # jobs = ci_con.table("jobs")
-    # workflows = ci_con.table("workflows")
-    # analysis = ci_con.table("analysis")
-    # con.create_table("jobs", jobs.to_pyarrow(), overwrite=True)
-    # con.create_table("workflows", workflows.to_pyarrow(), overwrite=True)
-    # con.create_table("analysis", analysis.to_pyarrow(), overwrite=True)
+    if config["ci_enabled"]:
+        ci_con = ibis.connect("duckdb://data/ci/ibis/raw.ddb")
+
+        jobs = ci_con.table("jobs")
+        workflows = ci_con.table("workflows")
+        analysis = ci_con.table("analysis")
+
+        con.create_table("jobs", jobs.to_pyarrow(), overwrite=True)
+        con.create_table("workflows", workflows.to_pyarrow(), overwrite=True)
+        con.create_table("analysis", analysis.to_pyarrow(), overwrite=True)
 
     con.create_table("docs", docs, overwrite=True)
     con.create_table("downloads", downloads, overwrite=True)
