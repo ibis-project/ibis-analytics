@@ -1,6 +1,9 @@
-[eda]
+[app]
 #database="cache.ddb"
 database="md:metrics"
+[eda]
+database="cache.ddb"
+#database="md:metrics"
 ci_enabled=false
 [ci]
 #backfill=365

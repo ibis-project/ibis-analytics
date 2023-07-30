@@ -1,4 +1,5 @@
 # imports
+import toml
 import ibis
 
 import streamlit as st
@@ -9,11 +10,14 @@ import ibis.selectors as s
 from datetime import datetime, timedelta
 
 # options
+## config.toml
+config = toml.load("config.toml")["app"]
+
 ## streamlit config
 st.set_page_config(layout="wide")
 
 ## ibis config
-con = ibis.connect("duckdb://md:metrics", read_only=True)
+con = ibis.connect(f"duckdb://{config['database']}", read_only=True)
 
 # use precomputed data
 docs = con.tables.docs

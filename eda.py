@@ -34,7 +34,7 @@ pio.templates.default = "plotly_dark"
 POETRY_MERGED_DATE = date(2021, 10, 15)
 TEAMIZATION_DATE = date(2022, 11, 28)
 
-# load in
+# load in data
 if len(sys.argv) == 1:
     load_dotenv()
     database = config["database"]
@@ -55,6 +55,7 @@ if len(sys.argv) == 1:
         jobs = con.table("jobs")
         workflows = con.table("workflows")
         analysis = con.table("analysis")
+# produce data
 else:
     con = ibis.connect("duckdb://cache.ddb")
     ibis.options.interactive = False
@@ -115,6 +116,7 @@ else:
     issues = issues.mutate((ibis._.closed_at != None).name("is_closed"))
     issues = issues.mutate(ibis._.count().over(rows=(0, None)).name("total_issues"))
     issue_state = ibis.case().when(issues.is_closed, "closed").else_("open").end()
+    issues = issues.mutate(issue_state.name("state"))
 
     pulls = clean_data(
         con.read_json("data/github/ibis-project/ibis/pullRequests.*.json")

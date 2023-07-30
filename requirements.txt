@@ -1,4 +1,5 @@
 # python
+black
 python-dotenv
 
 # data
@@ -8,6 +9,6 @@ ibis-framework[duckdb,polars,deltalake,bigquery] @ git+https://github.com/ibis-p
 matplotlib
 seaborn
 plotly
-altair @ git+https://github.com/altair-viz/altair.git@master
+altair @ git+https://github.com/altair-viz/altair.git@main
 streamlit
 

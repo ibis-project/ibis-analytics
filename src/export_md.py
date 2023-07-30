@@ -18,6 +18,9 @@ exclude_tables = config["exclude_tables"] or []
 load_dotenv()
 
 # connect to motherduck
+log.info(f"Export database: {config['database']}")
+log.info(f"EDA database: {eda_config['database']}")
+assert f"md:{config['database']}" != eda_config["database"]
 con = ibis.connect(f"duckdb://md:{config['database']}")
 eda_con = ibis.connect(f"duckdb://{eda_config['database']}")
 
@@ -26,11 +29,11 @@ if not eda_config["ci_enabled"]:
     exclude_tables.extend(["jobs", "workflows", "analysis"])
 
 # overwrite tables
-for t in con.list_tables():
+for t in eda_con.list_tables():
     if t not in exclude_tables:
         log.info(f"Copying {t}...")
         try:
-            con.create_table(t, eda_con.table(t), overwrite=True)
+            con.create_table(t, eda_con.table(t).to_pyarrow(), overwrite=True)
         except Exception as e:
             log.warning(f"Failed to copy {t}...")
             log.warning(e)
