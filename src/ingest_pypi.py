@@ -31,40 +31,30 @@ log.info(f"Packages: {config['packages']}")
 backfill = config["backfill"] if "backfill" in config else DEFAULT_BACKFILL
 log.info(f"Backfill: {backfill}")
 
+# for each package
+for package in config["packages"]:
+    log.info(f"Package: {package}")
+    # create output directory
+    output_dir = os.path.join("data", "pypi", package)
+    os.makedirs(output_dir, exist_ok=True)
 
-# define main function
-def main():
-    for package in config["packages"]:
-        log.info(f"Package: {package}")
-        # create output directory
-        output_dir = os.path.join("data", "pypi", package)
-        os.makedirs(output_dir, exist_ok=True)
+    # construct query
+    query = f"""
+    SELECT *
+    FROM `{BIGQUERY_DATASET}`
+    WHERE file.project = '{package}'
+    AND DATE(timestamp)
+    BETWEEN DATE_SUB(CURRENT_DATE(), INTERVAL {backfill} DAY)
+    AND CURRENT_DATE()
+    """.strip()
 
-        # construct query
-        query = f"""
-        SELECT *
-        FROM `{BIGQUERY_DATASET}`
-        WHERE file.project = '{package}'
-        AND DATE(timestamp)
-        BETWEEN DATE_SUB(CURRENT_DATE(), INTERVAL {backfill} DAY)
-        AND CURRENT_DATE()
-        """.strip()
+    # connect to bigquery and execute query
+    con = ibis.connect(f"bigquery://{project_id}")
+    log.info(f"Executing query: {query}")
+    t = con.sql(query)
 
-        # define main function
-        # extract config variables
-        con = ibis.connect(f"bigquery://{project_id}")
-
-        log.info(f"Executing query: {query}")
-        t = con.sql(query)
-
-        filename = f"file_downloads.parquet"
-        output_path = os.path.join(output_dir, filename)
-        log.info(f"Writing to: {output_path}")
-
-        t.to_parquet(output_path)
-
-
-# if __name__ == "__main__":
-if __name__ == "__main__":
-    # run the main function
-    main()
+    # write to parquet
+    filename = f"file_downloads.parquet"
+    output_path = os.path.join(output_dir, filename)
+    log.info(f"Writing to: {output_path}")
+    t.to_parquet(output_path)

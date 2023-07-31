@@ -24,6 +24,7 @@ GH_TOKEN = os.getenv("GITHUB_TOKEN")
 
 # load config
 config = toml.load("config.toml")["github"]
+log.info(f"Using repos: {config['repos']}")
 
 # construct header
 headers = {
@@ -39,29 +40,6 @@ queries = {
     "stargazers": stargazers_query,
     "watchers": watchers_query,
 }
-
-
-# define main function
-def main():
-    # extract config variables
-    repos = config["repos"]
-    log.info(f"Using repos: {repos}")
-
-    # create a requests session
-    with requests.Session() as client:
-        for repo in repos:
-            log.info(f"Fetching data for {repo}...")
-            for query in queries:
-                owner, repo_name = repo.split("/")
-                output_dir = os.path.join(
-                    "data",
-                    "github",
-                    owner,
-                    repo_name,
-                )
-                os.makedirs(output_dir, exist_ok=True)
-                log.info(f"\tFetching data for {owner}/{repo_name} {query}...")
-                fetch_data(client, owner, repo_name, query, queries[query], output_dir)
 
 
 # define helper functions
@@ -166,7 +144,18 @@ def get_next_link(link_header):
     return None
 
 
-# if __name__ == "__main__":
-if __name__ == "__main__":
-    # run the main function
-    main()
+# create a requests session
+with requests.Session() as client:
+    for repo in config["repos"]:
+        log.info(f"Fetching data for {repo}...")
+        for query in queries:
+            owner, repo_name = repo.split("/")
+            output_dir = os.path.join(
+                "data",
+                "github",
+                owner,
+                repo_name,
+            )
+            os.makedirs(output_dir, exist_ok=True)
+            log.info(f"\tFetching data for {owner}/{repo_name} {query}...")
+            fetch_data(client, owner, repo_name, query, queries[query], output_dir)

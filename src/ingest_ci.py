@@ -33,18 +33,14 @@ backfill = config["backfill"] if "backfill" in config else DEFAULT_BACKFILL
 log.info(f"Backfill: {backfill}")
 
 
-# define main function
-def main():
-    os.makedirs("data/ci/ibis", exist_ok=True)
-    con = ibis.connect("duckdb://data/ci/ibis/raw.ddb")
-    bq_con = ibis.connect(f"bigquery://{project_id}/workflows")
+# make sure the data directory exists
+os.makedirs("data/ci/ibis", exist_ok=True)
 
-    for table in bq_con.list_tables():
-        log.info(f"Writing table: {table}")
-        con.create_table(table, bq_con.table(table).to_pyarrow(), overwrite=True)
+# connect to databases
+con = ibis.connect("duckdb://data/ci/ibis/raw.ddb")
+bq_con = ibis.connect(f"bigquery://{project_id}/workflows")
 
-
-# if __name__ == "__main__":
-if __name__ == "__main__":
-    # run the main function
-    main()
+# copy over tables
+for table in bq_con.list_tables():
+    log.info(f"Writing table: {table}")
+    con.create_table(table, bq_con.table(table).to_pyarrow(), overwrite=True)
