@@ -129,7 +129,6 @@ def fetch_data(client, owner, repo, query_name, query, output_dir, num_items=100
             breakpoint()
 
         # save json to a file
-        breakpoint()
         filename = get_filename(query_name, page)
         output_path = os.path.join(output_dir, filename)
         log.info(f"\t\tWriting data to {output_path}")
