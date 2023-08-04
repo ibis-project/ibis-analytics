@@ -9,6 +9,10 @@ set dotenv-load
 default:
     just --list
 
+# setup
+setup:
+    @pip install -r requirements.txt
+
 # run
 run:
     @time python eda.py run
