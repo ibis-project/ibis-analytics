@@ -4,13 +4,14 @@
 set dotenv-load
 
 # aliases
-alias st := app
-alias streamlit := app
-alias export := metrics
 
 # list justfile recipes
 default:
     just --list
+
+# setup
+setup:
+    @pip install -r requirements.txt
 
 # run
 run:
@@ -20,6 +21,10 @@ run:
 ingest-gh:
     @python src/ingest_gh.py
 
+# ingest PyPI data
+ingest-pypi:
+    @python src/ingest_pypi.py
+
 # ingest CI data
 ingest-ci:
     @python src/ingest_ci.py
@@ -28,15 +33,11 @@ ingest-ci:
 ingest-docs:
     @python src/ingest_docs.py
 
-# ingest PyPI data
-ingest-pypi:
-    @python src/ingest_pypi.py
-
-# ingest all data
+# ingest all data # TODO: add docs
 ingest: ingest-gh ingest-pypi ingest-ci
 
 # copy local database to MotherDuck
-metrics:
+export:
     @python src/export_md.py
 
 # cleanup daata

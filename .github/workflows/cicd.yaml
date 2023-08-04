@@ -1,0 +1,39 @@
+name: cicd
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0/3 * * *"
+  push:
+    branches:
+      - main
+  pull_request:
+    paths:
+      - '.github/workflows/cicd.yaml'
+      - '**.py'
+      - 'justfile'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: extractions/setup-just@v1
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+      - name: install requirements
+        run: just setup
+      - name: ingest data
+        run: just ingest-gh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: run analytics
+        run: just run
+      - name: export to MotherDuck
+        run: just export
+        env:
+          MOTHERDUCK_TOKEN: ${{ secrets.MOTHERDUCK_TOKEN }}

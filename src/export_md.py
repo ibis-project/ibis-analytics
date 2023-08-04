@@ -1,4 +1,5 @@
 # imports
+import os
 import toml
 import ibis
 
@@ -24,12 +25,20 @@ assert f"md:{config['database']}" != eda_config["database"]
 con = ibis.connect(f"duckdb://md:{config['database']}")
 eda_con = ibis.connect(f"duckdb://{eda_config['database']}")
 
+# supported tables in ci
+ci_tables = config["ci_tables"]
+
+# source tables
+source_tables = eda_con.list_tables()
+
 # exclude tables
+if not os.getenv("CI"):
+    exclude_tables.extend([t for t in source_tables if t not in ci_tables])
 if not eda_config["ci_enabled"]:
     exclude_tables.extend(["jobs", "workflows", "analysis"])
 
 # overwrite tables
-for t in eda_con.list_tables():
+for t in source_tables:
     if t not in exclude_tables:
         log.info(f"Copying {t}...")
         try:
