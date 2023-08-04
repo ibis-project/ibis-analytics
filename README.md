@@ -1,6 +1,19 @@
 # ibis-analytics
 
+[![cicd](https://github.com/lostmygithubaccount/ibis-analytics/workflows/cicd/badge.svg)](https://github.com/lostmygithubaccount/ibis-analytics/actions/workflows/cicd.yaml)
+
 This repository is intended to be an analytics project for [Ibis](https://github.com/ibis-project/ibis) to understand key metrics.
+
+## Application
+
+Hosted on Streamlit:
+
+
+- [Home page](https://ibis-analytics.streamlit.app/)
+- [GitHub metrics](https://ibis-analytics.streamlit.app/github) (updated every 3 hours)
+- [PyPI download metrics](https://ibis-analytics.streamlit.app/pypi) (updated manually)
+- [Docs metrics](https://ibis-analytics.streamlit.app/docs) (updated manually)
+- [About](https://ibis-analytics.streamlit.app/about)
 
 ## Setup
 
