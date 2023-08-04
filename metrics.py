@@ -40,21 +40,32 @@ with st.form(key="app"):
         "X days",
         min_value=1,
         max_value=365,
-        value=28,
-        step=28,
+        value=7,
+        step=7,
         format="%d",
     )
     update_button = st.form_submit_button(label="update")
 
+# metric
+def metricfy(val):
+    """
+    The trillion dollar mistake.
+    """
+    if val == None:
+        return 0
+    else:
+        return val
+
+
 # compute metrics
-total_stars = (
+total_stars = metricfy(
     stars.filter(ibis._.starred_at >= datetime.now() - timedelta(days=days))
     .select("login")
     .distinct()
     .count()
     .to_pandas()
 )
-total_stars_prev = (
+total_stars_prev = metricfy(
     stars.filter(ibis._.starred_at <= datetime.now() - timedelta(days=days))
     .filter(ibis._.starred_at >= datetime.now() - timedelta(days=days * 2))
     .select("login")
@@ -62,14 +73,14 @@ total_stars_prev = (
     .count()
     .to_pandas()
 )
-total_forks = (
+total_forks = metricfy(
     forks.filter(ibis._.created_at >= datetime.now() - timedelta(days=days))
     .select("login")
     .distinct()
     .count()
     .to_pandas()
 )
-total_forks_prev = (
+total_forks_prev = metricfy(
     forks.filter(ibis._.created_at <= datetime.now() - timedelta(days=days))
     .filter(ibis._.created_at >= datetime.now() - timedelta(days=days * 2))
     .select("login")
@@ -77,14 +88,14 @@ total_forks_prev = (
     .count()
     .to_pandas()
 )
-total_issues = (
+total_issues = metricfy(
     issues.filter(ibis._.created_at >= datetime.now() - timedelta(days=days))
     .select("number")
     .distinct()
     .count()
     .to_pandas()
 )
-total_issues_prev = (
+total_issues_prev = metricfy(
     issues.filter(ibis._.created_at <= datetime.now() - timedelta(days=days))
     .filter(ibis._.created_at >= datetime.now() - timedelta(days=days * 2))
     .select("number")
@@ -92,14 +103,14 @@ total_issues_prev = (
     .count()
     .to_pandas()
 )
-total_pulls = (
+total_pulls = metricfy(
     pulls.filter(ibis._.created_at >= datetime.now() - timedelta(days=days))
     .select("number")
     .distinct()
     .count()
     .to_pandas()
 )
-total_pulls_prev = (
+total_pulls_prev = metricfy(
     pulls.filter(ibis._.created_at <= datetime.now() - timedelta(days=days))
     .filter(ibis._.created_at >= datetime.now() - timedelta(days=days * 2))
     .select("number")
@@ -107,7 +118,7 @@ total_pulls_prev = (
     .count()
     .to_pandas()
 )
-total_contributors = (
+total_contributors = metricfy(
     pulls.filter(ibis._.merged_at != None)
     .filter(ibis._.merged_at >= datetime.now() - timedelta(days=days))
     .select("login")
@@ -115,7 +126,7 @@ total_contributors = (
     .count()
     .to_pandas()
 )
-total_contributors_prev = (
+total_contributors_prev = metricfy(
     pulls.filter(ibis._.merged_at != None)
     .filter(ibis._.merged_at <= datetime.now() - timedelta(days=days))
     .filter(ibis._.merged_at >= datetime.now() - timedelta(days=days * 2))
@@ -124,42 +135,46 @@ total_contributors_prev = (
     .count()
     .to_pandas()
 )
-total_downloads = (
+total_downloads = metricfy(
     downloads.filter(ibis._.timestamp >= datetime.now() - timedelta(days=days))
     .downloads.sum()
     .to_pandas()
 )
-total_downloads_prev = (
+total_downloads_prev = metricfy(
     downloads.filter(ibis._.timestamp <= datetime.now() - timedelta(days=days))
     .filter(ibis._.timestamp >= datetime.now() - timedelta(days=days * 2))
     .downloads.sum()
     .to_pandas()
 )
-total_docs_visits = (
+total_docs_visits = metricfy(
     docs.filter(ibis._.timestamp >= datetime.now() - timedelta(days=days))
     .count()
     .to_pandas()
 )
-total_docs_visits_prev = (
+total_docs_visits_prev = metricfy(
     docs.filter(ibis._.timestamp <= datetime.now() - timedelta(days=days))
     .filter(ibis._.timestamp >= datetime.now() - timedelta(days=days * 2))
     .count()
     .to_pandas()
 )
-total_docs_return_visits = (
-    docs.filter(ibis._.timestamp >= datetime.now() - timedelta(days=days)).count()
-    - docs.filter(
-        ibis._.timestamp >= datetime.now() - timedelta(days=days)
-    ).first_visit.sum()
-).to_pandas()
-total_docs_return_visits_prev = (
-    docs.filter(ibis._.timestamp <= datetime.now() - timedelta(days=days))
-    .filter(ibis._.timestamp >= datetime.now() - timedelta(days=days * 2))
-    .count()
-    - docs.filter(ibis._.timestamp <= datetime.now() - timedelta(days=days))
-    .filter(ibis._.timestamp >= datetime.now() - timedelta(days=days * 2))
-    .first_visit.sum()
-).to_pandas()
+total_docs_return_visits = metricfy(
+    (
+        docs.filter(ibis._.timestamp >= datetime.now() - timedelta(days=days)).count()
+        - docs.filter(
+            ibis._.timestamp >= datetime.now() - timedelta(days=days)
+        ).first_visit.sum()
+    ).to_pandas()
+)
+total_docs_return_visits_prev = metricfy(
+    (
+        docs.filter(ibis._.timestamp <= datetime.now() - timedelta(days=days))
+        .filter(ibis._.timestamp >= datetime.now() - timedelta(days=days * 2))
+        .count()
+        - docs.filter(ibis._.timestamp <= datetime.now() - timedelta(days=days))
+        .filter(ibis._.timestamp >= datetime.now() - timedelta(days=days * 2))
+        .first_visit.sum()
+    ).to_pandas()
+)
 
 f"""
 ## totals (last {days} days)

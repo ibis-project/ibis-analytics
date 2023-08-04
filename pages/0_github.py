@@ -37,8 +37,8 @@ with st.form(key="pypi"):
         "X days",
         min_value=1,
         max_value=3650,
-        value=90,
-        step=7,
+        value=3650,
+        step=650,
         format="%d",
     )
     timescale = st.selectbox(

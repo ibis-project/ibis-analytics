@@ -5,10 +5,8 @@ import toml
 import ibis
 import ibis.selectors as s
 import logging as log
-import seaborn as sns
 import plotly.io as pio
 import plotly.express as px
-import matplotlib.pyplot as plt
 
 from dotenv import load_dotenv
 from datetime import datetime, timedelta, date
@@ -19,13 +17,6 @@ log.basicConfig(level=log.INFO)
 
 ## config.toml
 config = toml.load("config.toml")["eda"]
-
-## matplotlib config
-plt.style.use("dark_background")
-
-## seaborn config
-sns.set(style="darkgrid")
-sns.set(rc={"figure.figsize": (12, 10)})
 
 ## plotly config
 pio.templates.default = "plotly_dark"
@@ -97,13 +88,6 @@ else:
         )
         return downloads
 
-    docs = clean_data(con.read_csv("data/docs/*.csv*"))
-    docs = docs.relabel({"2_path": "path", "date": "timestamp"})
-
-    downloads = clean_data(con.read_parquet("data/pypi/ibis-framework/*.parquet"))
-    downloads = downloads.drop("project").unpack("file").unpack("details")
-    downloads = agg_downloads(downloads)
-
     stars = clean_data(con.read_json("data/github/ibis-project/ibis/stargazers.*.json"))
     stars = clean_data(stars.unpack("node"))
     stars = stars.order_by(ibis._.starred_at.desc())
@@ -161,9 +145,30 @@ else:
     commits = commits.order_by(ibis._.committed_date.desc())
     commits = commits.mutate(total_commits=ibis._.count().over(rows=(0, None)))
 
-    if config["ci_enabled"]:
+    if not os.getenv("CI"):
+        docs = clean_data(con.read_csv("data/docs/*.csv*"))
+        docs = docs.relabel({"2_path": "path", "date": "timestamp"})
+
+        downloads = clean_data(con.read_parquet("data/pypi/ibis-framework/*.parquet"))
+        downloads = downloads.drop("project").unpack("file").unpack("details")
+        downloads = agg_downloads(downloads)
+
+    # create tables
+    con.create_table("stars", stars, overwrite=True)
+    con.create_table("issues", issues, overwrite=True)
+    con.create_table("pulls", pulls, overwrite=True)
+    con.create_table("forks", forks, overwrite=True)
+    con.create_table("watchers", watchers, overwrite=True)
+    con.create_table("commits", commits, overwrite=True)
+
+    if not os.getenv("CI"):
+        con.create_table("docs", docs, overwrite=True)
+        con.create_table("downloads", downloads, overwrite=True)
+
+    if config["ci_enabled"] and not os.getenv("CI"):
         ci_con = ibis.connect("duckdb://data/ci/ibis/raw.ddb")
 
+        # TODO: processing
         jobs = ci_con.table("jobs")
         workflows = ci_con.table("workflows")
         analysis = ci_con.table("analysis")
@@ -171,12 +176,3 @@ else:
         con.create_table("jobs", jobs.to_pyarrow(), overwrite=True)
         con.create_table("workflows", workflows.to_pyarrow(), overwrite=True)
         con.create_table("analysis", analysis.to_pyarrow(), overwrite=True)
-
-    con.create_table("docs", docs, overwrite=True)
-    con.create_table("downloads", downloads, overwrite=True)
-    con.create_table("stars", stars, overwrite=True)
-    con.create_table("issues", issues, overwrite=True)
-    con.create_table("pulls", pulls, overwrite=True)
-    con.create_table("forks", forks, overwrite=True)
-    con.create_table("watchers", watchers, overwrite=True)
-    con.create_table("commits", commits, overwrite=True)
