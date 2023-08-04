@@ -4,9 +4,6 @@ on:
   workflow_dispatch:
   schedule:
     - cron: "0 0/3 * * *"
-  push:
-    branches:
-      - main
   pull_request:
     paths:
       - '.github/workflows/cicd.yaml'
