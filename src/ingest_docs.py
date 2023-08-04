@@ -11,9 +11,6 @@ import gzip
 from pathlib import Path
 from dotenv import load_dotenv
 
-# load .env file
-load_dotenv()
-
 # configure logger
 log.basicConfig(level=log.INFO)
 
