@@ -94,20 +94,23 @@ def fetch_data(client, owner, repo, query_name, query, output_dir, num_items=100
                 has_next_page = json_data["data"]["repository"][query_name]["pageInfo"][
                     "hasNextPage"
                 ]
+            # save json to a file
+            filename = get_filename(query_name, page)
+            output_path = os.path.join(output_dir, filename)
+            log.info(f"\t\tWriting data to {output_path}")
+            write_json(data, output_path)
+
+            variables["cursor"] = f"{cursor}"
+            print(f"has_next_page={has_next_page}")
+            print(f"cursor={cursor}")
+            if not has_next_page:
+                break
+
         except:
-            breakpoint()
-
-        # save json to a file
-        filename = get_filename(query_name, page)
-        output_path = os.path.join(output_dir, filename)
-        log.info(f"\t\tWriting data to {output_path}")
-        write_json(data, output_path)
-
-        variables["cursor"] = f"{cursor}"
-        print(f"has_next_page={has_next_page}")
-        print(f"cursor={cursor}")
-        if not has_next_page:
-            break
+            if not os.getenv("CI"):
+                breakpoint()
+            else:
+                pass
 
         # increment page number
         page += 1
