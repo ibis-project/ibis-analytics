@@ -104,29 +104,26 @@ def fetch_data(client, owner, repo, query_name, query, output_dir, num_items=100
             return
 
         # extract data
-        try:
-            if query_name == "commits":
-                data = json_data["data"]["repository"]["defaultBranchRef"]["target"][
-                    "history"
-                ]["edges"]
-                # get the next link
-                cursor = json_data["data"]["repository"]["defaultBranchRef"]["target"][
-                    "history"
-                ]["pageInfo"]["endCursor"]
-                has_next_page = json_data["data"]["repository"]["defaultBranchRef"][
-                    "target"
-                ]["history"]["pageInfo"]["hasNextPage"]
+        if query_name == "commits":
+            data = json_data["data"]["repository"]["defaultBranchRef"]["target"][
+                "history"
+            ]["edges"]
+            # get the next link
+            cursor = json_data["data"]["repository"]["defaultBranchRef"]["target"][
+                "history"
+            ]["pageInfo"]["endCursor"]
+            has_next_page = json_data["data"]["repository"]["defaultBranchRef"][
+                "target"
+            ]["history"]["pageInfo"]["hasNextPage"]
 
-            else:
-                data = json_data["data"]["repository"][query_name]["edges"]
-                cursor = json_data["data"]["repository"][query_name]["pageInfo"][
-                    "endCursor"
-                ]
-                has_next_page = json_data["data"]["repository"][query_name]["pageInfo"][
-                    "hasNextPage"
-                ]
-        except:
-            breakpoint()
+        else:
+            data = json_data["data"]["repository"][query_name]["edges"]
+            cursor = json_data["data"]["repository"][query_name]["pageInfo"][
+                "endCursor"
+            ]
+            has_next_page = json_data["data"]["repository"][query_name]["pageInfo"][
+                "hasNextPage"
+            ]
 
         # save json to a file
         filename = get_filename(query_name, page)
