@@ -2,12 +2,11 @@
 
 [![cicd](https://github.com/lostmygithubaccount/ibis-analytics/workflows/cicd/badge.svg)](https://github.com/lostmygithubaccount/ibis-analytics/actions/workflows/cicd.yaml)
 
-This repository is intended to be an analytics project for [Ibis](https://github.com/ibis-project/ibis) to understand key metrics.
+This repository is intended to be an analytics project for [Ibis](https://github.com/ibis-project/ibis).
 
 ## Application
 
 Hosted on Streamlit:
-
 
 - [Home page](https://ibis-analytics.streamlit.app/)
 - [GitHub metrics](https://ibis-analytics.streamlit.app/github) (updated every 3 hours)
