@@ -2,18 +2,26 @@ import os
 import time
 import json
 import requests
-from dotenv import load_dotenv
-import pandas as pd
-import gzip
-from pathlib import Path
 
+import pandas as pd
+import logging as log
+import gzip
+
+from pathlib import Path
+from dotenv import load_dotenv
+
+# configure logger
+log.basicConfig(level=log.INFO)
+
+# load .env file
 load_dotenv()
 
+# setup for goatcounter
 api_token = os.getenv("GOAT_TOKEN")
 api_url = "https://ibis.goatcounter.com/api/v0"
-
 headers = {
     "Authorization": f"Bearer {api_token}",
+    "Content-Type": "application/json",
 }
 
 
@@ -25,16 +33,19 @@ def get_last_cursor():
     last_file = max(files, key=lambda p: p.stat().st_mtime)
     # extract the cursor from the filename
     return str(last_file.stem.split("-")[-2])
-    breakpoint()
 
 
 def start_export(cursor=None):
     data = {}
     if cursor is not None:
         data = {"start_from_hit_id": cursor}
-    r = requests.post(f"{api_url}/export", headers=headers, data=json.dumps(data))
+    r = requests.post(f"{api_url}/export", headers=headers, data=data)
     breakpoint()
-    return r.json()
+    if r.status_code >= 200 and r.status_code < 300:
+        return r.json()["id"]
+    else:
+        log.error(f"Error starting export: {r.status_code} {r.text}")
+        return None
 
 
 def check_export(id):
