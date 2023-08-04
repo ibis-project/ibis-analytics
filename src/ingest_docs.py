@@ -1,3 +1,4 @@
+# imports
 import os
 import time
 import json
@@ -7,11 +8,12 @@ import pandas as pd
 import gzip
 from pathlib import Path
 
+# load .env file
 load_dotenv()
 
+# set up variables
 api_token = os.getenv("GOAT_TOKEN")
 api_url = "https://ibis.goatcounter.com/api/v0"
-
 headers = {
     "Authorization": f"Bearer {api_token}",
 }
@@ -25,7 +27,6 @@ def get_last_cursor():
     last_file = max(files, key=lambda p: p.stat().st_mtime)
     # extract the cursor from the filename
     return str(last_file.stem.split("-")[-2])
-    breakpoint()
 
 
 def start_export(cursor=None):

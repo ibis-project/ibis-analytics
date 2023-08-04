@@ -1,4 +1,4 @@
-# imoprts
+# imports
 import os
 import ibis
 import toml
