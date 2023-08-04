@@ -43,6 +43,37 @@ queries = {
 
 
 # define helper functions
+def get_filename(query_name, page):
+    # return the filename
+    return f"{query_name}.{page:06}.json"
+
+
+def write_json(data, filename):
+    # write the data to a file
+    with open(filename, "w") as f:
+        json.dump(data, f, indent=4)
+
+
+def get_next_link(link_header):
+    # if there is no link header, return None
+    if link_header is None:
+        return None
+
+    # split the link header into links
+    links = link_header.split(", ")
+    for link in links:
+        # split the link into segments
+        segments = link.split("; ")
+
+        # if there are two segments and the second segment is rel="next"
+        if len(segments) == 2 and segments[1] == 'rel="next"':
+            # remove the < and > around the link
+            return segments[0].strip("<>")
+
+    # if there is no next link, return None
+    return None
+
+
 def fetch_data(client, owner, repo, query_name, query, output_dir, num_items=100):
     # initialize variables
     variables = {
@@ -98,6 +129,7 @@ def fetch_data(client, owner, repo, query_name, query, output_dir, num_items=100
             breakpoint()
 
         # save json to a file
+        breakpoint()
         filename = get_filename(query_name, page)
         output_path = os.path.join(output_dir, filename)
         log.info(f"\t\tWriting data to {output_path}")
@@ -111,37 +143,6 @@ def fetch_data(client, owner, repo, query_name, query, output_dir, num_items=100
 
         # increment page number
         page += 1
-
-
-def get_filename(query_name, page):
-    # return the filename
-    return f"{query_name}.{page:06}.json"
-
-
-def write_json(data, filename):
-    # write the data to a file
-    with open(filename, "w") as f:
-        json.dump(data, f, indent=4)
-
-
-def get_next_link(link_header):
-    # if there is no link header, return None
-    if link_header is None:
-        return None
-
-    # split the link header into links
-    links = link_header.split(", ")
-    for link in links:
-        # split the link into segments
-        segments = link.split("; ")
-
-        # if there are two segments and the second segment is rel="next"
-        if len(segments) == 2 and segments[1] == 'rel="next"':
-            # remove the < and > around the link
-            return segments[0].strip("<>")
-
-    # if there is no next link, return None
-    return None
 
 
 # create a requests session
