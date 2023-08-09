@@ -136,10 +136,10 @@ con.create_table("pulls", pulls, overwrite=True)
 con.create_table("forks", forks, overwrite=True)
 con.create_table("watchers", watchers, overwrite=True)
 con.create_table("commits", commits, overwrite=True)
+con.create_table("downloads", downloads, overwrite=True)
 
 if not os.getenv("CI"):
     con.create_table("docs", docs, overwrite=True)
-    con.create_table("downloads", downloads, overwrite=True)
 
 if config["ci_enabled"] and not os.getenv("CI"):
     ci_con = ibis.connect("duckdb://data/ci/ibis/raw.ddb")
