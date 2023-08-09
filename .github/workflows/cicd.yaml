@@ -28,7 +28,7 @@ jobs:
       - name: install requirements
         run: just setup
       - name: ingest data
-        run: 
+        run: |
           just ingest-gh
           just ingest-pypi
         env:
