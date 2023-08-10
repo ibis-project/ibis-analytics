@@ -39,4 +39,3 @@ pulls = con.table("pulls")
 forks = con.table("forks")
 watchers = con.table("watchers")
 commits = con.table("commits")
-

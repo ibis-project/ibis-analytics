@@ -31,22 +31,86 @@ watchers = con.tables.watchers
 """
 # GitHub  metrics
 """
+
+total_stars_all_time = stars.select("login").distinct().count().to_pandas()
+total_forks_all_time = forks.select("login").distinct().count().to_pandas()
+total_closed_issues_all_time = (
+    issues.filter(ibis._.state == "closed")
+    .select("number")
+    .distinct()
+    .count()
+    .to_pandas()
+)
+total_merged_pulls_all_time = (
+    pulls.filter(ibis._.state == "merged")
+    .select("number")
+    .distinct()
+    .count()
+    .to_pandas()
+)
+total_contributors_all_time = (
+    pulls.filter(ibis._.merged_at != None)
+    .select("login")
+    .distinct()
+    .count()
+    .to_pandas()
+)
+total_watchers_all_time = watchers.select("login").distinct().count().to_pandas()
+open_issues = (
+    issues.filter(ibis._.is_closed != True)
+    .select("number")
+    .distinct()
+    .count()
+    .to_pandas()
+)
+open_pulls = (
+    pulls.filter(ibis._.state == "open").select("number").distinct().count().to_pandas()
+)
+
+f"""
+## open items
+"""
+st.metric(
+    label="open issues",
+    value=f"{open_issues:,}",
+)
+st.metric(
+    label="open pull requests",
+    value=f"{open_pulls:,}",
+)
+
+f"""
+## totals (all time)
+"""
+col0, col1, col2 = st.columns(3)
+with col0:
+    st.metric(
+        label="stars",
+        value=f"{total_stars_all_time:,}",
+    )
+    st.metric("contributors", f"{total_contributors_all_time:,}")
+with col1:
+    st.metric("forks", f"{total_forks_all_time:,}")
+    st.metric("watchers", f"{total_watchers_all_time:,}")
+with col2:
+    st.metric("closed issues", f"{total_closed_issues_all_time:,}")
+    st.metric("merged pull requests", f"{total_merged_pulls_all_time:,}")
+
 # variables
 with st.form(key="pypi"):
     days = st.number_input(
         "X days",
         min_value=1,
         max_value=3650,
-        value=3650,
-        step=650,
+        value=90,
+        step=30,
         format="%d",
     )
     timescale = st.selectbox(
         "timescale (plots)",
         ["D", "W", "M", "Q", "Y"],
-        index=1,
+        index=0,
     )
-    exclude_voda = st.checkbox("exclude VoDa (TODO: implement)", value=False)
     update_button = st.form_submit_button(label="update")
 
 # compute metrics
@@ -80,16 +144,7 @@ total_forks_prev = (
     .count()
     .to_pandas()
 )
-open_issues = (
-    issues.filter(ibis._.is_closed != True)
-    .select("number")
-    .distinct()
-    .count()
-    .to_pandas()
-)
-open_pulls = (
-    pulls.filter(ibis._.state == "open").select("number").distinct().count().to_pandas()
-)
+
 closed_issues = (
     issues.filter(ibis._.closed_at >= datetime.now() - timedelta(days=days))
     .select("number")
@@ -176,20 +231,33 @@ total_watchers_prev = (
     .to_pandas()
 )
 
-st.metric(
-    label="open issues",
-    value=f"{open_issues:,}",
-)
-st.metric(
-    label="open pull requests",
-    value=f"{open_pulls:,}",
-)
-
 f"""
 ## totals (last {days} days)
 """
 col2, col3, col4 = st.columns(3)
 with col2:
+    st.metric(
+        label="stars",
+        value=f"{total_stars:,}",
+        delta=f"{total_stars - total_stars_prev:,}",
+    )
+    st.metric(
+        label="contributors",
+        value=f"{total_contributors:,}",
+        delta=f"{total_contributors - total_contributors_prev:,}",
+    )
+with col3:
+    st.metric(
+        label="forks",
+        value=f"{total_forks:,}",
+        delta=f"{total_forks - total_forks_prev:,}",
+    )
+    st.metric(
+        label="watchers",
+        value=f"{total_watchers:,}",
+        delta=f"{total_watchers - total_watchers_prev:,}",
+    )
+with col4:
     st.metric(
         label="closed issues",
         value=f"{closed_issues:,}",
@@ -199,28 +267,6 @@ with col2:
         label="merged pull requests",
         value=f"{merged_pulls:,}",
         delta=f"{merged_pulls - merged_pulls_prev:,}",
-    )
-with col3:
-    st.metric(
-        label="stars",
-        value=f"{total_stars:,}",
-        delta=f"{total_stars - total_stars_prev:,}",
-    )
-    st.metric(
-        label="forks",
-        value=f"{total_forks:,}",
-        delta=f"{total_forks - total_forks_prev:,}",
-    )
-with col4:
-    st.metric(
-        label="contributors",
-        value=f"{total_contributors:,}",
-        delta=f"{total_contributors - total_contributors_prev:,}",
-    )
-    st.metric(
-        label="watchers",
-        value=f"{total_watchers:,}",
-        delta=f"{total_watchers - total_watchers_prev:,}",
     )
 
 # viz

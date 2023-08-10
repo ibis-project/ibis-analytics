@@ -26,20 +26,30 @@ docs = con.tables.docs
 """
 # documentation metrics
 """
+
+f"""
+## totals (all time)
+"""
+total_visits_all_time = docs.count().to_pandas()
+total_first_visits_all_time = docs.first_visit.sum().to_pandas()
+
+st.metric("visits", f"{total_visits_all_time:,}")
+st.metric("first visits", f"{total_first_visits_all_time:,}")
+
 # variables
 with st.form(key="docs"):
     days = st.number_input(
         "X days",
         min_value=1,
         max_value=3650,
-        value=365,
+        value=90,
         step=30,
         format="%d",
     )
     timescale = st.selectbox(
         "timescale (plots)",
         ["D", "W", "M", "Q", "Y"],
-        index=1,
+        index=0,
     )
     grouper = st.selectbox(
         "grouper",
@@ -47,6 +57,23 @@ with st.form(key="docs"):
         index=2,
     )
     update_button = st.form_submit_button(label="update")
+
+f"""
+## last X days
+"""
+total_visits = (
+    docs.filter(ibis._.timestamp >= datetime.now() - timedelta(days=days))
+    .count()
+    .to_pandas()
+)
+total_first_visits = (
+    docs.filter(ibis._.timestamp >= datetime.now() - timedelta(days=days))
+    .first_visit.sum()
+    .to_pandas()
+)
+
+st.metric("visits", f"{total_visits:,}")
+st.metric("first visits", f"{total_first_visits:,}")
 
 # viz
 c0 = px.bar(
