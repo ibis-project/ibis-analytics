@@ -1,5 +1,6 @@
 # imports
 import os
+import re
 import sys
 import toml
 import ibis
@@ -31,6 +32,14 @@ TEAMIZATION_DATE = date(2022, 11, 28)
 con = ibis.connect("duckdb://cache.ddb")
 ibis.options.interactive = False
 
+# UDFs
+@ibis.udf.scalar.python
+def get_major_minor_version(version: str) -> str:
+    match = re.match(r'^(\d+\.\d+)', version)
+    if match:
+        return match.group(1)
+    else:
+        return version
 
 ## scratch
 def clean_data(t):
@@ -66,6 +75,8 @@ def agg_downloads(downloads):
         )
         .order_by(ibis._.timestamp.desc())
     )
+    downloads = downloads.mutate(ibis._["python"].fillna("").name("python_full"))
+    downloads = downloads.mutate(get_major_minor_version(downloads["python_full"]).name("python"))
     return downloads
 
 
