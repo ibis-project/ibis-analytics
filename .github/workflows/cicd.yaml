@@ -28,13 +28,14 @@ jobs:
           python-version: 3.11
       - name: install requirements
         run: just setup
-      - name: ingest data
-        run: |
-          just ingest-gh
-          just ingest-pypi
+      - name: ingest pypi data
+        run: just ingest-pypi
+        env:
+          BQ_PROJECT_ID: voltrondata-demo
+      - name: ingest gh data
+        run: just ingest-gh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BQ_PROJECT_ID: voltrondata-demo
       - name: run analytics
         run: just run
       - name: export to MotherDuck
