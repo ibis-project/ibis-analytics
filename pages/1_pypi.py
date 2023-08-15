@@ -132,6 +132,7 @@ c1 = px.line(
     .order_by([ibis._.timestamp.desc(), ibis._.downloads.desc()]),
     x="timestamp",
     y="total_downloads",
+    log_y=True,
     color=groupers[0],
     title=f"cumulative downloads by {groupers[0]}",
 )
