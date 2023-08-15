@@ -10,7 +10,7 @@ Hosted on Streamlit:
 
 - [Home page](https://ibis-analytics.streamlit.app/)
 - [GitHub metrics](https://ibis-analytics.streamlit.app/github) (updated every 3 hours)
-- [PyPI download metrics](https://ibis-analytics.streamlit.app/pypi) (updated manually)
+- [PyPI download metrics](https://ibis-analytics.streamlit.app/pypi) (updated every 3 hours)
 - [Docs metrics](https://ibis-analytics.streamlit.app/docs) (updated manually)
 - [About](https://ibis-analytics.streamlit.app/about)
 
