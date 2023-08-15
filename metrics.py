@@ -159,8 +159,7 @@ total_docs_visits_prev = metricfy(
 )
 total_docs_return_visits = metricfy(
     (
-        docs.filter(ibis._.timestamp >= datetime.now() - timedelta(days=days)).count()
-        - docs.filter(
+        docs.filter(
             ibis._.timestamp >= datetime.now() - timedelta(days=days)
         ).first_visit.sum()
     ).to_pandas()
@@ -168,9 +167,6 @@ total_docs_return_visits = metricfy(
 total_docs_return_visits_prev = metricfy(
     (
         docs.filter(ibis._.timestamp <= datetime.now() - timedelta(days=days))
-        .filter(ibis._.timestamp >= datetime.now() - timedelta(days=days * 2))
-        .count()
-        - docs.filter(ibis._.timestamp <= datetime.now() - timedelta(days=days))
         .filter(ibis._.timestamp >= datetime.now() - timedelta(days=days * 2))
         .first_visit.sum()
     ).to_pandas()
@@ -285,7 +281,6 @@ c2 = px.bar(
     title=f"PRs by login",
 )
 st.plotly_chart(c2, use_container_width=True)
-
 
 f"""
 ### docs visits by path and referrer

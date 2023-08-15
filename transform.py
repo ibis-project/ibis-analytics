@@ -130,16 +130,25 @@ if not os.getenv("CI"):
     downloads = agg_downloads(downloads)
 
 # create tables
+log.info("processing stars...")
 con.create_table("stars", stars, overwrite=True)
+log.info("processing issues...")
 con.create_table("issues", issues, overwrite=True)
+log.info("processing pulls...")
 con.create_table("pulls", pulls, overwrite=True)
+log.info("processing forks...")
 con.create_table("forks", forks, overwrite=True)
+log.info("processing watchers...")
 con.create_table("watchers", watchers, overwrite=True)
+log.info("processing commits...")
 con.create_table("commits", commits, overwrite=True)
 con.create_table("downloads", downloads, overwrite=True)
 
 if not os.getenv("CI"):
+    log.info("processing docs...")
     con.create_table("docs", docs, overwrite=True)
+    log.info("processing downloads...")
+    con.create_table("downloads", downloads, overwrite=True)
 
 if config["ci_enabled"] and not os.getenv("CI"):
     ci_con = ibis.connect("duckdb://data/ci/ibis/raw.ddb")
@@ -149,6 +158,9 @@ if config["ci_enabled"] and not os.getenv("CI"):
     workflows = ci_con.table("workflows")
     analysis = ci_con.table("analysis")
 
+    log.info("processing jobs...")
     con.create_table("jobs", jobs.to_pyarrow(), overwrite=True)
+    log.info("processing workflows...")
     con.create_table("workflows", workflows.to_pyarrow(), overwrite=True)
+    log.info("processing analysis...")
     con.create_table("analysis", analysis.to_pyarrow(), overwrite=True)

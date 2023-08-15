@@ -25,17 +25,8 @@ assert f"md:{config['database']}" != transform_config["database"]
 con = ibis.connect(f"duckdb://md:{config['database']}")
 transform_con = ibis.connect(f"duckdb://{transform_config['database']}")
 
-# supported tables in ci
-ci_tables = config["ci_tables"]
-
 # source tables
 source_tables = transform_con.list_tables()
-
-# exclude tables
-if not os.getenv("CI"):
-    exclude_tables.extend([t for t in source_tables if t not in ci_tables])
-if not transform_config["ci_enabled"]:
-    exclude_tables.extend(["jobs", "workflows", "analysis"])
 
 # overwrite tables
 for t in source_tables:

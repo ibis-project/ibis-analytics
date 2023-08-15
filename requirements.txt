@@ -2,7 +2,7 @@
 python-dotenv
 
 # data
-ibis-framework[duckdb,polars,deltalake,bigquery] @ git+https://github.com/ibis-project/ibis.git@master
+ibis-framework[duckdb,polars,deltalake,bigquery]
 
 # viz
 #matplotlib

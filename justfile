@@ -56,3 +56,12 @@ clean-dbs:
 # streamlit stuff
 app:
     @streamlit run metrics.py
+
+# temp
+goat:
+    #!/bin/bash +x
+    api="https://ibis.goatcounter.com/api/v0"
+    curl -v -X POST \
+        --header 'Content-Type: application/json' \
+        --header "Authorization: Bearer $GOAT_TOKEN" \
+        "$api/export"
