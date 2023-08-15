@@ -28,10 +28,6 @@ jobs:
           python-version: 3.11
       - name: install requirements
         run: just setup
-      - name: ingest ci data
-        run: just ingest-ci
-        env:
-          BQ_PROJECT_ID: ibis-gbq
       - name: ingest pypi data
         run: just ingest-pypi
         env:

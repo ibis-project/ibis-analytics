@@ -6,7 +6,7 @@ database="cache.ddb"
 #database="md:metrics"
 [transform]
 database="cache.ddb"
-ci_enabled=true
+ci_enabled=false
 [ci]
 #backfill=365
 [pypi]
