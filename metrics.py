@@ -46,6 +46,7 @@ with st.form(key="app"):
     )
     update_button = st.form_submit_button(label="update")
 
+
 # metric
 def metricfy(val):
     """
