@@ -33,7 +33,7 @@ jobs:
           just ingest-pypi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BQ_PROJECT_ID: ibis-gbq
+          BQ_PROJECT_ID: voltrondata-demo
       - name: run analytics
         run: just run
       - name: export to MotherDuck
