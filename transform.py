@@ -31,6 +31,7 @@ TEAMIZATION_DATE = date(2022, 11, 28)
 con = ibis.connect("duckdb://cache.ddb")
 ibis.options.interactive = False
 
+
 ## scratch
 def clean_data(t):
     t = t.relabel("snake_case")
@@ -121,13 +122,9 @@ commits = clean_data(commits.unpack("node").unpack("author"))
 commits = commits.order_by(ibis._.committed_date.desc())
 commits = commits.mutate(total_commits=ibis._.count().over(rows=(0, None)))
 
-if not os.getenv("CI"):
-    docs = clean_data(con.read_csv("data/docs/*.csv*"))
-    docs = docs.relabel({"2_path": "path", "date": "timestamp"})
-
-    downloads = clean_data(con.read_parquet("data/pypi/ibis-framework/*.parquet"))
-    downloads = downloads.drop("project").unpack("file").unpack("details")
-    downloads = agg_downloads(downloads)
+downloads = clean_data(con.read_parquet("data/pypi/ibis-framework/*.parquet"))
+downloads = downloads.drop("project").unpack("file").unpack("details")
+downloads = agg_downloads(downloads)
 
 # create tables
 log.info("processing stars...")
@@ -146,6 +143,9 @@ log.info("processing downloads...")
 con.create_table("downloads", downloads, overwrite=True)
 
 if not os.getenv("CI"):
+    docs = clean_data(con.read_csv("data/docs/*.csv*"))
+    docs = docs.relabel({"2_path": "path", "date": "timestamp"})
+
     log.info("processing docs...")
     con.create_table("docs", docs, overwrite=True)
 
