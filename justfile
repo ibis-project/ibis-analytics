@@ -34,8 +34,8 @@ ingest-ci:
     @python src/ingest_ci.py
 
 # ingest docs data
-ingest-docs:
-    @python src/ingest_docs.py
+#ingest-docs:
+#    @python src/ingest_docs.py
 
 # ingest all data # TODO: add docs
 ingest: ingest-gh ingest-pypi ingest-ci
@@ -65,3 +65,11 @@ goat:
         --header 'Content-Type: application/json' \
         --header "Authorization: Bearer $GOAT_TOKEN" \
         "$api/export"
+
+ingest-docs:
+    #!/bin/bash +x
+    api="https://ibis.goatcounter.com/api/v0/export/791705491/download"
+    curl -v -X POST \
+        --header 'Content-Type: application/json' \
+        --header "Authorization: Bearer $GOAT_TOKEN" \
+        "$api"

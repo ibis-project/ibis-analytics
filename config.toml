@@ -31,4 +31,5 @@ endpoints = [
 [motherduck]
 database="metrics"
 exclude_tables = ["penguins"]
+#exclude_tables = ["penguins", "stars", "issues", "pulls", "forks", "watchers", "commits", "downloads"]
 ci_tables = ["stars", "issues", "pulls", "forks", "watchers", "commits"]
