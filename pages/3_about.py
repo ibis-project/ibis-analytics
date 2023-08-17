@@ -27,9 +27,7 @@ It also serves as an end-to-end data project with Ibis, from ETL to BI to ML usi
 
 ## Why?
 
-We had a project tracking metrics but it was written in R, and I wanted to use a programming language instead of a fancy calculator. This will also a good excuse to try both Streamlit and MotherDuck for a real project.
-
-As a Technical Product Manager at Voltron Data, I want to ensure the health of Ibis as an open-source standard Python dataframe library. This entails tracking key metrics, which is fairly easy to do in Python.
+As a Technical Product Manager at Voltron Data, I want to ensure the health of Ibis as an open-source standard Python dataframe library. We had a project tracking metrics but it was written in R, and I wanted to use a programming language instead of a fancy calculator. This will also a good excuse to try both Streamlit and MotherDuck for a real project.
 
 ## How?
 
