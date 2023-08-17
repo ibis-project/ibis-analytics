@@ -89,60 +89,71 @@ def fetch_data(client, owner, repo, query_name, query, output_dir, num_items=100
     # while True
     while True:
         # request data
-        log.info(f"\t\tFetching page {page}...")
-        resp = requests.post(
-            GRAPH_URL,
-            headers=headers,
-            json={"query": query, "variables": variables},
-        )
-        json_data = resp.json()
-
-        log.info(f"\t\t\tStatus code: {resp.status_code}")
-        # log.info(f"\t\t\tResponse: {resp.text}")
-        # log.info(f"\t\t\tJSON: {json_data}")
-
-        if resp.status_code != 200:
-            log.error(
-                f"\t\tFailed to fetch data for {owner}/{repo}; url={GRAPH_URL}\n\n {resp.status_code}\n {resp.text}"
+        try:
+            log.info(f"\t\tFetching page {page}...")
+            resp = requests.post(
+                GRAPH_URL,
+                headers=headers,
+                json={"query": query, "variables": variables},
             )
-            return
+            json_data = resp.json()
 
-        # extract data
-        if query_name == "commits":
-            data = json_data["data"]["repository"]["defaultBranchRef"]["target"][
-                "history"
-            ]["edges"]
-            # get the next link
-            cursor = json_data["data"]["repository"]["defaultBranchRef"]["target"][
-                "history"
-            ]["pageInfo"]["endCursor"]
-            has_next_page = json_data["data"]["repository"]["defaultBranchRef"][
-                "target"
-            ]["history"]["pageInfo"]["hasNextPage"]
+            log.info(f"\t\t\tStatus code: {resp.status_code}")
+            # log.info(f"\t\t\tResponse: {resp.text}")
+            # log.info(f"\t\t\tJSON: {json_data}")
 
-        else:
-            data = json_data["data"]["repository"][query_name]["edges"]
-            cursor = json_data["data"]["repository"][query_name]["pageInfo"][
-                "endCursor"
-            ]
-            has_next_page = json_data["data"]["repository"][query_name]["pageInfo"][
-                "hasNextPage"
-            ]
+            if resp.status_code != 200:
+                log.error(
+                    f"\t\tFailed to fetch data for {owner}/{repo}; url={GRAPH_URL}\n\n {resp.status_code}\n {resp.text}"
+                )
+                return
 
-        # save json to a file
-        filename = get_filename(query_name, page)
-        output_path = os.path.join(output_dir, filename)
-        log.info(f"\t\tWriting data to {output_path}")
-        write_json(data, output_path)
+            # extract data
+            if query_name == "commits":
+                data = json_data["data"]["repository"]["defaultBranchRef"]["target"][
+                    "history"
+                ]["edges"]
+                # get the next link
+                cursor = json_data["data"]["repository"]["defaultBranchRef"]["target"][
+                    "history"
+                ]["pageInfo"]["endCursor"]
+                has_next_page = json_data["data"]["repository"]["defaultBranchRef"][
+                    "target"
+                ]["history"]["pageInfo"]["hasNextPage"]
 
-        variables["cursor"] = f"{cursor}"
-        print(f"has_next_page={has_next_page}")
-        print(f"cursor={cursor}")
-        if not has_next_page:
+            else:
+                data = json_data["data"]["repository"][query_name]["edges"]
+                cursor = json_data["data"]["repository"][query_name]["pageInfo"][
+                    "endCursor"
+                ]
+                has_next_page = json_data["data"]["repository"][query_name]["pageInfo"][
+                    "hasNextPage"
+                ]
+
+            # save json to a file
+            filename = get_filename(query_name, page)
+            output_path = os.path.join(output_dir, filename)
+            log.info(f"\t\tWriting data to {output_path}")
+            write_json(data, output_path)
+
+            variables["cursor"] = f"{cursor}"
+            print(f"has_next_page={has_next_page}")
+            print(f"cursor={cursor}")
+            if not has_next_page:
+                break
+
+            # increment page number
+            page += 1
+        except:
+            # print error if response
+            log.error(f"\t\tFailed to fetch data for {owner}/{repo}")
+
+            try:
+                log.error(f"\t\t\tResponse: {resp.text}")
+            except:
+                pass
+
             break
-
-        # increment page number
-        page += 1
 
 
 # create a requests session
