@@ -129,7 +129,7 @@ with st.expander("Show ingest_docs.py", expanded=False):
 
 ### Exploratory data analysis
 
-Having a quick iteration roop for exploring and analyzing the data, then transforming it into the proper shape for BI and ML, is critical. To achieve this, I setup an `eda.py` file that contains code I run every new Python session:
+Having a quick iteration loop for exploring and analyzing the data, then transforming it into the proper shape for BI and ML, is critical. To achieve this, I setup an `eda.py` file that contains code I run every new Python session:
 """
 
 with open("eda.py") as f:
@@ -172,9 +172,7 @@ Notice it was easy to iterate with EDA, transform and cache the data into a loca
 
 ### Deploying and automating
 
-Now, I need to automate the data pipeline and create a public dashboard. Time to move to a hybrid local + cloud approach.
-
-Fortunately, this is easy with GitHub, Ibis, DuckDB, MotherDuck, Streamlit, and Streamlit Community Cloud.
+Now I need to automate the data pipeline and create a public dashboard. Time to move to a hybrid local + cloud approach Fortunately, this is easy with GitHub, Ibis, DuckDB, MotherDuck, Streamlit, and Streamlit Community Cloud.
 
 We first copy over local DuckDB tables to MotherDuck:
 """
@@ -210,5 +208,5 @@ Our metrics and dashboard components are already defined in the `metrics.py` fil
 
 ## Next steps
 
-ML probably.
+ML (LLMs???) probably.
 """
