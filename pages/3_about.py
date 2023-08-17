@@ -43,7 +43,7 @@ The tools and services used include:
 - DuckDB (database and query engine)
 - MotherDuck (cloud service for DuckDB)
 - Streamlit (dashboard)
-- Streamlit cloud (cloud service for Streamlit)
+- Streamlit Community Cloud (cloud service for Streamlit)
 - GitHub (source control, CI/CD)
 - justfile (command runner)
 - TOML (configuration)
