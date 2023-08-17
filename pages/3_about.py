@@ -19,8 +19,6 @@ st.set_page_config()
 f"""
 # Hybrid analytics with Ibis, Streamlit, DuckDB, and MotherDuck
 
-**Work in progress**
-
 ## What?
 
 This project is a dashboard that shows the health of the OSS project [Ibis](https://github.com/ibis-project/ibis).
@@ -37,7 +35,7 @@ As a Technical Product Manager at Voltron Data, I want to ensure the health of I
 
 The source code can be found here: https://github.com/lostmygithubaccount/ibis-analytics.
 
-The tools and services used are:
+The tools and services used include:
 
 - Ibis (dataframe library)
 - BigQuery (source data)
