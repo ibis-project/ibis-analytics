@@ -23,8 +23,6 @@ f"""
 
 This project is a dashboard that shows the health of the OSS project [Ibis](https://github.com/ibis-project/ibis).
 
-It also serves as an end-to-end data project with Ibis, from ETL to BI to ML using as many industry buzz words as possible.
-
 ## Why?
 
 As a Technical Product Manager at Voltron Data, I want to ensure the health of Ibis as an open-source standard Python dataframe library. We had a project tracking metrics but it was written in R and and this seemed like a good excuse to do an end-to-end analytics project with Ibis and try both Streamlit and MotherDuck.
