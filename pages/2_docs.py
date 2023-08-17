@@ -24,7 +24,7 @@ docs = con.tables.docs
 
 # display metrics
 """
-# documentation metrics
+# Documentation metrics
 """
 
 f"""

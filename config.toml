@@ -1,5 +1,4 @@
 [app]
-#database="cache.ddb"
 database="md:metrics"
 [eda]
 database="cache.ddb"
