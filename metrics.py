@@ -35,7 +35,7 @@ watchers = con.tables.watchers
 
 See the [about page](about/) for implementation details.
 
-:red[**Warning**]: Data ingestion is not fully automated. GitHub and PyPI metrics are refreshed every 3 hours. Documentation metrics are to be automated. CI (GitHub Actions) and Conda metrics are to be implemented and automated.
+:red[**Warning**]: Data ingestion is not fully automated. GitHub and PyPI metrics are refreshed every 3 hours. Documentation metrics are to be automated. CI (GitHub Actions) and Conda metrics are to be implemented and automated. Documentation metrics are also difficult to analyze given numerous changes in structure (with another pending).
 """
 
 f"""
