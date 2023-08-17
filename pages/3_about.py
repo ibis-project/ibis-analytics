@@ -206,7 +206,7 @@ This checks out the repository, authenitcates with Google Cloud Platform, sets u
 
 It runs on PRs (that change relevant files), every 3 hours, and on a manual trigger.
 
-With that, data ingestion and transformation is automated. All that's left is to deploy with app to Stramlit Community Cloud, which is just a few clicks in their GUI!
+With that, data ingestion and transformation is automated. All that's left is to deploy with app to Streamlit Community Cloud, which is just a few clicks in their GUI!
 
 Our metrics and dashboard components are already defined in the `metrics.py` file. There are some more specific dashboard pages in the `pages/` directory.
 
