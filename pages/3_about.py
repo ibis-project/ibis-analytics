@@ -128,7 +128,6 @@ with st.expander("Show ingest_docs.py", expanded=False):
     st.code(ingest_docs_code, line_numbers=True, language="python")
 
 
-
 """
 :red[Note:] documentation data ingestion is not finished.
 
@@ -217,5 +216,3 @@ Our metrics and dashboard components are already defined in the `metrics.py` fil
 
 ML probably.
 """
-
-
