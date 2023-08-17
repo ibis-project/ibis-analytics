@@ -98,8 +98,8 @@ def fetch_data(client, owner, repo, query_name, query, output_dir, num_items=100
         json_data = resp.json()
 
         log.info(f"\t\t\tStatus code: {resp.status_code}")
-        log.info(f"\t\t\tResponse: {resp.text}")
-        log.info(f"\t\t\tJSON: {json_data}")
+        #log.info(f"\t\t\tResponse: {resp.text}")
+        #log.info(f"\t\t\tJSON: {json_data}")
 
         if resp.status_code != 200:
             log.error(
