@@ -31,8 +31,75 @@ watchers = con.tables.watchers
 
 # display metrics
 """
-# last X days metrics
+# Metrics
+
+See the [about page](about/) for implementation details.
+
+:red[**Warning**]: Data ingestion is not fully automated. GitHub and PyPI metrics are refreshed every 3 hours. Documentation metrics are to be automated. CI (GitHub Actions) and Conda metrics are to be implemented and automated.
 """
+
+f"""
+## totals (all time)
+"""
+
+total_stars_all_time = stars.select("login").distinct().count().to_pandas()
+total_forks_all_time = forks.select("login").distinct().count().to_pandas()
+total_closed_issues_all_time = (
+    issues.filter(ibis._.state == "closed")
+    .select("number")
+    .distinct()
+    .count()
+    .to_pandas()
+)
+total_merged_pulls_all_time = (
+    pulls.filter(ibis._.state == "merged")
+    .select("number")
+    .distinct()
+    .count()
+    .to_pandas()
+)
+total_contributors_all_time = (
+    pulls.filter(ibis._.merged_at != None)
+    .select("login")
+    .distinct()
+    .count()
+    .to_pandas()
+)
+total_watchers_all_time = watchers.select("login").distinct().count().to_pandas()
+open_issues = (
+    issues.filter(ibis._.is_closed != True)
+    .select("number")
+    .distinct()
+    .count()
+    .to_pandas()
+)
+open_pulls = (
+    pulls.filter(ibis._.state == "open").select("number").distinct().count().to_pandas()
+)
+
+downloads_all_time = downloads["downloads"].sum().to_pandas()
+
+
+total_visits_all_time = docs.count().to_pandas()
+total_first_visits_all_time = docs.first_visit.sum().to_pandas()
+
+col0, col1, col2 = st.columns(3)
+with col0:
+    st.metric(
+        label="GitHub stars",
+        value=f"{total_stars_all_time:,}",
+    )
+    st.metric("PyPI downloads", f"{downloads_all_time:,}")
+    st.metric("GitHub contributors", f"{total_contributors_all_time:,}")
+with col1:
+    st.metric("GitHub forks", f"{total_forks_all_time:,}")
+    st.metric("GitHub watchers", f"{total_watchers_all_time:,}")
+    st.metric("GitHub issues closed", f"{total_closed_issues_all_time:,}")
+with col2:
+    st.metric("GitHub PRs merged", f"{total_merged_pulls_all_time:,}")
+    st.metric("Documentation visits", f"{total_visits_all_time:,}")
+    st.metric("Documentation first visits", f"{total_first_visits_all_time:,}")
+
 
 # variables
 with st.form(key="app"):
@@ -176,48 +243,47 @@ total_docs_return_visits_prev = metricfy(
 f"""
 ## totals (last {days} days)
 """
-col1, col2, col3, col4 = st.columns(4)
+col1, col2, col3 = st.columns(3)
 with col1:
     st.metric(
-        label="stars",
+        label="GitHub stars",
         value=f"{total_stars:,}",
         delta=f"{total_stars - total_stars_prev:,}",
-    )
-    st.metric(
-        label="forks",
-        value=f"{total_forks:,}",
-        delta=f"{total_forks - total_forks_prev:,}",
-    )
-with col2:
-    st.metric(
-        label="issues",
-        value=f"{total_issues:,}",
-        delta=f"{total_issues - total_issues_prev:,}",
-    )
-    st.metric(
-        label="pull requests",
-        value=f"{total_pulls:,}",
-        delta=f"{total_pulls - total_pulls_prev:,}",
-    )
-with col3:
-    st.metric(
-        label="contributors",
-        value=f"{total_contributors:,}",
-        delta=f"{total_contributors - total_contributors_prev:,}",
     )
     st.metric(
         label="downloads",
         value=f"{total_downloads:,}",
         delta=f"{total_downloads - total_downloads_prev:,}",
     )
-with col4:
     st.metric(
-        label="docs visits",
+        label="GitHub contributors",
+        value=f"{total_contributors:,}",
+        delta=f"{total_contributors - total_contributors_prev:,}",
+    )
+with col2:
+    st.metric(
+        label="GitHub forks created",
+        value=f"{total_forks:,}",
+        delta=f"{total_forks - total_forks_prev:,}",
+    )
+    st.metric(
+        label="GitHub issues opened",
+        value=f"{total_issues:,}",
+        delta=f"{total_issues - total_issues_prev:,}",
+    )
+    st.metric(
+        label="GitHub PRs opened",
+        value=f"{total_pulls:,}",
+        delta=f"{total_pulls - total_pulls_prev:,}",
+    )
+with col3:
+    st.metric(
+        label="Documentation visits",
         value=f"{total_docs_visits:,}",
         delta=f"{total_docs_visits - total_docs_visits_prev:,}",
     )
     st.metric(
-        label="return docs visits",
+        label="Documentation return visits",
         value=f"{total_docs_return_visits:,}",
         delta=f"{total_docs_return_visits - total_docs_return_visits_prev:,}",
     )
