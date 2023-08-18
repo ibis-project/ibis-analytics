@@ -25,6 +25,8 @@ docs = con.tables.docs
 # display metrics
 """
 # Documentation metrics
+
+:red[**Warning**:] Documentation data is manually ingested and may not be up to date. Ibis documentation has also gone through several refactors (and pending another) so data is difficult to analyze over many months.
 """
 
 f"""
