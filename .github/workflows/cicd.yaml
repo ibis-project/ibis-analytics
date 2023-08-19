@@ -22,9 +22,6 @@ jobs:
       - uses: 'google-github-actions/auth@v1'
         with:
           credentials_json: ${{ secrets.GCLOUD_JSON }}
-      - uses: 'azure/login@v1'
-        with:
-          creds: ${{ secrets.AZURE_STORAGE_SECRET }}
       - uses: extractions/setup-just@v1
       - uses: actions/setup-python@v4
         with:
@@ -43,6 +40,8 @@ jobs:
         run: just run
       - name: backup data
         run: just export-backup
+        env: 
+          AZURE_STORAGE_SECRet: ${{ secrets.AZURE_STORAGE_SECRET }}
       - name: export to MotherDuck
         run: just export
         env:
