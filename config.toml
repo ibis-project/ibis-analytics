@@ -1,6 +1,6 @@
 [app]
-#database="app.ddb"
-database="md:metrics"
+database="app.ddb"
+#database="md:metrics"
 [eda]
 database="cache.ddb"
 #database="md:metrics"

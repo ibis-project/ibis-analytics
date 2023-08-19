@@ -16,14 +16,8 @@ from rich import print
 from dotenv import load_dotenv
 from datetime import datetime, timedelta, date
 
-from langchain.chat_models import ChatOpenAI
-from langchain.prompts.chat import (
-    ChatPromptTemplate,
-    SystemMessagePromptTemplate,
-    HumanMessagePromptTemplate,
-)
-from langchain.chains import LLMChain
-from langchain.schema import BaseOutputParser
+## local imports
+from functions import *
 
 # configuration
 ## logger
@@ -88,9 +82,6 @@ watchers = con.table("watchers")
 commits = con.table("commits")
 
 
-# scratch
-chat = ChatOpenAI(openai_api_key=openai.api_key)
-
 #@ibis.udf.scalar.python
 #def llm(user_message: str = "") -> str:
 #    log.info("llming")
@@ -121,44 +112,6 @@ t = t.mutate(
     )
 )
 temp = t.filter(t.ratio > 0.7)
-test = f"{temp[4:5].a.to_pandas()[0]} or {temp[4:5].b.to_pandas()[0]}?"
-
-template = "Which is a better name?"
-system_message_prompt = SystemMessagePromptTemplate.from_template(template)
-user_template = "{string_a} or {string_b}?"
-user_message_prompt = HumanMessagePromptTemplate.from_template(user_template)
-
-chat_prompt = ChatPromptTemplate.from_messages([system_message_prompt, user_message_prompt])
-messages = chat_prompt.format_messages(string_a=temp[4:5].a.to_pandas()[0], string_b=temp[4:5].b.to_pandas()[0])
-
-class OutputParser(BaseOutputParser):
-    """Parse the output of an LLM call to string."""
-
-
-    def parse(self, text: str):
-        """Parse the output of an LLM call."""
-        return text.strip().split(", ")
-
-
-template = """You are a helpful assistant who picks the better string of two options.
-A user will pass two strings and ask you which is best.
-ONLY return a single string, and nothing more."""
-system_message_prompt = SystemMessagePromptTemplate.from_template(template)
-user_template = "{string_a} or {string_b}?"
-user_message_prompt = HumanMessagePromptTemplate.from_template(user_template)
-
-chat_prompt = ChatPromptTemplate.from_messages([system_message_prompt, user_message_prompt])
-chain = LLMChain(
-    llm=ChatOpenAI(engine=model),
-    prompt=chat_prompt,
-    output_parser=OutputParser()
-)
 a = temp[4:5].a.to_pandas()[0]
 b = temp[4:5].b.to_pandas()[0]
 
-
-@ibis.udf.scalar.python
-def llm_dedup(string_a: str = "", string_b: str = "") -> str:
-    log.info("llming")
-    response = chain.run({"string_a": string_a, "string_b": string_b})
-    return response[0]

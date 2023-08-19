@@ -4,6 +4,7 @@
 set dotenv-load
 
 # aliases
+alias preview:=app
 
 # list justfile recipes
 default:
