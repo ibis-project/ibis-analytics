@@ -16,6 +16,15 @@ from rich import print
 from dotenv import load_dotenv
 from datetime import datetime, timedelta, date
 
+from langchain.chat_models import ChatOpenAI
+from langchain.prompts.chat import (
+    ChatPromptTemplate,
+    SystemMessagePromptTemplate,
+    HumanMessagePromptTemplate,
+)
+from langchain.chains import LLMChain
+from langchain.schema import BaseOutputParser
+
 # configuration
 ## logger
 log.basicConfig(level=log.INFO)
@@ -34,8 +43,8 @@ openai.api_type = "azure"
 openai.api_base = "https://birdbrain.openai.azure.com/"
 openai.api_version = "2023-03-15-preview"
 openai.api_key = os.getenv("AZURE_OPENAI_API_KEY")
-# model = "birdbrain-35"
-model = "birdbrain-4-32k"
+#model = "birdbrain-35"
+model = "birdbrain-4"
 
 system = f"""
 You are to pick the correct string. You will receive an input like:
@@ -80,26 +89,28 @@ commits = con.table("commits")
 
 
 # scratch
-@ibis.udf.scalar.python
-def llm(user_message: str = "") -> str:
-    log.info("llming")
-    messages.append({"role": "user", "content": user_message})
-    full_response = ""
-    for response in openai.ChatCompletion.create(
-        engine=model,
-        messages=messages,
-        stream=True,
-        temperature=0.7,
-        max_tokens=150,
-        top_p=0.95,
-        frequency_penalty=0.5,
-        presence_penalty=0.0,
-        stop=None,
-    ):
-        print(response.choices[0].delta.get("content", ""), end="")
-        full_response += response.choices[0].delta.get("content", "")
-    messages.append({"role": "system", "content": full_response})
-    return full_response
+chat = ChatOpenAI(openai_api_key=openai.api_key)
+
+#@ibis.udf.scalar.python
+#def llm(user_message: str = "") -> str:
+#    log.info("llming")
+#    messages.append({"role": "user", "content": user_message})
+#    full_response = ""
+#    for response in openai.ChatCompletion.create(
+#        engine=model,
+#        messages=messages,
+#        stream=True,
+#        temperature=0.7,
+#        max_tokens=150,
+#        top_p=0.95,
+#        frequency_penalty=0.5,
+#        presence_penalty=0.0,
+#        stop=None,
+#    ):
+#        print(response.choices[0].delta.get("content", ""), end="")
+#        full_response += response.choices[0].delta.get("content", "")
+#    messages.append({"role": "system", "content": full_response})
+#    return full_response
 
 orgs = stars.group_by("company").agg()
 t = orgs.join(orgs, how="cross", lname="a", rname="b")
@@ -112,3 +123,41 @@ t = t.mutate(
 temp = t.filter(t.ratio > 0.7)
 test = f"{temp[4:5].a.to_pandas()[0]} or {temp[4:5].b.to_pandas()[0]}?"
 
+template = "Which is a better name?"
+system_message_prompt = SystemMessagePromptTemplate.from_template(template)
+user_template = "{string_a} or {string_b}?"
+user_message_prompt = HumanMessagePromptTemplate.from_template(user_template)
+
+chat_prompt = ChatPromptTemplate.from_messages([system_message_prompt, user_message_prompt])
+messages = chat_prompt.format_messages(string_a=temp[4:5].a.to_pandas()[0], string_b=temp[4:5].b.to_pandas()[0])
+
+class CommaSeparatedListOutputParser(BaseOutputParser):
+    """Parse the output of an LLM call to a comma-separated list."""
+
+
+    def parse(self, text: str):
+        """Parse the output of an LLM call."""
+        return text.strip().split(", ")
+
+template = """You are a helpful assistant who picks the better string of two options.
+A user will pass two strings and ask you which is best.
+ONLY return a single, and nothing more."""
+system_message_prompt = SystemMessagePromptTemplate.from_template(template)
+user_template = "{string_a} or {string_b}?"
+user_message_prompt = HumanMessagePromptTemplate.from_template(user_template)
+
+chat_prompt = ChatPromptTemplate.from_messages([system_message_prompt, user_message_prompt])
+chain = LLMChain(
+    llm=ChatOpenAI(engine=model),
+    prompt=chat_prompt,
+    output_parser=CommaSeparatedListOutputParser()
+)
+a = temp[4:5].a.to_pandas()[0]
+b = temp[4:5].b.to_pandas()[0]
+
+
+@ibis.udf.scalar.python
+def llm_dedup(string_a: str = "", string_b: str = "") -> str:
+    log.info("llming")
+    response = chain.run({"string_a": string_a, "string_b": string_b})
+    return response[0]
