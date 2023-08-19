@@ -1,8 +1,10 @@
+# imports
 import re
 import ibis
 
 import ibis.selectors as s
 
+# udfs
 @ibis.udf.scalar.python
 def clean_version(version: str, patch: bool = True) -> str:
     pattern = r"(\d+\.\d+\.\d+)" if patch else r"(\d+\.\d+)"
@@ -13,7 +15,7 @@ def clean_version(version: str, patch: bool = True) -> str:
         return version
 
 
-## scratch
+# functions
 def clean_data(t):
     t = t.relabel("snake_case")
     t = t.mutate(s.across(s.of_type("timestamp"), lambda x: x.cast("timestamp('UTC')")))
