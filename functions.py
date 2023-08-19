@@ -4,6 +4,7 @@ import ibis
 
 import ibis.selectors as s
 
+
 # udfs
 @ibis.udf.scalar.python
 def clean_version(version: str, patch: bool = True) -> str:
