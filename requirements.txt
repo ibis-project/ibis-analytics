@@ -1,4 +1,8 @@
 python-dotenv
-ibis-framework[duckdb,bigquery]
+ibis-framework[duckdb,bigquery,deltalake]
 plotly
 streamlit
+openai
+azure-identity
+azure-storage-blob
+azure-storage-file-datalake --pre

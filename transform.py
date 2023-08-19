@@ -12,6 +12,9 @@ import plotly.express as px
 from dotenv import load_dotenv
 from datetime import datetime, timedelta, date
 
+## local imports
+from functions import clean_data, agg_downloads
+
 # configuration
 ## logger
 log.basicConfig(level=log.INFO)
@@ -32,58 +35,7 @@ TEAMIZATION_DATE = date(2022, 11, 28)
 con = ibis.connect("duckdb://cache.ddb")
 ibis.options.interactive = False
 
-
-# UDFs
-@ibis.udf.scalar.python
-def get_major_minor_version(version: str) -> str:
-    match = re.match(r"^(\d+\.\d+)", version)
-    if match:
-        return match.group(1)
-    else:
-        return version
-
-
-## scratch
-def clean_data(t):
-    t = t.relabel("snake_case")
-    t = t.mutate(s.across(s.of_type("timestamp"), lambda x: x.cast("timestamp('UTC')")))
-    return t
-
-
-def agg_downloads(downloads):
-    downloads = (
-        downloads.group_by(
-            [
-                ibis._.timestamp.truncate("D").name("timestamp"),
-                ibis._.country_code,
-                ibis._.version,
-                ibis._.python,
-                ibis._.system["name"].name("system"),
-            ]
-        )
-        .agg(
-            # TODO: fix this
-            ibis._.count().name("downloads"),
-        )
-        .order_by(ibis._.timestamp.desc())
-        .mutate(
-            ibis._.downloads.sum()
-            .over(
-                rows=(0, None),
-                group_by=["country_code", "version", "python", "system"],
-                order_by=ibis._.timestamp.desc(),
-            )
-            .name("total_downloads")
-        )
-        .order_by(ibis._.timestamp.desc())
-    )
-    downloads = downloads.mutate(ibis._["python"].fillna("").name("python_full"))
-    downloads = downloads.mutate(
-        get_major_minor_version(downloads["python_full"]).name("python")
-    )
-    return downloads
-
-
+# tables
 stars = clean_data(con.read_json("data/github/ibis-project/ibis/stargazers.*.json"))
 stars = clean_data(stars.unpack("node"))
 stars = stars.order_by(ibis._.starred_at.desc())

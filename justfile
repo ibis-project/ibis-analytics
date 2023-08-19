@@ -4,6 +4,7 @@
 set dotenv-load
 
 # aliases
+alias preview:=app
 
 # list justfile recipes
 default:
@@ -37,12 +38,22 @@ ingest-ci:
 #ingest-docs:
 #    @python src/ingest_docs.py
 
+# load a backup
+load-backup:
+    @python src/ingest_az.py
 # ingest all data # TODO: add docs
 ingest: ingest-gh ingest-pypi ingest-ci
 
 # copy local database to MotherDuck
-export:
+export-md:
     @python src/export_md.py
+
+# copy local database to Azure
+export-backup:
+    @python src/export_az.py
+
+# export all data
+export: export-md export-backup
 
 # cleanup daata
 clean-data:
@@ -73,3 +84,12 @@ ingest-docs:
         --header 'Content-Type: application/json' \
         --header "Authorization: Bearer $GOAT_TOKEN" \
         "$api"
+
+#load-backup:
+#    az storage azcopy blob download \
+#        --account-name notonedrive \
+#        --account-key $AZURE_STORAGE_KEY \
+#        -c metrics-backup \
+#        -s cache.ddb \
+#        -d cache.ddb
+
