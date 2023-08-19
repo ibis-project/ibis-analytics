@@ -1,4 +1,6 @@
 python-dotenv
-ibis-framework[duckdb,bigquery]
+ibis-framework[duckdb,bigquery,deltalake] @git+https://github.com/ibis-project/ibis
 plotly
 streamlit
+openai
+langchain

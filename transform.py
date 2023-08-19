@@ -35,8 +35,9 @@ ibis.options.interactive = False
 
 # UDFs
 @ibis.udf.scalar.python
-def get_major_minor_version(version: str) -> str:
-    match = re.match(r"^(\d+\.\d+)", version)
+def clean_version(version: str, patch: bool = True) -> str:
+    pattern = r"^v?(\d+\.\d+\.\d+)" if patch else r"^v?(\d+\.\d+)"
+    match = re.match(pattern, version)
     if match:
         return match.group(1)
     else:
@@ -51,6 +52,16 @@ def clean_data(t):
 
 
 def agg_downloads(downloads):
+    downloads = downloads.mutate(
+        major_minor_patch=clean_version(downloads["version"], patch=True),
+        major_minor=clean_version(downloads["version"], patch=False).cast("float"),
+    )
+    downloads = downloads.relabel(
+        {
+            "version": "version_raw",
+            "major_minor_patch": "version",
+        }
+    )
     downloads = (
         downloads.group_by(
             [
@@ -62,7 +73,6 @@ def agg_downloads(downloads):
             ]
         )
         .agg(
-            # TODO: fix this
             ibis._.count().name("downloads"),
         )
         .order_by(ibis._.timestamp.desc())
@@ -79,7 +89,7 @@ def agg_downloads(downloads):
     )
     downloads = downloads.mutate(ibis._["python"].fillna("").name("python_full"))
     downloads = downloads.mutate(
-        get_major_minor_version(downloads["python_full"]).name("python")
+        clean_version(downloads["python_full"], patch=False).name("python")
     )
     return downloads
 
