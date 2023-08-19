@@ -103,15 +103,15 @@ commits = con.table("commits")
 #    messages.append({"role": "system", "content": full_response})
 #    return full_response
 
-orgs = stars.group_by("company").agg()
-t = orgs.join(orgs, how="cross", lname="a", rname="b")
-t = t.mutate(t.a.levenshtein(t.b).name("c"))
-t = t.mutate(
-    (((t.a.length() + t.b.length()) - t.c) / (t.a.length() + t.b.length())).name(
-        "ratio"
-    )
-)
-temp = t.filter(t.ratio > 0.7)
-a = temp[4:5].a.to_pandas()[0]
-b = temp[4:5].b.to_pandas()[0]
+#orgs = stars.group_by("company").agg()
+#t = orgs.join(orgs, how="cross", lname="a", rname="b")
+#t = t.mutate(t.a.levenshtein(t.b).name("c"))
+#t = t.mutate(
+#    (((t.a.length() + t.b.length()) - t.c) / (t.a.length() + t.b.length())).name(
+#        "ratio"
+#    )
+#)
+#temp = t.filter(t.ratio > 0.7)
+#a = temp[4:5].a.to_pandas()[0]
+#b = temp[4:5].b.to_pandas()[0]
 
