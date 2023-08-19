@@ -41,7 +41,7 @@ jobs:
       - name: backup data
         run: just export-backup
         env: 
-          AZURE_STORAGE_SECRet: ${{ secrets.AZURE_STORAGE_SECRET }}
+          AZURE_STORAGE_SECRET: ${{ secrets.AZURE_STORAGE_SECRET }}
       - name: export to MotherDuck
         run: just export
         env:
