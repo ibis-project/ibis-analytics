@@ -107,8 +107,8 @@ with st.form(key="app"):
         "X days",
         min_value=1,
         max_value=365,
-        value=7,
-        step=7,
+        value=90,
+        step=30,
         format="%d",
     )
     update_button = st.form_submit_button(label="update")
