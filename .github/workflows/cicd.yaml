@@ -43,6 +43,6 @@ jobs:
         env: 
           AZURE_STORAGE_SECRET: ${{ secrets.AZURE_STORAGE_SECRET }}
       - name: export to MotherDuck
-        run: just export
+        run: just export-md
         env:
           MOTHERDUCK_TOKEN: ${{ secrets.MOTHERDUCK_TOKEN }}
