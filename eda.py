@@ -43,8 +43,8 @@ openai.api_type = "azure"
 openai.api_base = "https://birdbrain.openai.azure.com/"
 openai.api_version = "2023-03-15-preview"
 openai.api_key = os.getenv("AZURE_OPENAI_API_KEY")
-#model = "birdbrain-35"
-model = "birdbrain-4"
+model = "birdbrain-35"
+#model = "birdbrain-4"
 
 system = f"""
 You are to pick the correct string. You will receive an input like:
@@ -131,17 +131,18 @@ user_message_prompt = HumanMessagePromptTemplate.from_template(user_template)
 chat_prompt = ChatPromptTemplate.from_messages([system_message_prompt, user_message_prompt])
 messages = chat_prompt.format_messages(string_a=temp[4:5].a.to_pandas()[0], string_b=temp[4:5].b.to_pandas()[0])
 
-class CommaSeparatedListOutputParser(BaseOutputParser):
-    """Parse the output of an LLM call to a comma-separated list."""
+class OutputParser(BaseOutputParser):
+    """Parse the output of an LLM call to string."""
 
 
     def parse(self, text: str):
         """Parse the output of an LLM call."""
         return text.strip().split(", ")
 
+
 template = """You are a helpful assistant who picks the better string of two options.
 A user will pass two strings and ask you which is best.
-ONLY return a single, and nothing more."""
+ONLY return a single string, and nothing more."""
 system_message_prompt = SystemMessagePromptTemplate.from_template(template)
 user_template = "{string_a} or {string_b}?"
 user_message_prompt = HumanMessagePromptTemplate.from_template(user_template)
@@ -150,7 +151,7 @@ chat_prompt = ChatPromptTemplate.from_messages([system_message_prompt, user_mess
 chain = LLMChain(
     llm=ChatOpenAI(engine=model),
     prompt=chat_prompt,
-    output_parser=CommaSeparatedListOutputParser()
+    output_parser=OutputParser()
 )
 a = temp[4:5].a.to_pandas()[0]
 b = temp[4:5].b.to_pandas()[0]
