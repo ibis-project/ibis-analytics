@@ -21,7 +21,7 @@ blob_name = config.get("blob_name")
 
 # load env vars
 load_dotenv()
-storage_token = os.getenv("AZURE_STORAGE_KEY")
+storage_token = os.getenv("AZURE_STORAGE_SECRET")
 
 # cloud config
 account_url = f"https://{account_name}.blob.core.windows.net/"
