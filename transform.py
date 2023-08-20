@@ -93,6 +93,12 @@ downloads = clean_data(con.read_parquet("data/pypi/ibis-framework/*.parquet"))
 downloads = downloads.drop("project").unpack("file").unpack("details")
 downloads = agg_downloads(downloads)
 
+docs = clean_data(con.read_csv("data/docs/*.csv*"))
+docs = docs.relabel({"2_path": "path", "date": "timestamp"})
+
+log.info("processing docs...")
+con.create_table("docs", docs, overwrite=True)
+
 # create tables
 log.info("processing stars...")
 con.create_table("stars", stars, overwrite=True)
@@ -109,12 +115,7 @@ con.create_table("commits", commits, overwrite=True)
 log.info("processing downloads...")
 con.create_table("downloads", downloads, overwrite=True)
 
-docs = clean_data(con.read_csv("data/docs/*.csv*"))
-docs = docs.relabel({"2_path": "path", "date": "timestamp"})
-
-log.info("processing docs...")
-con.create_table("docs", docs, overwrite=True)
-
+# TODO: implement for CI
 if config["ci_enabled"] and not os.getenv("CI"):
     ci_con = ibis.connect("duckdb://data/ci/ibis/raw.ddb")
 
