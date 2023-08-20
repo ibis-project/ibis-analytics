@@ -25,24 +25,11 @@ This project is a dashboard that shows the health of the OSS project [Ibis](http
 
 ## Why?
 
-As a Technical Product Manager at Voltron Data, I want to ensure the health of Ibis as an open-source standard Python dataframe library. We had a project tracking metrics but it was written in R and and this seemed like a good excuse to do an end-to-end analytics project with Ibis and try both Streamlit and MotherDuck.
+Blog coming soon!
 
 ## How?
 
 The source code can be found here: https://github.com/lostmygithubaccount/ibis-analytics.
-
-The tools and services used include:
-
-- Ibis (dataframe library)
-- BigQuery (source data)
-- GitHub web APIs (source data)
-- DuckDB (database and query engine)
-- MotherDuck (cloud service for DuckDB)
-- Streamlit (dashboard)
-- Streamlit Community Cloud (cloud service for Streamlit)
-- GitHub (source control, CI/CD)
-- justfile (command runner)
-- TOML (configuration)
 
 The Python requirements are:
 """
@@ -123,7 +110,7 @@ with st.expander("Show ingest_docs.py", expanded=False):
 
 
 """
-:red[Note:] documentation data ingestion is not finished.
+:red[Note:] documentation data ingestion is not finished and usually done manually.
 
 ### Exploratory data analysis
 
@@ -166,11 +153,9 @@ with st.expander("Show metrics.py", expanded=False):
     st.code(metrics_code, line_numbers=True, language="python")
 """
 
-Notice it was easy to iterate with EDA, transform and cache the data into a local database, and take my exploration and visualization directly to a locally deployed dashboard.
-
 ### Deploying and automating
 
-Now I need to automate the data pipeline and create a public dashboard. Time to move to a hybrid local + cloud approach Fortunately, this is easy with GitHub, Ibis, DuckDB, MotherDuck, Streamlit, and Streamlit Community Cloud.
+This is easy with GitHub, Ibis, DuckDB, MotherDuck, Streamlit, and Streamlit Community Cloud.
 
 We first copy over local DuckDB tables to MotherDuck:
 """
@@ -182,8 +167,6 @@ with st.expander("Show export_md.py", expanded=False):
     st.code(export_md_code, line_numbers=True, language="python")
 
 """
- Notice that we can just switch the value in the `config.toml` to switch between a local DuckDB cache and the production MotherDuck database.
-
 Since our tasks are defined in the `justfile` and we have a `requirements.txt` file, we can easily automate the end-to-end pipeline in a simple GitHub Action:
 """
 
@@ -200,9 +183,8 @@ This checks out the repository, authenitcates with Google Cloud Platform, sets u
 
 It runs on PRs (that change relevant files), every 3 hours, and on a manual trigger.
 
-With that, data ingestion and transformation is automated. All that's left is to deploy with app to Streamlit Community Cloud, which is just a few clicks in their GUI!
-
 ## Next steps
 
 ML (LLMs???) probably.
+
 """
