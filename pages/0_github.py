@@ -32,6 +32,20 @@ watchers = con.tables.watchers
 # GitHub  metrics
 """
 
+f"""
+---
+"""
+
+with open("pages/0_github.py") as f:
+    github_code = f.read()
+
+with st.expander("Show source code", expanded=False):
+    st.code(github_code, line_numbers=True, language="python")
+
+"""
+---
+"""
+
 total_stars_all_time = stars.select("login").distinct().count().to_pandas()
 total_forks_all_time = forks.select("login").distinct().count().to_pandas()
 total_closed_issues_all_time = (

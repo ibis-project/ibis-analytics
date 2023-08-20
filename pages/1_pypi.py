@@ -28,6 +28,18 @@ downloads = con.tables.downloads
 """
 
 f"""
+---
+"""
+
+with open("pages/1_pypi.py") as f:
+    pypi_code = f.read()
+
+with st.expander("Show source code", expanded=False):
+    st.code(pypi_code, line_numbers=True, language="python")
+
+f"""
+---
+
 ## totals (all time)
 """
 downloads_all_time = downloads["downloads"].sum().to_pandas()

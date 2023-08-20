@@ -30,12 +30,24 @@ commits = con.tables.commits
 watchers = con.tables.watchers
 
 # display metrics
-"""
+f"""
 # Metrics
-
+#
 See the [about page](/about/) for implementation details.
 
 :red[**Warning**]: Data ingestion is not fully automated. GitHub and PyPI metrics are refreshed every 3 hours. Documentation metrics are to be automated. CI (GitHub Actions) and Conda metrics are to be implemented and automated. Documentation metrics are also difficult to analyze given numerous changes in structure (with another pending).
+
+___
+"""
+
+with open("metrics.py") as f:
+    metrics_code = f.read()
+
+with st.expander("Show source code", expanded=False):
+    st.code(metrics_code, line_numbers=True, language="python")
+
+f"""
+---
 """
 
 f"""

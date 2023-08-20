@@ -30,6 +30,18 @@ docs = con.tables.docs
 """
 
 f"""
+---
+"""
+
+with open("pages/2_docs.py") as f:
+    docs_code = f.read()
+
+with st.expander("Show source code", expanded=False):
+    st.code(docs_code, line_numbers=True, language="python")
+
+f"""
+---
+
 ## totals (all time)
 """
 total_visits_all_time = docs.count().to_pandas()
