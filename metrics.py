@@ -225,14 +225,14 @@ total_docs_visits_prev = metricfy(
     .count()
     .to_pandas()
 )
-total_docs_return_visits = metricfy(
+total_docs_first_visits = metricfy(
     (
         docs.filter(
             ibis._.timestamp >= datetime.now() - timedelta(days=days)
         ).first_visit.sum()
     ).to_pandas()
 )
-total_docs_return_visits_prev = metricfy(
+total_docs_first_visits_prev = metricfy(
     (
         docs.filter(ibis._.timestamp <= datetime.now() - timedelta(days=days))
         .filter(ibis._.timestamp >= datetime.now() - timedelta(days=days * 2))
@@ -283,9 +283,9 @@ with col3:
         delta=f"{total_docs_visits - total_docs_visits_prev:,}",
     )
     st.metric(
-        label="Documentation return visits",
-        value=f"{total_docs_return_visits:,}",
-        delta=f"{total_docs_return_visits - total_docs_return_visits_prev:,}",
+        label="Documentation first visits",
+        value=f"{total_docs_first_visits:,}",
+        delta=f"{total_docs_first_visits - total_docs_first_visits_prev:,}",
     )
 
 f"""
