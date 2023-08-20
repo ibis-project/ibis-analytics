@@ -1,71 +1,37 @@
 # imports
 import os
-import time
-import json
-import requests
+import toml
 
-import pandas as pd
 import logging as log
-import gzip
 
-from pathlib import Path
 from dotenv import load_dotenv
+
+from azure.storage.blob import BlobServiceClient as BSC
 
 # configure logger
 log.basicConfig(level=log.INFO)
 
-# load .env file
+# config.toml
+config = toml.load("config.toml")["goat"]
+transform_config = toml.load("config.toml")["transform"]
+
+account_name = config.get("account_name")
+directory = config.get("directory")
+blob_name = config.get("blob_name")
+
+# load env vars
 load_dotenv()
+storage_token = os.getenv("AZURE_STORAGE_SECRET")
 
-# setup for goatcounter
-api_token = os.getenv("GOAT_TOKEN")
-api_url = "https://ibis.goatcounter.com/api/v0"
-headers = {
-    "Authorization": f"Bearer {api_token}",
-    "Content-Type": "application/json",
-}
+# cloud config
+account_url = f"https://{account_name}.blob.core.windows.net/"
+credential = {"account_name": account_name, "account_key": storage_token}
 
+bsc = BSC(account_url=account_url, credential=credential)
+bs = bsc.get_blob_client(directory, "goatcounter-export-ibis.csv.gz")
 
-def get_last_cursor():
-    path = Path("data/docs")
-    files = path.glob("goatcounter-export-*.csv.gz")
-    if not files:
-        return None
-    last_file = max(files, key=lambda p: p.stat().st_mtime)
-    # extract the cursor from the filename
-    return str(last_file.stem.split("-")[-2])
-
-
-def start_export(cursor=None):
-    data = {}
-    if cursor is not None:
-        data = {"start_from_hit_id": cursor}
-    r = requests.post(f"{api_url}/export", headers=headers, data=data)
-    breakpoint()
-    if r.status_code >= 200 and r.status_code < 300:
-        return r.json()["id"]
-    else:
-        log.error(f"Error starting export: {r.status_code} {r.text}")
-        return None
-
-
-def check_export(id):
-    r = requests.get(f"{api_url}/export/{id}", headers=headers)
-    return r.json()["finished_at"]
-
-
-def download_export(id):
-    r = requests.get(f"{api_url}/export/{id}/download", headers=headers)
-    filename = f"data/docs/goatcounter-export-{id}.csv.gz"
-    with open(filename, "wb") as f:
-        f.write(r.content)
-
-
-cursor = get_last_cursor()
-export_id = start_export(cursor)
-
-while True:
-    time.sleep(1)
-    if check_export(export_id):
-        download_export(export_id)
-        break
+# download blob
+log.info("Downloading blob...")
+with open(f"data/docs/{blob_name}", "wb") as f:
+    data = bs.download_blob()
+    data.readinto(f)
