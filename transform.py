@@ -109,12 +109,11 @@ con.create_table("commits", commits, overwrite=True)
 log.info("processing downloads...")
 con.create_table("downloads", downloads, overwrite=True)
 
-if not os.getenv("CI"):
-    docs = clean_data(con.read_csv("data/docs/*.csv*"))
-    docs = docs.relabel({"2_path": "path", "date": "timestamp"})
+docs = clean_data(con.read_csv("data/docs/*.csv*"))
+docs = docs.relabel({"2_path": "path", "date": "timestamp"})
 
-    log.info("processing docs...")
-    con.create_table("docs", docs, overwrite=True)
+log.info("processing docs...")
+con.create_table("docs", docs, overwrite=True)
 
 if config["ci_enabled"] and not os.getenv("CI"):
     ci_con = ibis.connect("duckdb://data/ci/ibis/raw.ddb")

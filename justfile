@@ -35,8 +35,8 @@ ingest-ci:
     @python src/ingest_ci.py
 
 # ingest docs data
-#ingest-docs:
-#    @python src/ingest_docs.py
+ingest-docs:
+    @python src/ingest_docs.py
 
 # load a backup
 load-backup:
@@ -77,19 +77,26 @@ goat:
         --header "Authorization: Bearer $GOAT_TOKEN" \
         "$api/export"
 
-ingest-docs:
-    #!/bin/bash +x
-    api="https://ibis.goatcounter.com/api/v0/export/791705491/download"
-    curl -v -X POST \
-        --header 'Content-Type: application/json' \
-        --header "Authorization: Bearer $GOAT_TOKEN" \
-        "$api"
-
+#ingest-docs:
+#    #!/bin/bash +x
+#    api="https://ibis.goatcounter.com/api/v0/export/791705491/download"
+#    curl -v -X POST \
+#        --header 'Content-Type: application/json' \
+#        --header "Authorization: Bearer $GOAT_TOKEN" \
+#        "$api"
+#
 #load-backup:
 #    az storage azcopy blob download \
 #        --account-name notonedrive \
-#        --account-key $AZURE_STORAGE_KEY \
+#        --account-key $AZURE_STORAGE_SECRET \
 #        -c metrics-backup \
 #        -s cache.ddb \
 #        -d cache.ddb
 
+upload-goat:
+    az storage azcopy blob upload \
+        --account-name notonedrive \
+        --account-key $AZURE_STORAGE_SECRET \
+        -c goat-export \
+        -s data/docs/*.csv.gz \
+        -d goatcounter-export-ibis.csv.gz

@@ -25,6 +25,10 @@ jobs:
           python-version: 3.11
       - name: install requirements
         run: just setup
+      - name: ingest docs data
+        run: just ingest-docs
+        env:
+          AZURE_STORAGE_SECRET: ${{ secrets.AZURE_STORAGE_SECRET }}
       - name: ingest pypi data
         run: just ingest-pypi
         env:

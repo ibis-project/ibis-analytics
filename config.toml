@@ -29,11 +29,15 @@ endpoints = [
     "issues",
     "contributors",
 ]
+[goat]
+account_name = "notonedrive"
+directory = "goat-export"
+blob_name = "goatcounter-export-ibis.csv.gz"
 [motherduck]
 database="metrics"
 exclude_tables = ["penguins"]
 #exclude_tables = ["penguins", "stars", "issues", "pulls", "forks", "watchers", "commits", "downloads"]
-ci_tables = ["stars", "issues", "pulls", "forks", "watchers", "commits"]
+#ci_tables=["jobs", "analysis", "workflows"]
 [azure]
 account_name = "notonedrive"
 directory = "metrics-backup"
