@@ -32,6 +32,7 @@ bs = bsc.get_blob_client(directory, "goatcounter-export-ibis.csv.gz")
 
 # download blob
 log.info("Downloading blob...")
+os.makedirs("data/docs", exist_ok=True)
 with open(f"data/docs/{blob_name}", "wb") as f:
     data = bs.download_blob()
     data.readinto(f)
