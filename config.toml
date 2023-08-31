@@ -2,8 +2,8 @@
 #database="app.ddb"
 database="md:metrics"
 [eda]
-database="cache.ddb"
-#database="md:metrics"
+#database="cache.ddb"
+database="md:metrics"
 [transform]
 database="cache.ddb"
 ci_enabled=false
