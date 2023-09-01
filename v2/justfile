@@ -1,0 +1,48 @@
+# Justfile
+
+# load environment variables
+set dotenv-load
+
+# variables
+module := "dag"
+
+# aliases
+alias preview:=app
+
+# list justfile recipes
+default:
+    just --list
+
+# setup
+setup:
+    @pip install -r requirements.txt
+
+# install
+install:
+    @pip install -e '.[dev]'
+
+# ingest
+ingest:
+    @python {{module}}/ingest.py
+
+# dag
+dag:
+    @dagster dev -m {{module}}
+
+run:
+    @dagster job execute -j all_assets -m {{module}}
+
+# streamlit stuff
+app:
+    @streamlit run app.py
+
+# smoke-test
+smoke-test:
+    black --check .
+
+# clean
+clean:
+    @rm -r data/system || true
+
+open:
+    @open http://localhost:3000/asset-groups
