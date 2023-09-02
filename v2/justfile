@@ -25,16 +25,25 @@ install:
 ingest:
     @python {{module}}/ingest.py
 
+# deploy
+deploy:
+    @python {{module}}/deploy.py
+
+# backup
+backup:
+    @python {{module}}/backup.py
+
 # dag
 dag:
     @dagster dev -m {{module}}
 
+# run
 run:
     @dagster job execute -j all_assets -m {{module}}
 
 # streamlit stuff
 app:
-    @streamlit run app.py
+    @streamlit run metrics.py
 
 # smoke-test
 smoke-test:
@@ -42,7 +51,21 @@ smoke-test:
 
 # clean
 clean:
+    @rm -r *.ddb* || true
     @rm -r data/system || true
+    @rm -r data/backup || true
 
+# open
 open:
     @open http://localhost:3000/asset-groups
+
+# wip below here
+goat:
+    #!/bin/bash +x
+    api="https://ibis.goatcounter.com/api/v0"
+    curl -v -X POST \
+        --header 'Content-Type: application/json' \
+        --header "Authorization: Bearer $GOAT_TOKEN" \
+        "$api/export"
+
+#

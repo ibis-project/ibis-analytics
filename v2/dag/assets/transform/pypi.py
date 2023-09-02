@@ -11,6 +11,53 @@ def transform_downloads(extract_downloads):
     """
     Transform the PyPI downloads data.
     """
-    downloads = extract_downloads.drop("project").unpack("file").unpack("details")
-    downloads = f.agg_downloads(downloads)
+    return _transform_downloads(extract_downloads)
+
+
+def _transform_downloads(downloads):
+    downloads = downloads.drop("project").unpack("file").unpack("details")
+    downloads = _agg_downloads(downloads)
+    return downloads
+
+
+def _agg_downloads(downloads):
+    downloads = downloads.mutate(
+        major_minor_patch=f.clean_version(downloads["version"], patch=True),
+        major_minor=f.clean_version(downloads["version"], patch=False).cast("float"),
+    )
+    downloads = downloads.rename(
+        {
+            "version_raw": "version",
+            "version": "major_minor_patch",
+        }
+    )
+    downloads = (
+        downloads.group_by(
+            [
+                ibis._.timestamp.truncate("D").name("timestamp"),
+                ibis._.country_code,
+                ibis._.version,
+                ibis._.python,
+                ibis._.system["name"].name("system"),
+            ]
+        )
+        .agg(
+            ibis._.count().name("downloads"),
+        )
+        .order_by(ibis._.timestamp.desc())
+        .mutate(
+            ibis._.downloads.sum()
+            .over(
+                rows=(0, None),
+                group_by=["country_code", "version", "python", "system"],
+                order_by=ibis._.timestamp.desc(),
+            )
+            .name("total_downloads")
+        )
+        .order_by(ibis._.timestamp.desc())
+    )
+    downloads = downloads.mutate(ibis._["python"].fillna("").name("python_full"))
+    downloads = downloads.mutate(
+        f.clean_version(downloads["python_full"], patch=False).name("python")
+    )
     return downloads

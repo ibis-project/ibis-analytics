@@ -24,7 +24,8 @@ from graphql_queries import (
 def main():
     ingest_gh()
     ingest_pypi()
-    #ingest_ci() # TODO: fix permissions, add assets
+    # ingest_ci() # TODO: fix permissions, add assets
+
 
 def ingest_gh():
     """
@@ -238,6 +239,7 @@ def ingest_pypi():
         log.info(f"Writing to: {output_path}")
         t.to_parquet(output_path)
 
+
 def ingest_ci():
     # constants
     # set DEFAULT_BACKFILL to the number of days
@@ -270,6 +272,7 @@ def ingest_ci():
     for table in bq_con.list_tables():
         log.info(f"Writing table: {table}")
         con.create_table(table, bq_con.table(table).to_pyarrow(), overwrite=True)
+
 
 if __name__ == "__main__":
     main()
