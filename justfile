@@ -59,6 +59,7 @@ download:
         --source 'data' \
         --destination 'data/backup/cloud' \
         --recursive
+    mv data/backup/cloud/data/ingest/docs data/ingest
 
 # upload
 sync:

@@ -27,7 +27,7 @@ def backup(storage: str = "local") -> None:
     # backup ingested data
     # that's hard to re-ingest
     source_path = "data/ingest/docs"
-    target_path = "data/backup/ingested/docs"
+    target_path = "data/backup/ingest/docs"
     os.makedirs(source_path, exist_ok=True)
     os.makedirs(target_path, exist_ok=True)
 
