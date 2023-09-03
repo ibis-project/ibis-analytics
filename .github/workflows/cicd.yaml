@@ -29,6 +29,7 @@ jobs:
         run: just download
         env:
           AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_KEY }}
+          AZURE_STORAGE_CONTAINER: prod
       - name: ingest
         run: just ingest
         env:
@@ -42,6 +43,7 @@ jobs:
           just sync
         env:
           AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_KEY }}
+          AZURE_STORAGE_CONTAINER: prod
       - name: deploy to prod
         run: just deploy
         env:
