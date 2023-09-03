@@ -15,17 +15,16 @@ prod="prod.ddb"
 #backfill = 365
 packages = [
     "ibis-framework",
-    "substrait",
-    "ibis-substrait",
+    #"substrait",
+    #"ibis-substrait",
 ]
 [ingest.github]
 repos = [
     "ibis-project/ibis",
-    "ibis-project/ibis-examples",
-    "substrait-io/substrait",
-    "substrait-io/substrait-python",
-    "ibis-project/ibis-substrait",
-    "ibis-project/ibis-examples",
+    #"ibis-project/ibis-examples",
+    #"substrait-io/substrait",
+    #"substrait-io/substrait-python",
+    #"ibis-project/ibis-substrait",
 ]
 endpoints = [
     "repo",
