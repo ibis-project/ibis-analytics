@@ -1,23 +1,31 @@
 [app]
-#database="app.ddb"
-database="md:metrics"
+database="data/backup/cloud/data/backup.ddb"
+#database="md:prod_metrics"
 [eda]
-#database="cache.ddb"
-database="md:metrics"
-[transform]
-database="cache.ddb"
-ci_enabled=false
-[ci]
+#database="md:prod_metrics"
+database="data/backup/cloud/data/backup.ddb"
+
+[prod]
+staging="stage.ddb"
+prod="prod.ddb"
+
+[ingest.ci]
 #backfill=365
-[pypi]
+[ingest.pypi]
 #backfill = 365
 packages = [
     "ibis-framework",
+    "substrait",
+    "ibis-substrait",
 ]
-[github]
+[ingest.github]
 repos = [
     "ibis-project/ibis",
-    #"ibis-project/ibis-examples",
+    "ibis-project/ibis-examples",
+    "substrait-io/substrait",
+    "substrait-io/substrait-python",
+    "ibis-project/ibis-substrait",
+    "ibis-project/ibis-examples",
 ]
 endpoints = [
     "repo",
@@ -29,15 +37,6 @@ endpoints = [
     "issues",
     "contributors",
 ]
-[goat]
-account_name = "notonedrive"
+[ingest.goat]
 directory = "goat-export"
 blob_name = "goatcounter-export-ibis.csv.gz"
-[motherduck]
-database="metrics"
-exclude_tables = ["penguins"]
-[azure]
-account_name = "notonedrive"
-directory = "metrics-backup"
-blob_name = "cache.ddb"
-

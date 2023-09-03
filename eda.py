@@ -25,7 +25,9 @@ from azure.storage.filedatalake import DataLakeServiceClient as DLSC
 from azure.storage.filedatalake import DataLakeFileClient as DLFC
 
 ## local imports
-from functions import *
+import dag.functions as f
+
+from dag.assets import extract, load, transform
 
 # configuration
 ## logger
@@ -68,20 +70,4 @@ NOW_10 = NOW - timedelta(days=3650)
 # connect to database
 database = config["database"]
 log.info(f"database: {database}")
-# TODO: fix
-if "_share" in database:
-    con = ibis.connect(f"duckdb://")
-    con.raw_sql(f"ATTACH '{database}' as eda;")
-else:
-    con = ibis.connect(f"duckdb://{database}")
-
-# load tables
-docs = con.table("docs")
-downloads = con.table("downloads")
-stars = con.table("stars")
-issues = con.table("issues")
-pulls = con.table("pulls")
-forks = con.table("forks")
-watchers = con.table("watchers")
-commits = con.table("commits")
-
+con = ibis.connect(f"duckdb://{database}")

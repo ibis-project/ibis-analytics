@@ -25,25 +25,24 @@ jobs:
           python-version: 3.11
       - name: install requirements
         run: just setup
-      - name: ingest docs data
-        run: just ingest-docs
+      - name: load backup data # TODO: restore from GH cache
+        run: just download
         env:
-          AZURE_STORAGE_SECRET: ${{ secrets.AZURE_STORAGE_SECRET }}
-      - name: ingest pypi data
-        run: just ingest-pypi
+          AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_KEY }}
+      - name: ingest
+        run: just ingest
         env:
           BQ_PROJECT_ID: voltrondata-demo
-      - name: ingest gh data
-        run: just ingest-gh
-        env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: run analytics
+      - name: run ETL job
         run: just run
-      - name: backup data
-        run: just export-backup
-        env: 
-          AZURE_STORAGE_SECRET: ${{ secrets.AZURE_STORAGE_SECRET }}
-      - name: export to MotherDuck
-        run: just export-md
+      - name: backup and sync to cloud(s)
+        run: |
+          just backup
+          just sync
+        env:
+          AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_KEY }}
+      - name: deploy to prod
+        run: just deploy
         env:
           MOTHERDUCK_TOKEN: ${{ secrets.MOTHERDUCK_TOKEN }}

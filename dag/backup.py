@@ -21,16 +21,34 @@ def main():
 
 def backup(storage: str = "local") -> None:
     """
-    Upload the data.
+    Backup the data.
     """
-    path = "data/system/duckdb"
-    target = ibis.duckdb.connect(f"backup.ddb")
 
-    os.makedirs(path, exist_ok=True)
+    # backup ingested data
+    # that's hard to re-ingest
+    source_path = "data/ingest/docs"
+    target_path = "data/backup/ingested/docs"
+    os.makedirs(source_path, exist_ok=True)
+    os.makedirs(target_path, exist_ok=True)
+
+    for root, dirs, files in os.walk(source_path):
+        for file in files:
+            full_path = os.path.join(root, file)
+            log.info(f"Backing up {full_path} to {target_path}...")
+            os.system(f"cp {full_path} {target_path}")
+
+    # backup loaded data as Delta Lake tables
+    # and a DuckDB Database
+    source_path = "data/system/duckdb"
+    target_path = "data/backup"
+    os.makedirs(source_path, exist_ok=True)
+    os.makedirs(target_path, exist_ok=True)
+
+    target = ibis.duckdb.connect(f"data/backup/backup.ddb")
 
     ingested_at = f.now()
 
-    for root, dirs, files in os.walk(path):
+    for root, dirs, files in os.walk(source_path):
         for file in files:
             if fnmatch.fnmatch(file, "load_*.ddb"):
                 full_path = os.path.join(root, file)
