@@ -12,16 +12,18 @@ on:
       - 'justfile'
 
 jobs:
-  wake-vm:
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    steps:
-      - uses: actions/checkout@v3 # idk if this is required
-      - uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-      - name: wake vm
-        run: just vm-start
+
+  #wake-vm:
+  #  runs-on: ubuntu-latest
+  #  continue-on-error: true
+  #  steps:
+  #    - uses: actions/checkout@v3 # idk if this is required
+  #    - uses: azure/login@v1
+  #      with:
+  #        creds: ${{ secrets.AZURE_CREDENTIALS }}
+  #    - name: wake vm
+  #      run: just vm-start
+
   ingest-etl-deploy:
     runs-on: self-hosted
     steps:
@@ -62,4 +64,3 @@ jobs:
         run: just test
         env:
           MOTHERDUCK_TOKEN: ${{ secrets.MOTHERDUCK_TOKEN }}
-
