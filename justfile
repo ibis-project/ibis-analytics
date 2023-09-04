@@ -54,22 +54,32 @@ upload-prod:
 # download
 download:
     rm -r data || true
-    mkdir -p data/backup/cloud
     az storage azcopy blob download \
         --account-name ibisanalytics \
         --container $AZURE_STORAGE_CONTAINER \
         --source 'data' \
-        --destination 'data/backup/cloud' \
+        --destination '.' \
         --recursive
-    cp -r data/backup/cloud/data/* data
+
+download-prod:
+    rm -r data || true
+    az storage azcopy blob download \
+        --account-name ibisanalytics \
+        --container prod \
+        --source 'data' \
+        --destination '.' \
+        --recursive
+
 
 # upload
 sync:
     az storage azcopy blob sync \
         --account-name ibisanalytics \
         --container $AZURE_STORAGE_CONTAINER \
-        --source 'data'
+        --source 'data' \
+        --destination '.'
 
+# dag
 dag:
     @dagster dev -m {{module}}
 
@@ -99,16 +109,19 @@ clean:
     @rm -r data/system || true
     @rm -r data/backup || true
 
-# open
+# open dag
 open-dag:
     @open http://localhost:3000/asset-groups
 
+# open dash
 open-dash:
     @open https://ibis-analytics.streamlit.app
 
+# cicd
 cicd:
     @gh workflow run cicd.yaml
 
+# start vm
 vm-start:
     @az vm start -n cicd -g ibis-analytics
 
