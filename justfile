@@ -61,7 +61,7 @@ download:
         --source 'data' \
         --destination 'data/backup/cloud' \
         --recursive
-    cp -r data/backup/cloud/data data
+    cp -r data/backup/cloud/data/* data
 
 # upload
 sync:
