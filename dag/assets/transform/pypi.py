@@ -11,16 +11,9 @@ def transform_downloads(extract_downloads):
     """
     Transform the PyPI downloads data.
     """
-    return _transform_downloads(extract_downloads)
-
-
-def _transform_downloads(downloads):
-    downloads = downloads.drop("project").unpack("file").unpack("details")
-    downloads = _agg_downloads(downloads)
-    return downloads
-
-
-def _agg_downloads(downloads):
+    downloads = f.clean_data(
+        extract_downloads.drop("project").unpack("file").unpack("details")
+    )
     downloads = downloads.mutate(
         major_minor_patch=f.clean_version(downloads["version"], patch=True),
         major_minor=f.clean_version(downloads["version"], patch=False).cast("float"),
