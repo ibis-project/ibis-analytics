@@ -84,7 +84,6 @@ test:
     @python pages/2_docs.py
     @python pages/3_about.py
 
-
 # streamlit stuff
 app:
     @streamlit run metrics.py
@@ -105,6 +104,12 @@ open-dag:
 
 open-dash:
     @open https://ibis-analytics.streamlit.app
+
+cicd:
+    @gh workflow run cicd.yaml
+
+vm-start:
+    @az vm start -n cicd -g ibis-analytics
 
 # wip below here
 goat:
