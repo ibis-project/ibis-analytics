@@ -48,3 +48,8 @@ jobs:
         run: just deploy
         env:
           MOTHERDUCK_TOKEN: ${{ secrets.MOTHERDUCK_TOKEN }}
+      - name: test
+        run: just test
+        env:
+          MOTHERDUCK_TOKEN: ${{ secrets.MOTHERDUCK_TOKEN }}
+
