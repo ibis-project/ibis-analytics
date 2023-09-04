@@ -6,37 +6,67 @@ from dag import functions as f
 
 
 # assets
-@dagster.multi_asset(
-    outs={
-        "extract_stars": dagster.AssetOut(),
-        "extract_issues": dagster.AssetOut(),
-        "extract_pulls": dagster.AssetOut(),
-        "extract_forks": dagster.AssetOut(),
-        "extract_watchers": dagster.AssetOut(),
-        "extract_commits": dagster.AssetOut(),
-    }
-)
-def extract_github():
+@dagster.asset
+def extract_stars():
     """
-    Load the GitHub data.
+    Extract the ingested GitHub stars data.
     """
-    # imports
     stars = f.clean_data(
         ibis.read_json("data/ingest/github/ibis-project/ibis/stargazers.*.json")
     )
+    return stars
+
+
+@dagster.asset
+def extract_issues():
+    """
+    Extract the ingested GitHub issues data.
+    """
     issues = f.clean_data(
         ibis.read_json("data/ingest/github/ibis-project/ibis/issues.*.json")
     )
+    return issues
+
+
+@dagster.asset
+def extract_pulls():
+    """
+    Extract the ingested GitHub pull requests data.
+    """
     pulls = f.clean_data(
         ibis.read_json("data/ingest/github/ibis-project/ibis/pullRequests.*.json")
     )
+    return pulls
+
+
+@dagster.asset
+def extract_forks():
+    """
+    Extract the ingested GitHub forks data.
+    """
     forks = f.clean_data(
         ibis.read_json("data/ingest/github/ibis-project/ibis/forks.*.json")
     )
+    return forks
+
+
+@dagster.asset
+def extract_watchers():
+    """
+    Extract the ingested GitHub watchers data.
+    """
     watchers = f.clean_data(
         ibis.read_json("data/ingest/github/ibis-project/ibis/watchers.*.json")
     )
+    return watchers
+
+
+@dagster.asset
+def extract_commits():
+    """
+    Extract the ingested GitHub git commits data.
+    """
     commits = f.clean_data(
         ibis.read_json("data/ingest/github/ibis-project/ibis/commits.*.json")
     )
-    return stars, issues, pulls, forks, watchers, commits
+    return commits
