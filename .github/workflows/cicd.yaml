@@ -22,7 +22,8 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
       - name: wake vm
         run: just vm-start
-  ingest-etl-deploy:
+
+  setup:
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v3
@@ -40,13 +41,25 @@ jobs:
         env:
           AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_KEY }}
           AZURE_STORAGE_CONTAINER: prod
+
+  ingest:
+    runs-on: self-hosted
+    steps:
       - name: ingest
         run: just ingest
         env:
           BQ_PROJECT_ID: voltrondata-demo
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  etl:
+    runs-on: self-hosted
+    steps:
       - name: run ETL job
         run: just run
+
+  backup:
+    runs-on: self-hosted
+    steps:
       - name: backup and sync to cloud(s)
         run: |
           just backup
@@ -54,12 +67,19 @@ jobs:
         env:
           AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_KEY }}
           AZURE_STORAGE_CONTAINER: prod
+
+  deploy:
+    runs-on: self-hosted
+    steps:
       - name: deploy to prod
         run: just deploy
         env:
           MOTHERDUCK_TOKEN: ${{ secrets.MOTHERDUCK_TOKEN }}
+
+  test:
+    runs-on: self-hosted
+    steps:
       - name: test
         run: just test
         env:
           MOTHERDUCK_TOKEN: ${{ secrets.MOTHERDUCK_TOKEN }}
-
