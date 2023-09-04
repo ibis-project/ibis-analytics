@@ -38,7 +38,7 @@ upload:
     az storage azcopy blob upload \
         --account-name ibisanalytics \
         --container $AZURE_STORAGE_CONTAINER \
-        --source 'data/backup/cloud/data' \
+        --source 'data' \
         --destination . \
         --recursive
 
@@ -47,27 +47,27 @@ upload-prod:
     az storage azcopy blob upload \
         --account-name ibisanalytics \
         --container prod \
-        --source 'data/backup/cloud/data/' \
+        --source 'data' \
         --destination . \
         --recursive
 
 # download
 download:
+    rm -r data || true
     az storage azcopy blob download \
         --account-name ibisanalytics \
         --container $AZURE_STORAGE_CONTAINER \
         --source 'data' \
         --destination 'data/backup/cloud' \
         --recursive
-    mkdir -p data/ingest
-    cp -r data/backup/cloud/data/ingest/* data/ingest
+    cp -r data/backup/cloud/data data
 
 # upload
 sync:
     az storage azcopy blob sync \
         --account-name ibisanalytics \
         --container $AZURE_STORAGE_CONTAINER \
-        --source 'data/backup/cloud'
+        --source 'data'
 
 dag:
     @dagster dev -m {{module}}
