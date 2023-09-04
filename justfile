@@ -3,6 +3,9 @@
 # load environment variables
 set dotenv-load
 
+# variables
+module := "dag"
+
 # aliases
 alias preview:=app
 
@@ -14,61 +17,84 @@ default:
 setup:
     @pip install -r requirements.txt
 
-# eda
-eda:
-    ipython -i eda.py
+# install
+install:
+    @pip install -e '.[dev]'
+
+# ingest
+ingest:
+    @python {{module}}/ingest.py
+
+# deploy
+deploy:
+    @python {{module}}/deploy.py
+
+# backup
+backup:
+    @python {{module}}/backup.py
+
+# upload
+upload:
+    az storage azcopy blob upload \
+        --account-name ibisanalytics \
+        --container $AZURE_STORAGE_CONTAINER \
+        --source 'data/backup/cloud/data' \
+        --destination . \
+        --recursive
+
+# DANGER
+upload-prod:
+    az storage azcopy blob upload \
+        --account-name ibisanalytics \
+        --container prod \
+        --source 'data/backup/cloud/data/' \
+        --destination . \
+        --recursive
+
+# download
+download:
+    az storage azcopy blob download \
+        --account-name ibisanalytics \
+        --container $AZURE_STORAGE_CONTAINER \
+        --source 'data' \
+        --destination 'data/backup/cloud' \
+        --recursive
+    mkdir -p data/ingest
+    mv data/backup/cloud/data/ingest/docs data/ingest
+
+# upload
+sync:
+    az storage azcopy blob sync \
+        --account-name ibisanalytics \
+        --container $AZURE_STORAGE_CONTAINER \
+        --source 'data/backup/cloud'
+
+dag:
+    @dagster dev -m {{module}}
 
 # run
 run:
-    @time python transform.py
-
-# ingest GitHub data
-ingest-gh:
-    @python src/ingest_gh.py
-
-# ingest PyPI data
-ingest-pypi:
-    @python src/ingest_pypi.py
-
-# ingest CI data
-ingest-ci:
-    @python src/ingest_ci.py
-
-# ingest docs data
-ingest-docs:
-    @python src/ingest_docs.py
-
-# load a backup
-load-backup:
-    @python src/ingest_az.py
-# ingest all data # TODO: add docs
-ingest: ingest-gh ingest-pypi ingest-ci
-
-# copy local database to MotherDuck
-export-md:
-    @python src/export_md.py
-
-# copy local database to Azure
-export-backup:
-    @python src/export_az.py
-
-# export all data
-export: export-md export-backup
-
-# cleanup daata
-clean-data:
-    -rm -r data/pypi || true
-    -rm -r data/github || true
-
-# remove DuckDB databases
-clean-dbs:
-    -rm *.ddb* || true
+    @dagster job execute -j all_assets -m {{module}}
 
 # streamlit stuff
 app:
     @streamlit run metrics.py
 
-# temp
+# smoke-test
+smoke-test:
+    @black --check .
+
+# clean
+clean:
+    @rm -r *.ddb* || true
+    @rm -r data/system || true
+    @rm -r data/backup || true
+
+# open
+open:
+    @open http://localhost:3000/asset-groups
+
+# wip below here
 goat:
     #!/bin/bash +x
     api="https://ibis.goatcounter.com/api/v0"
@@ -77,26 +103,4 @@ goat:
         --header "Authorization: Bearer $GOAT_TOKEN" \
         "$api/export"
 
-#ingest-docs:
-#    #!/bin/bash +x
-#    api="https://ibis.goatcounter.com/api/v0/export/791705491/download"
-#    curl -v -X POST \
-#        --header 'Content-Type: application/json' \
-#        --header "Authorization: Bearer $GOAT_TOKEN" \
-#        "$api"
 #
-#load-backup:
-#    az storage azcopy blob download \
-#        --account-name notonedrive \
-#        --account-key $AZURE_STORAGE_SECRET \
-#        -c metrics-backup \
-#        -s cache.ddb \
-#        -d cache.ddb
-
-upload-goat:
-    az storage azcopy blob upload \
-        --account-name notonedrive \
-        --account-key $AZURE_STORAGE_SECRET \
-        -c goat-export \
-        -s data/docs/*.csv.gz \
-        -d goatcounter-export-ibis.csv.gz

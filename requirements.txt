@@ -1,9 +1,23 @@
-pandas>2,<2.1
+# python
+black
 python-dotenv
-ibis-framework[duckdb,bigquery,deltalake]
+
+# data
+ibis-framework[duckdb,bigquery,deltalake] @ git+https://github.com/ibis-project/ibis
+
+# viz
 plotly
 streamlit
+
+# ops
+dagster
+dagster-webserver
+
+# ai
 openai
+marvin
+
+# cloud
 azure-identity
 azure-storage-blob
 azure-storage-file-datalake --pre

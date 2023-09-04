@@ -1,37 +1,34 @@
 # imports
-import re
 import ibis
+import dagster
 
-import ibis.selectors as s
-
-
-# udfs
-@ibis.udf.scalar.python
-def clean_version(version: str, patch: bool = True) -> str:
-    pattern = r"(\d+\.\d+\.\d+)" if patch else r"(\d+\.\d+)"
-    match = re.search(pattern, version)
-    if match:
-        return match.group(1)
-    else:
-        return version
+from dag import functions as f
 
 
-# functions
-def clean_data(t):
-    t = t.relabel("snake_case")
-    t = t.mutate(s.across(s.of_type("timestamp"), lambda x: x.cast("timestamp('UTC')")))
-    return t
+# assets
+@dagster.asset
+def transform_downloads(extract_downloads):
+    """
+    Transform the PyPI downloads data.
+    """
+    return _transform_downloads(extract_downloads)
 
 
-def agg_downloads(downloads):
+def _transform_downloads(downloads):
+    downloads = downloads.drop("project").unpack("file").unpack("details")
+    downloads = _agg_downloads(downloads)
+    return downloads
+
+
+def _agg_downloads(downloads):
     downloads = downloads.mutate(
-        major_minor_patch=clean_version(downloads["version"], patch=True),
-        major_minor=clean_version(downloads["version"], patch=False).cast("float"),
+        major_minor_patch=f.clean_version(downloads["version"], patch=True),
+        major_minor=f.clean_version(downloads["version"], patch=False).cast("float"),
     )
-    downloads = downloads.relabel(
+    downloads = downloads.rename(
         {
-            "version": "version_raw",
-            "major_minor_patch": "version",
+            "version_raw": "version",
+            "version": "major_minor_patch",
         }
     )
     downloads = (
@@ -61,6 +58,6 @@ def agg_downloads(downloads):
     )
     downloads = downloads.mutate(ibis._["python"].fillna("").name("python_full"))
     downloads = downloads.mutate(
-        clean_version(downloads["python_full"], patch=False).name("python")
+        f.clean_version(downloads["python_full"], patch=False).name("python")
     )
     return downloads
