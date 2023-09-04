@@ -76,6 +76,15 @@ dag:
 run:
     @dagster job execute -j all_assets -m {{module}}
 
+# test
+test:
+    @python metrics.py
+    @python pages/0_github.py
+    @python pages/1_pypi.py
+    @python pages/2_docs.py
+    @python pages/3_about.py
+
+
 # streamlit stuff
 app:
     @streamlit run metrics.py

@@ -7,9 +7,13 @@ import plotly.io as pio
 import plotly.express as px
 import ibis.selectors as s
 
+from dotenv import load_dotenv
 from datetime import datetime, timedelta
 
 # options
+## load .env
+load_dotenv()
+
 ## config.toml
 config = toml.load("config.toml")["app"]
 
