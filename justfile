@@ -62,6 +62,17 @@ download:
     mkdir -p data
     cp -r data/backup/cloud/data/* data
 
+download-prod:
+    az storage azcopy blob download \
+        --account-name ibisanalytics \
+        --container prod \
+        --source 'data' \
+        --destination 'data/backup/cloud' \
+        --recursive
+    mkdir -p data
+    cp -r data/backup/cloud/data/* data
+
+
 # upload
 sync:
     az storage azcopy blob sync \
