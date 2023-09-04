@@ -60,7 +60,7 @@ download:
         --destination 'data/backup/cloud' \
         --recursive
     mkdir -p data
-    cp -r data/backup/cloud/data/* data
+    cp -r data/backup/cloud/data/* data || true
 
 download-prod:
     az storage azcopy blob download \
