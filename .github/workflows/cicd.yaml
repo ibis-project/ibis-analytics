@@ -25,6 +25,7 @@ jobs:
 
   setup:
     runs-on: self-hosted
+    needs: wake-vm
     steps:
       - uses: actions/checkout@v3
       - uses: google-github-actions/auth@v1
@@ -44,6 +45,7 @@ jobs:
 
   ingest:
     runs-on: self-hosted
+    needs: setup
     steps:
       - name: ingest
         run: just ingest
@@ -53,12 +55,14 @@ jobs:
 
   etl:
     runs-on: self-hosted
+    needs: ingest
     steps:
       - name: run ETL job
         run: just run
 
   backup:
     runs-on: self-hosted
+    needs: etl
     steps:
       - name: backup and sync to cloud(s)
         run: |
@@ -70,6 +74,7 @@ jobs:
 
   deploy:
     runs-on: self-hosted
+    needs: etl
     steps:
       - name: deploy to prod
         run: just deploy
@@ -78,6 +83,7 @@ jobs:
 
   test:
     runs-on: self-hosted
+    needs: deploy
     steps:
       - name: test
         run: just test
