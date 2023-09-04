@@ -27,7 +27,7 @@ def backup(storage: str = "local") -> None:
     # backup ingested data
     # that's hard to re-ingest
     source_path = "data/ingest"
-    target_path = "data/backup/ingest"
+    target_path = f"data/backup/cloud/{source_path}"
     os.makedirs(source_path, exist_ok=True)
     os.makedirs(target_path, exist_ok=True)
 
@@ -37,11 +37,11 @@ def backup(storage: str = "local") -> None:
     # backup loaded data as Delta Lake tables
     # and a DuckDB Database
     source_path = "data/system/duckdb"
-    target_path = "data/backup"
-    os.makedirs(source_path, exist_ok=True)
-    os.makedirs(target_path, exist_ok=True)
+    target_path = "data/backup/cloud/data/backup.ddb"
 
-    target = ibis.duckdb.connect(f"data/backup/backup.ddb")
+    os.makedirs(source_path, exist_ok=True)
+
+    target = ibis.duckdb.connect(target_path)
 
     ingested_at = f.now()
 
@@ -58,7 +58,9 @@ def backup(storage: str = "local") -> None:
                 target.create_table(tablename, table.to_pyarrow(), overwrite=True)
 
                 log.info(f"Backing up {tablename} to data/backup/{tablename}.delta...")
-                table.to_delta(f"data/backup/{tablename}.delta", mode="append")
+                table.mutate(ingested_at=ingested_at).to_delta(
+                    f"data/backup/{tablename}.delta", mode="append"
+                )
 
 
 if __name__ == "__main__":
