@@ -24,7 +24,7 @@ jobs:
   #    - name: wake vm
   #      run: just vm-start
 
-  ingest-etl-deploy:
+  ingest-etl-backup-deploy-test:
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v3
