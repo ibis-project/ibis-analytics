@@ -28,6 +28,7 @@ stars = con.tables.stars
 forks = con.tables.forks
 commits = con.tables.commits
 watchers = con.tables.watchers
+backends = con.tables.backends
 
 # display metrics
 f"""
@@ -49,6 +50,25 @@ with st.expander("Show source code", expanded=False):
 f"""
 ---
 """
+
+f"""
+## Ibis stuff
+"""
+
+current_backends_total = (
+    backends.filter(backends.ingested_at == backends.ingested_at.max())
+    .num_backends.max()
+    .to_pandas()
+)
+current_backends = ibis.memtable(backends.backends.unnest()).rename(backends="col0")
+
+col0, col1 = st.columns(2)
+
+with col0:
+    st.metric("Current backends", f"{current_backends_total:,}")
+with col1:
+    st.dataframe(current_backends, use_container_width=True)
+
 
 f"""
 ## totals (all time)
