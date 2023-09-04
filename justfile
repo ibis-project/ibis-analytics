@@ -59,8 +59,8 @@ download:
         --source 'data' \
         --destination 'data/backup/cloud' \
         --recursive
-    mkdir -p data/ingest
-    mv data/backup/cloud/data/ingest/docs data/ingest
+    mkdir -p data/ingest/docs
+    mv data/backup/cloud/data/ingest/docs/* data/ingest/docs
 
 # upload
 sync:
@@ -91,8 +91,11 @@ clean:
     @rm -r data/backup || true
 
 # open
-open:
+open-dag:
     @open http://localhost:3000/asset-groups
+
+open-dash:
+    @open https://ibis-analytics.streamlit.app
 
 # wip below here
 goat:
