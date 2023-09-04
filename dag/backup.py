@@ -57,9 +57,9 @@ def backup(storage: str = "local") -> None:
                 log.info(f"Backing up {tablename} to backup.ddb...")
                 target.create_table(tablename, table.to_pyarrow(), overwrite=True)
 
-                log.info(f"Backing up {tablename} to data/backup/{tablename}.delta...")
+                log.info(f"Backing up {tablename} to data/backup/cloud/data/{tablename}.delta...")
                 table.mutate(ingested_at=ingested_at).to_delta(
-                    f"data/backup/{tablename}.delta", mode="append"
+                    f"data/backup/cloud/data/{tablename}.delta", mode="append"
                 )
 
 
