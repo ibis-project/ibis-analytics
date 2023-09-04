@@ -54,6 +54,7 @@ upload-prod:
 # download
 download:
     rm -r data || true
+    mkdir -p data/backup/cloud
     az storage azcopy blob download \
         --account-name ibisanalytics \
         --container $AZURE_STORAGE_CONTAINER \
