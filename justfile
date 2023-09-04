@@ -59,8 +59,8 @@ download:
         --source 'data' \
         --destination 'data/backup/cloud' \
         --recursive
-    mkdir -p data/ingest/docs
-    mv data/backup/cloud/data/ingest/docs/* data/ingest/docs
+    mkdir -p data/ingest
+    cp -r data/backup/cloud/data/ingest/docs data/ingest
 
 # upload
 sync:
