@@ -26,16 +26,13 @@ def backup(storage: str = "local") -> None:
 
     # backup ingested data
     # that's hard to re-ingest
-    source_path = "data/ingest/docs"
-    target_path = "data/backup/ingest/docs"
+    source_path = "data/ingest"
+    target_path = "data/backup/ingest"
     os.makedirs(source_path, exist_ok=True)
     os.makedirs(target_path, exist_ok=True)
 
-    for root, dirs, files in os.walk(source_path):
-        for file in files:
-            full_path = os.path.join(root, file)
-            log.info(f"Backing up {full_path} to {target_path}...")
-            os.system(f"cp {full_path} {target_path}")
+    log.info(f"Backing up {source_path} to {target_path}...")
+    os.system(f"cp -r {source_path} {target_path}")
 
     # backup loaded data as Delta Lake tables
     # and a DuckDB Database

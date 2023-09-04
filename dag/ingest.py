@@ -230,7 +230,7 @@ def ingest_pypi():
 
         # connect to bigquery and execute query
         con = ibis.connect(f"bigquery://{project_id}")
-        log.info(f"Executing query: {query}")
+        log.info(f"Executing query:\n{query}")
         t = con.sql(query)
 
         # write to parquet
