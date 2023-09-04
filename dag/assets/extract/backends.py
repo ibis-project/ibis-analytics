@@ -9,7 +9,7 @@ from dag import functions as f
 @dagster.asset
 def extract_backends():
     """
-    Load the backend data.
+    Extract the backend data.
     """
     backends = ibis.util.backend_entry_points()
     backend_data = {

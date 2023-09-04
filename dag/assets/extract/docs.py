@@ -9,7 +9,7 @@ from dag import functions as f
 @dagster.asset
 def extract_docs():
     """
-    Load the docs data.
+    Extract the ingested docs data.
     """
     docs = f.clean_data(ibis.read_csv("data/ingest/docs/*.csv*"))
     return docs
