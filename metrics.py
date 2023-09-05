@@ -56,7 +56,7 @@ f"""
 """
 
 f"""
-## Supported backends
+## supported backends
 """
 
 current_backends_total = (

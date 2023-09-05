@@ -115,6 +115,7 @@ clean:
     @rm -r *.ddb* || true
     @rm -r data/system || true
     @rm -r data/backup || true
+    @rm data/backup.ddb || true
 
 # open dag
 open-dag:
