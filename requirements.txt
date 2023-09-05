@@ -13,11 +13,3 @@ streamlit
 dagster
 dagster-webserver
 
-# ai
-openai
-marvin
-
-# cloud
-azure-identity
-azure-storage-blob
-azure-storage-file-datalake --pre
