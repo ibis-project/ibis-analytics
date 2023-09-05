@@ -1,4 +1,4 @@
-# Justfile
+# justfile
 
 # load environment variables
 set dotenv-load
