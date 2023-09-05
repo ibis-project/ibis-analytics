@@ -71,11 +71,18 @@ download-prod:
         --recursive
 
 
-# upload
+# sync
 sync:
     az storage azcopy blob sync \
         --account-name ibisanalytics \
         --container $AZURE_STORAGE_CONTAINER \
+        --source 'data' \
+        --destination '.'
+
+sync-prod:
+    az storage azcopy blob sync \
+        --account-name ibisanalytics \
+        --container prod \
         --source 'data' \
         --destination '.'
 

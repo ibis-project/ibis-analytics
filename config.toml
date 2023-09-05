@@ -1,9 +1,9 @@
 [app]
-#database="data/backup/cloud/data/backup.ddb"
+#database="databackup.ddb"
 database="md:prod_metrics"
 [eda]
 database="md:prod_metrics"
-#database="data/backup/cloud/data/backup.ddb"
+#database="data/backup.ddb"
 
 [prod]
 staging="stage.ddb"
