@@ -33,6 +33,3 @@ endpoints = [
     "issues",
     "contributors",
 ]
-[ingest.goat]
-directory = "goat-export"
-blob_name = "goatcounter-export-ibis.csv.gz"
