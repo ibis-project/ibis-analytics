@@ -56,7 +56,7 @@ f"""
 """
 
 f"""
-## Ibis stuff
+## Supported backends
 """
 
 current_backends_total = (
@@ -66,7 +66,7 @@ current_backends_total = (
 )
 current_backends = ibis.memtable(backends.backends.unnest()).rename(backends="col0")
 
-st.metric("Current backends", f"{current_backends_total:,}")
+st.metric("Total", f"{current_backends_total:,}")
 st.dataframe(current_backends, use_container_width=True)
 
 f"""
