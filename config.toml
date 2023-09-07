@@ -1,5 +1,5 @@
 [app]
-#database="databackup.ddb"
+#database="data/backup.ddb"
 database="md:prod_metrics"
 
 [eda]

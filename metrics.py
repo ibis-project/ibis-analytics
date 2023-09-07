@@ -36,20 +36,52 @@ backends = con.tables.backends
 
 # display metrics
 f"""
-# Metrics
-#
-See the [about page](/about/) for implementation details.
+# Analytics on Ibis
+
+Built with [Ibis](https://ibis-project.org) and:
+
+- [GitHub](https://github.com/lostmygithubaccount/ibis-analytics) (source control, CI/CD, source data)
+- [DuckDB](https://duckdb.org) (database, query engine)
+- [Streamlit](https://streamlit.io) (dashboard)
+- [Plotly](https://plotly.com/python/) (plotting)
+- [justfile](https://github.com/casey/just) (command runner)
+- [TOML](https://toml.io) (configuration)
+- [Google BigQuery](https://cloud.google.com/free/docs/free-cloud-features#bigquery) (source data)
+- [Azure](https://azure.microsoft.com) (VM, storage backups)
+- [Streamlit Community Cloud](https://docs.streamlit.io/streamlit-community-cloud) (cloud hosting for dashboard)
+- [MotherDuck](https://motherduck.com/) (cloud hosting for production databases)
+
+This is an end-to-end analytics project ingesting and processing >10M rows of data at little to no cost with OSS and freemium cloud services. See the [about page](/about/) for implementation details.
 
 :red[**Warning**]: Data ingestion is not fully automated. GitHub and PyPI metrics are refreshed every 3 hours. Documentation metrics are to be automated. CI (GitHub Actions) and Conda metrics are to be implemented and automated. Documentation metrics are also difficult to analyze given numerous changes in structure (with another pending).
 
 ___
 """
 
+with open("requirements.txt") as f:
+    metrics_code = f.read()
+
+with st.expander("show `requirements.txt`", expanded=False):
+    st.code(metrics_code, line_numbers=True, language="python")
+
 with open("metrics.py") as f:
     metrics_code = f.read()
 
-with st.expander("Show source code", expanded=False):
+with st.expander("show `metrics.py` (source for this page)", expanded=False):
     st.code(metrics_code, line_numbers=True, language="python")
+
+with open("config.toml") as f:
+    config_code = f.read()
+
+with st.expander("show `config.toml`", expanded=False):
+    st.code(config_code, line_numbers=True, language="toml")
+
+with open("justfile") as f:
+    justfile_code = f.read()
+
+with st.expander("show `justfile`", expanded=False):
+    st.code(justfile_code, line_numbers=True, language="makefile")
+
 
 f"""
 ---
