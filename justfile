@@ -38,8 +38,8 @@ upload:
     az storage azcopy blob upload \
         --account-name ibisanalytics \
         --container $AZURE_STORAGE_CONTAINER \
-        --source 'data' \
-        --destination . \
+        --source 'data/*' \
+        --destination 'data' \
         --recursive
 
 # DANGER
@@ -47,8 +47,8 @@ upload-prod:
     az storage azcopy blob upload \
         --account-name ibisanalytics \
         --container prod \
-        --source 'data' \
-        --destination . \
+        --source 'data/*' \
+        --destination 'data' \
         --recursive
 
 # download
@@ -58,7 +58,7 @@ download:
         --account-name ibisanalytics \
         --container $AZURE_STORAGE_CONTAINER \
         --source '*' \
-        --destination 'data' \
+        --destination '.' \
         --recursive
 
 download-prod:
@@ -67,7 +67,7 @@ download-prod:
         --account-name ibisanalytics \
         --container prod \
         --source '*' \
-        --destination 'data' \
+        --destination '.' \
         --recursive
 
 
@@ -99,8 +99,7 @@ test:
     @python metrics.py
     @python pages/0_github.py
     @python pages/1_pypi.py
-    @python pages/2_docs.py
-    @python pages/3_about.py
+    @python pages/2_about.py
 
 # streamlit stuff
 app:
