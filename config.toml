@@ -1,6 +1,6 @@
 [app]
-#database="data/backup.ddb"
-database="md:prod_metrics"
+database="data/backup.ddb"
+#database="md:prod_metrics"
 
 [eda]
 database="md:prod_metrics"

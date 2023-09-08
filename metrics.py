@@ -39,23 +39,32 @@ f"""
 
 This is an end-to-end analytics project ingesting and processing >10M rows of data at little to no cost.
 
-Built with [Ibis](https://ibis-project.org) and other OSS:
+"""
 
-- [DuckDB](https://duckdb.org) (databases, query engine)
-- [Streamlit](https://streamlit.io) (dashboard)
-- [Plotly](https://plotly.com/python) (plotting)
-- [Dagster](https://dagster.io) (DAG pipeline)
-- [justfile](https://github.com/casey/just) (command runner)
-- [TOML](https://toml.io) (configuration)
+col0, col1 = st.columns(2)
+with col0:
+    """
+    Built with [Ibis](https://ibis-project.org) and other OSS:
 
-plus some freemium cloud services:
+    - [DuckDB](https://duckdb.org) (databases, query engine)
+    - [Streamlit](https://streamlit.io) (dashboard)
+    - [Plotly](https://plotly.com/python) (plotting)
+    - [Dagster](https://dagster.io) (DAG pipeline)
+    - [justfile](https://github.com/casey/just) (command runner)
+    - [TOML](https://toml.io) (configuration)"""
 
-- [GitHub](https://github.com/lostmygithubaccount/ibis-analytics) (source control, CI/CD, source data)
-- [Google BigQuery](https://cloud.google.com/free/docs/free-cloud-features#bigquery) (source data)
-- [Azure](https://azure.microsoft.com) (VM, storage backups)
-- [Streamlit Community Cloud](https://docs.streamlit.io/streamlit-community-cloud) (cloud hosting for dashboard)
-- [MotherDuck](https://motherduck.com/) (cloud hosting for production databases)
+with col1:
+    """
+    And some freemium cloud services:
 
+    - [GitHub](https://github.com/lostmygithubaccount/ibis-analytics) (source control, CI/CD, source data)
+    - [Google BigQuery](https://cloud.google.com/free/docs/free-cloud-features#bigquery) (source data)
+    - [Azure](https://azure.microsoft.com) (VM, storage backups)
+    - [Streamlit Community Cloud](https://docs.streamlit.io/streamlit-community-cloud) (cloud hosting for dashboard)
+    - [MotherDuck](https://motherduck.com/) (cloud hosting for production databases)"""
+
+
+"""
 
 :red[**Warning**]: GitHub and PyPI data is refreshed every 3 hours. Check [the CI/CD pipeline for the latest run](https://github.com/lostmygithubaccount/ibis-analytics/actions/workflows/cicd.yaml).
 
