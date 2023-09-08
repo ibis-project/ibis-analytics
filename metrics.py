@@ -37,7 +37,7 @@ downloads = con.tables.downloads
 f"""
 # Analytics on Ibis
 
-This is an end-to-end analytics project ingesting and processing >10M rows of data at little to no cost.
+This is an end-to-end analytics project ingesting and processing ~10M rows of data at little to no cost.
 
 """
 
