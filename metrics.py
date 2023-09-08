@@ -37,11 +37,11 @@ downloads = con.tables.downloads
 f"""
 # Analytics on Ibis
 
-This is an end-to-end analytics project ingesting and processing >10M rows of data at little to no cost. 
+This is an end-to-end analytics project ingesting and processing >10M rows of data at little to no cost.
 
 Built with [Ibis](https://ibis-project.org) and other OSS:
 
-- [DuckDB](https://duckdb.org) (database, query engine)
+- [DuckDB](https://duckdb.org) (databases, query engine)
 - [Streamlit](https://streamlit.io) (dashboard)
 - [Plotly](https://plotly.com/python) (plotting)
 - [Dagster](https://dagster.io) (DAG pipeline)
@@ -159,13 +159,12 @@ with col0:
         value=f"{total_stars_all_time:,}",
     )
     st.metric("PyPI downloads", f"{downloads_all_time:,}")
-    st.metric("GitHub contributors", f"{total_contributors_all_time:,}")
 with col1:
+    st.metric("GitHub contributors", f"{total_contributors_all_time:,}")
     st.metric("GitHub forks", f"{total_forks_all_time:,}")
-    st.metric("GitHub watchers", f"{total_watchers_all_time:,}")
-    st.metric("GitHub issues closed", f"{total_closed_issues_all_time:,}")
 with col2:
     st.metric("GitHub PRs merged", f"{total_merged_pulls_all_time:,}")
+    st.metric("GitHub issues closed", f"{total_closed_issues_all_time:,}")
 
 
 # variables
@@ -181,26 +180,15 @@ with st.form(key="app"):
     update_button = st.form_submit_button(label="update")
 
 
-# metric
-def metricfy(val):
-    """
-    The trillion dollar mistake.
-    """
-    if val == None:
-        return 0
-    else:
-        return val
-
-
 # compute metrics
-total_stars = metricfy(
+total_stars = (
     stars.filter(ibis._.starred_at >= datetime.now() - timedelta(days=days))
     .select("login")
     .distinct()
     .count()
     .to_pandas()
 )
-total_stars_prev = metricfy(
+total_stars_prev = (
     stars.filter(ibis._.starred_at <= datetime.now() - timedelta(days=days))
     .filter(ibis._.starred_at >= datetime.now() - timedelta(days=days * 2))
     .select("login")
@@ -208,14 +196,14 @@ total_stars_prev = metricfy(
     .count()
     .to_pandas()
 )
-total_forks = metricfy(
+total_forks = (
     forks.filter(ibis._.created_at >= datetime.now() - timedelta(days=days))
     .select("login")
     .distinct()
     .count()
     .to_pandas()
 )
-total_forks_prev = metricfy(
+total_forks_prev = (
     forks.filter(ibis._.created_at <= datetime.now() - timedelta(days=days))
     .filter(ibis._.created_at >= datetime.now() - timedelta(days=days * 2))
     .select("login")
@@ -223,14 +211,14 @@ total_forks_prev = metricfy(
     .count()
     .to_pandas()
 )
-total_issues = metricfy(
+total_issues = (
     issues.filter(ibis._.created_at >= datetime.now() - timedelta(days=days))
     .select("number")
     .distinct()
     .count()
     .to_pandas()
 )
-total_issues_prev = metricfy(
+total_issues_prev = (
     issues.filter(ibis._.created_at <= datetime.now() - timedelta(days=days))
     .filter(ibis._.created_at >= datetime.now() - timedelta(days=days * 2))
     .select("number")
@@ -238,14 +226,31 @@ total_issues_prev = metricfy(
     .count()
     .to_pandas()
 )
-total_pulls = metricfy(
+total_issues_closed = (
+    issues.filter(ibis._.closed_at != None)
+    .filter(ibis._.closed_at >= datetime.now() - timedelta(days=days))
+    .select("number")
+    .distinct()
+    .count()
+    .to_pandas()
+)
+total_issues_closed_prev = (
+    issues.filter(ibis._.closed_at != None)
+    .filter(ibis._.closed_at <= datetime.now() - timedelta(days=days))
+    .filter(ibis._.closed_at >= datetime.now() - timedelta(days=days * 2))
+    .select("number")
+    .distinct()
+    .count()
+    .to_pandas()
+)
+total_pulls = (
     pulls.filter(ibis._.created_at >= datetime.now() - timedelta(days=days))
     .select("number")
     .distinct()
     .count()
     .to_pandas()
 )
-total_pulls_prev = metricfy(
+total_pulls_prev = (
     pulls.filter(ibis._.created_at <= datetime.now() - timedelta(days=days))
     .filter(ibis._.created_at >= datetime.now() - timedelta(days=days * 2))
     .select("number")
@@ -253,7 +258,24 @@ total_pulls_prev = metricfy(
     .count()
     .to_pandas()
 )
-total_contributors = metricfy(
+total_pulls_merged = (
+    pulls.filter(ibis._.merged_at != None)
+    .filter(ibis._.merged_at >= datetime.now() - timedelta(days=days))
+    .select("number")
+    .distinct()
+    .count()
+    .to_pandas()
+)
+total_pulls_merged_prev = (
+    pulls.filter(ibis._.merged_at != None)
+    .filter(ibis._.merged_at <= datetime.now() - timedelta(days=days))
+    .filter(ibis._.merged_at >= datetime.now() - timedelta(days=days * 2))
+    .select("number")
+    .distinct()
+    .count()
+    .to_pandas()
+)
+total_contributors = (
     pulls.filter(ibis._.merged_at != None)
     .filter(ibis._.merged_at >= datetime.now() - timedelta(days=days))
     .select("login")
@@ -261,7 +283,7 @@ total_contributors = metricfy(
     .count()
     .to_pandas()
 )
-total_contributors_prev = metricfy(
+total_contributors_prev = (
     pulls.filter(ibis._.merged_at != None)
     .filter(ibis._.merged_at <= datetime.now() - timedelta(days=days))
     .filter(ibis._.merged_at >= datetime.now() - timedelta(days=days * 2))
@@ -270,12 +292,12 @@ total_contributors_prev = metricfy(
     .count()
     .to_pandas()
 )
-total_downloads = metricfy(
+total_downloads = (
     downloads.filter(ibis._.timestamp >= datetime.now() - timedelta(days=days))
     .downloads.sum()
     .to_pandas()
 )
-total_downloads_prev = metricfy(
+total_downloads_prev = (
     downloads.filter(ibis._.timestamp <= datetime.now() - timedelta(days=days))
     .filter(ibis._.timestamp >= datetime.now() - timedelta(days=days * 2))
     .downloads.sum()
@@ -285,7 +307,7 @@ total_downloads_prev = metricfy(
 f"""
 ## totals (last {days} days)
 """
-col1, col2, col3 = st.columns(3)
+col1, col2, col3, col4 = st.columns(4)
 with col1:
     st.metric(
         label="GitHub stars",
@@ -293,30 +315,42 @@ with col1:
         delta=f"{total_stars - total_stars_prev:,}",
     )
     st.metric(
-        label="downloads",
+        label="PyPI downloads",
         value=f"{total_downloads:,}",
         delta=f"{total_downloads - total_downloads_prev:,}",
     )
+with col2:
     st.metric(
         label="GitHub contributors",
         value=f"{total_contributors:,}",
         delta=f"{total_contributors - total_contributors_prev:,}",
     )
-with col2:
     st.metric(
         label="GitHub forks created",
         value=f"{total_forks:,}",
         delta=f"{total_forks - total_forks_prev:,}",
+    )
+with col3:
+    st.metric(
+        label="GitHub PRs opened",
+        value=f"{total_pulls:,}",
+        delta=f"{total_pulls - total_pulls_prev:,}",
     )
     st.metric(
         label="GitHub issues opened",
         value=f"{total_issues:,}",
         delta=f"{total_issues - total_issues_prev:,}",
     )
+with col4:
     st.metric(
-        label="GitHub PRs opened",
-        value=f"{total_pulls:,}",
-        delta=f"{total_pulls - total_pulls_prev:,}",
+        label="GitHub PRs merged",
+        value=f"{total_pulls_merged:,}",
+        delta=f"{total_pulls_merged - total_pulls_merged_prev:,}",
+    )
+    st.metric(
+        label="GitHub issues closed",
+        value=f"{total_issues_closed:,}",
+        delta=f"{total_issues_closed - total_issues_closed_prev:,}",
     )
 
 f"""

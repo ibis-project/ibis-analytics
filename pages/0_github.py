@@ -24,10 +24,10 @@ st.set_page_config(layout="wide")
 con = ibis.connect(f"duckdb://{config['database']}", read_only=True)
 
 # use precomputed data
-issues = con.tables.issues
-pulls = con.tables.pulls
 stars = con.tables.stars
 forks = con.tables.forks
+pulls = con.tables.pulls
+issues = con.tables.issues
 commits = con.tables.commits
 watchers = con.tables.watchers
 
