@@ -57,8 +57,8 @@ download:
     az storage azcopy blob download \
         --account-name ibisanalytics \
         --container $AZURE_STORAGE_CONTAINER \
-        --source '*' \
-        --destination '.' \
+        --source 'data/*' \
+        --destination 'data' \
         --recursive
 
 download-prod:
@@ -66,8 +66,8 @@ download-prod:
     az storage azcopy blob download \
         --account-name ibisanalytics \
         --container prod \
-        --source '*' \
-        --destination '.' \
+        --source 'data/*' \
+        --destination 'data' \
         --recursive
 
 
@@ -77,14 +77,14 @@ sync:
         --account-name ibisanalytics \
         --container $AZURE_STORAGE_CONTAINER \
         --source 'data' \
-        --destination '.'
+        --destination 'data'
 
 sync-prod:
     az storage azcopy blob sync \
         --account-name ibisanalytics \
         --container prod \
         --source 'data' \
-        --destination '.'
+        --destination 'data'
 
 # dag
 dag:
