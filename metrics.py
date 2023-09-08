@@ -66,7 +66,7 @@ with col1:
 
 """
 
-:red[**Warning**]: GitHub and PyPI data is refreshed every 3 hours. Check [the CI/CD pipeline for the latest run](https://github.com/lostmygithubaccount/ibis-analytics/actions/workflows/cicd.yaml).
+:violet[**Note**]: data is refreshed every 3 hours. Check [the CI/CD pipeline for the latest run](https://github.com/lostmygithubaccount/ibis-analytics/actions/workflows/cicd.yaml).
 
 ___
 """
