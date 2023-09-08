@@ -24,36 +24,40 @@ st.set_page_config(layout="wide")
 con = ibis.connect(f"duckdb://{config['database']}", read_only=True)
 
 # use precomputed data
-docs = con.tables.docs
-downloads = con.tables.downloads
-issues = con.tables.issues
-pulls = con.tables.pulls
 stars = con.tables.stars
 forks = con.tables.forks
+pulls = con.tables.pulls
+issues = con.tables.issues
 commits = con.tables.commits
 watchers = con.tables.watchers
 backends = con.tables.backends
+downloads = con.tables.downloads
 
 # display metrics
 f"""
 # Analytics on Ibis
 
-Built with [Ibis](https://ibis-project.org) and:
+This is an end-to-end analytics project ingesting and processing >10M rows of data at little to no cost. 
 
-- [GitHub](https://github.com/lostmygithubaccount/ibis-analytics) (source control, CI/CD, source data)
+Built with [Ibis](https://ibis-project.org) and other OSS:
+
 - [DuckDB](https://duckdb.org) (database, query engine)
 - [Streamlit](https://streamlit.io) (dashboard)
-- [Plotly](https://plotly.com/python/) (plotting)
+- [Plotly](https://plotly.com/python) (plotting)
+- [Dagster](https://dagster.io) (DAG pipeline)
 - [justfile](https://github.com/casey/just) (command runner)
 - [TOML](https://toml.io) (configuration)
+
+plus some freemium cloud services:
+
+- [GitHub](https://github.com/lostmygithubaccount/ibis-analytics) (source control, CI/CD, source data)
 - [Google BigQuery](https://cloud.google.com/free/docs/free-cloud-features#bigquery) (source data)
 - [Azure](https://azure.microsoft.com) (VM, storage backups)
 - [Streamlit Community Cloud](https://docs.streamlit.io/streamlit-community-cloud) (cloud hosting for dashboard)
 - [MotherDuck](https://motherduck.com/) (cloud hosting for production databases)
 
-This is an end-to-end analytics project ingesting and processing >10M rows of data at little to no cost with OSS and freemium cloud services. See the [about page](/about/) for implementation details.
 
-:red[**Warning**]: Data ingestion is not fully automated. GitHub and PyPI metrics are refreshed every 3 hours. Documentation metrics are to be automated. CI (GitHub Actions) and Conda metrics are to be implemented and automated. Documentation metrics are also difficult to analyze given numerous changes in structure (with another pending).
+:red[**Warning**]: GitHub and PyPI data is refreshed every 3 hours. Check [the CI/CD pipeline for the latest run](https://github.com/lostmygithubaccount/ibis-analytics/actions/workflows/cicd.yaml).
 
 ___
 """
@@ -62,12 +66,6 @@ with open("requirements.txt") as f:
     metrics_code = f.read()
 
 with st.expander("show `requirements.txt`", expanded=False):
-    st.code(metrics_code, line_numbers=True, language="python")
-
-with open("metrics.py") as f:
-    metrics_code = f.read()
-
-with st.expander("show `metrics.py` (source for this page)", expanded=False):
     st.code(metrics_code, line_numbers=True, language="python")
 
 with open("config.toml") as f:
@@ -82,6 +80,17 @@ with open("justfile") as f:
 with st.expander("show `justfile`", expanded=False):
     st.code(justfile_code, line_numbers=True, language="makefile")
 
+with open(".github/workflows/cicd.yaml") as f:
+    cicd_code = f.read()
+
+with st.expander("show `cicd.yaml`", expanded=False):
+    st.code(cicd_code, line_numbers=True, language="yaml")
+
+with open("metrics.py") as f:
+    metrics_code = f.read()
+
+with st.expander("show `metrics.py` (source for this page)", expanded=False):
+    st.code(metrics_code, line_numbers=True, language="python")
 
 f"""
 ---
@@ -143,9 +152,6 @@ open_pulls = (
 downloads_all_time = downloads["downloads"].sum().to_pandas()
 
 
-total_visits_all_time = docs.count().to_pandas()
-total_first_visits_all_time = docs.first_visit.sum().to_pandas()
-
 col0, col1, col2 = st.columns(3)
 with col0:
     st.metric(
@@ -160,8 +166,6 @@ with col1:
     st.metric("GitHub issues closed", f"{total_closed_issues_all_time:,}")
 with col2:
     st.metric("GitHub PRs merged", f"{total_merged_pulls_all_time:,}")
-    st.metric("Documentation visits", f"{total_visits_all_time:,}")
-    st.metric("Documentation first visits", f"{total_first_visits_all_time:,}")
 
 
 # variables
@@ -277,31 +281,6 @@ total_downloads_prev = metricfy(
     .downloads.sum()
     .to_pandas()
 )
-total_docs_visits = metricfy(
-    docs.filter(ibis._.timestamp >= datetime.now() - timedelta(days=days))
-    .count()
-    .to_pandas()
-)
-total_docs_visits_prev = metricfy(
-    docs.filter(ibis._.timestamp <= datetime.now() - timedelta(days=days))
-    .filter(ibis._.timestamp >= datetime.now() - timedelta(days=days * 2))
-    .count()
-    .to_pandas()
-)
-total_docs_first_visits = metricfy(
-    (
-        docs.filter(
-            ibis._.timestamp >= datetime.now() - timedelta(days=days)
-        ).first_visit.sum()
-    ).to_pandas()
-)
-total_docs_first_visits_prev = metricfy(
-    (
-        docs.filter(ibis._.timestamp <= datetime.now() - timedelta(days=days))
-        .filter(ibis._.timestamp >= datetime.now() - timedelta(days=days * 2))
-        .first_visit.sum()
-    ).to_pandas()
-)
 
 f"""
 ## totals (last {days} days)
@@ -338,17 +317,6 @@ with col2:
         label="GitHub PRs opened",
         value=f"{total_pulls:,}",
         delta=f"{total_pulls - total_pulls_prev:,}",
-    )
-with col3:
-    st.metric(
-        label="Documentation visits",
-        value=f"{total_docs_visits:,}",
-        delta=f"{total_docs_visits - total_docs_visits_prev:,}",
-    )
-    st.metric(
-        label="Documentation first visits",
-        value=f"{total_docs_first_visits:,}",
-        delta=f"{total_docs_first_visits - total_docs_first_visits_prev:,}",
     )
 
 f"""
@@ -411,15 +379,3 @@ c2 = px.bar(
     title=f"PRs by login",
 )
 st.plotly_chart(c2, use_container_width=True)
-
-f"""
-### docs visits by path and referrer
-"""
-st.dataframe(
-    docs.filter(ibis._.timestamp > datetime.now() - timedelta(days=days))
-    .group_by([ibis._.path, ibis._.referrer])
-    .agg(ibis._.count().name("visits"))
-    # .mutate(ibis._.referrer.cast(str)[:20].name("referrer"))
-    .order_by(ibis._.visits.desc()),
-    use_container_width=True,
-)

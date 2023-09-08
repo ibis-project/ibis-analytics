@@ -13,17 +13,6 @@ on:
 
 jobs:
 
-  #wake-vm:
-  #  runs-on: ubuntu-latest
-  #  continue-on-error: true
-  #  steps:
-  #    - uses: actions/checkout@v3 # idk if this is required
-  #    - uses: azure/login@v1
-  #      with:
-  #        creds: ${{ secrets.AZURE_CREDENTIALS }}
-  #    - name: wake vm
-  #      run: just vm-start
-
   ingest-etl-backup-deploy-test:
     runs-on: self-hosted
     steps:
@@ -37,7 +26,7 @@ jobs:
           python-version: 3.11
       - name: install requirements
         run: just setup
-      - name: load backup data # TODO: restore from GH cache
+      - name: load backup data
         run: just download
         env:
           AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_KEY }}

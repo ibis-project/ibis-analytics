@@ -24,20 +24,10 @@ def backup(storage: str = "local") -> None:
     Backup the data.
     """
 
-    # backup ingested data
-    # that's hard to re-ingest
-    source_path = "data/ingest"
-    target_path = f"data/backup/cloud/{source_path}"
-    os.makedirs(source_path, exist_ok=True)
-    os.makedirs(target_path, exist_ok=True)
-
-    log.info(f"Backing up {source_path} to {target_path}...")
-    os.system(f"cp -r {source_path} {target_path}")
-
     # backup loaded data as Delta Lake tables
     # and a DuckDB Database
     source_path = "data/system/duckdb"
-    target_path = "data/backup/cloud/data/backup.ddb"
+    target_path = "data/backup.ddb"
 
     os.makedirs(source_path, exist_ok=True)
 

@@ -1,27 +1,18 @@
 [app]
-#database="data/backup.ddb"
-database="md:prod_metrics"
+database="data/backup.ddb"
+#database="md:prod_metrics"
 
 [eda]
 database="md:prod_metrics"
 #database="data/backup.ddb"
 
-[ingest.ci]
-#backfill=365
 [ingest.pypi]
-#backfill = 365
 packages = [
     "ibis-framework",
-    #"substrait",
-    #"ibis-substrait",
 ]
 [ingest.github]
 repos = [
     "ibis-project/ibis",
-    #"ibis-project/ibis-examples",
-    #"substrait-io/substrait",
-    #"substrait-io/substrait-python",
-    #"ibis-project/ibis-substrait",
 ]
 endpoints = [
     "repo",
