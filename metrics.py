@@ -33,12 +33,12 @@ watchers = con.tables.watchers
 backends = con.tables.backends
 downloads = con.tables.downloads
 
-# display metrics
+# display header stuff
+with open("readme.md") as f:
+    readme_code = f.read()
+
 f"""
-# Analytics on Ibis
-
-This is an end-to-end analytics project ingesting and processing ~10M rows of data at little to no cost.
-
+{readme_code}
 """
 
 col0, col1 = st.columns(2)
