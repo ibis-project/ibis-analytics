@@ -5,7 +5,7 @@ on:
 
 jobs:
 
-  ingest-etl-backup-deploy-test:
+  drop-dbs:
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v3

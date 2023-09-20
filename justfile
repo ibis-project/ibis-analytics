@@ -128,6 +128,11 @@ open-dash:
 cicd:
     @gh workflow run cicd.yaml
 
+# temp
+temp:
+    @gh workflow run temp.yaml
+
+
 # start vm
 vm-start:
     @az vm start -n cicd -g ibis-analytics
