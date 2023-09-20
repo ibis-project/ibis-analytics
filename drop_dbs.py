@@ -15,7 +15,7 @@ config = toml.load("config.toml")["app"]
 con = ibis.connect(f"duckdb://{config['database']}", read_only=True)
 
 # drop tables
-cur = con.raw_sql("drop database if exists staging_metrics cascade")
+cur = con.raw_sql("drop database if exists staging_metrics cascade;")
 cur.close()
-con.raw_sql("drop database if exists prod_metrics cascade")
+con.raw_sql("drop database if exists prod_metrics cascade;")
 cur.close()
