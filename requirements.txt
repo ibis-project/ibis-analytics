@@ -3,6 +3,7 @@ black
 python-dotenv
 
 # data
+duckdb~=0.8.0
 ibis-framework[duckdb,bigquery,deltalake] @ git+https://github.com/ibis-project/ibis
 
 # viz
