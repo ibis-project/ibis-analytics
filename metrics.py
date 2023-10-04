@@ -57,7 +57,7 @@ with col1:
     """
     And some freemium cloud services:
 
-    - [GitHub](https://github.com/lostmygithubaccount/ibis-analytics) (source control, CI/CD, source data)
+    - [GitHub](https://github.com/ibis-project/ibis-analytics) (source control, CI/CD, source data)
     - [Google BigQuery](https://cloud.google.com/free/docs/free-cloud-features#bigquery) (source data)
     - [Azure](https://azure.microsoft.com) (VM, storage backups)
     - [Streamlit Community Cloud](https://docs.streamlit.io/streamlit-community-cloud) (cloud hosting for dashboard)
@@ -66,7 +66,7 @@ with col1:
 
 """
 
-:violet[**Note**]: data is refreshed every 3 hours. Check [the CI/CD pipeline for the latest run](https://github.com/lostmygithubaccount/ibis-analytics/actions/workflows/cicd.yaml).
+:violet[**Note**]: data is refreshed every 3 hours. Check [the CI/CD pipeline for the latest run](https://github.com/ibis-project/ibis-analytics/actions/workflows/cicd.yaml).
 
 ___
 """
