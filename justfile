@@ -7,6 +7,7 @@ set dotenv-load
 module := "dag"
 
 # aliases
+alias open:=open-dash
 alias preview:=app
 
 # list justfile recipes
