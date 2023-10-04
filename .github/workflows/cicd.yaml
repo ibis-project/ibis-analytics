@@ -15,7 +15,8 @@ jobs:
 
   ingest-etl-backup-deploy-test:
     runs-on:
-      labels: larger-runners
+      group: large-runners
+      labels: linux-small
     steps:
       - uses: actions/checkout@v3
       - uses: google-github-actions/auth@v1
