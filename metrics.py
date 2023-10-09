@@ -3,9 +3,7 @@ import toml
 import ibis
 
 import streamlit as st
-import plotly.io as pio
 import plotly.express as px
-import ibis.selectors as s
 
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
@@ -28,8 +26,6 @@ stars = con.tables.stars
 forks = con.tables.forks
 pulls = con.tables.pulls
 issues = con.tables.issues
-commits = con.tables.commits
-watchers = con.tables.watchers
 backends = con.tables.backends
 downloads = con.tables.downloads
 
@@ -101,11 +97,11 @@ with open("metrics.py") as f:
 with st.expander("show `metrics.py` (source for this page)", expanded=False):
     st.code(metrics_code, line_numbers=True, language="python")
 
-f"""
+"""
 ---
 """
 
-f"""
+"""
 ## supported backends
 """
 
@@ -119,44 +115,21 @@ current_backends = ibis.memtable(backends.backends.unnest()).rename(backends="co
 st.metric("Total", f"{current_backends_total:,}")
 st.dataframe(current_backends, use_container_width=True)
 
-f"""
+"""
 ## totals (all time)
 """
 
-total_stars_all_time = stars.select("login").distinct().count().to_pandas()
-total_forks_all_time = forks.select("login").distinct().count().to_pandas()
-total_closed_issues_all_time = (
-    issues.filter(ibis._.state == "closed")
-    .select("number")
-    .distinct()
-    .count()
-    .to_pandas()
-)
-total_merged_pulls_all_time = (
-    pulls.filter(ibis._.state == "merged")
-    .select("number")
-    .distinct()
-    .count()
-    .to_pandas()
-)
-total_contributors_all_time = (
-    pulls.filter(ibis._.merged_at != None)
-    .select("login")
-    .distinct()
-    .count()
-    .to_pandas()
-)
-total_watchers_all_time = watchers.select("login").distinct().count().to_pandas()
-open_issues = (
-    issues.filter(ibis._.is_closed != True)
-    .select("number")
-    .distinct()
-    .count()
-    .to_pandas()
-)
-open_pulls = (
-    pulls.filter(ibis._.state == "open").select("number").distinct().count().to_pandas()
-)
+total_stars_all_time = stars.login.nunique().to_pandas()
+total_forks_all_time = forks.login.nunique().to_pandas()
+
+total_closed_issues_all_time = issues.agg(
+    total_closed_issues_all_time=ibis._.number.nunique(where=ibis._.state == "closed"),
+).to_pandas()
+
+total_merged_pulls_all_time, total_contributors_all_time = pulls.agg(
+    total_merged_pulls_all_time=ibis._.number.nunique(where=ibis._.state == "merged"),
+    total_contributors_all_time=ibis._.login.nunique(where=ibis._.merged_at.notnull()),
+).to_pandas()
 
 downloads_all_time = downloads["downloads"].sum().to_pandas()
 
@@ -189,129 +162,65 @@ with st.form(key="app"):
     update_button = st.form_submit_button(label="update")
 
 
+START = datetime.now() - timedelta(days=days * 2)
+STOP = datetime.now() - timedelta(days=days)
+
+
 # compute metrics
-total_stars = (
-    stars.filter(ibis._.starred_at >= datetime.now() - timedelta(days=days))
-    .select("login")
-    .distinct()
-    .count()
-    .to_pandas()
-)
-total_stars_prev = (
-    stars.filter(ibis._.starred_at <= datetime.now() - timedelta(days=days))
-    .filter(ibis._.starred_at >= datetime.now() - timedelta(days=days * 2))
-    .select("login")
-    .distinct()
-    .count()
-    .to_pandas()
-)
-total_forks = (
-    forks.filter(ibis._.created_at >= datetime.now() - timedelta(days=days))
-    .select("login")
-    .distinct()
-    .count()
-    .to_pandas()
-)
-total_forks_prev = (
-    forks.filter(ibis._.created_at <= datetime.now() - timedelta(days=days))
-    .filter(ibis._.created_at >= datetime.now() - timedelta(days=days * 2))
-    .select("login")
-    .distinct()
-    .count()
-    .to_pandas()
-)
-total_issues = (
-    issues.filter(ibis._.created_at >= datetime.now() - timedelta(days=days))
-    .select("number")
-    .distinct()
-    .count()
-    .to_pandas()
-)
-total_issues_prev = (
-    issues.filter(ibis._.created_at <= datetime.now() - timedelta(days=days))
-    .filter(ibis._.created_at >= datetime.now() - timedelta(days=days * 2))
-    .select("number")
-    .distinct()
-    .count()
-    .to_pandas()
-)
-total_issues_closed = (
-    issues.filter(ibis._.closed_at != None)
-    .filter(ibis._.closed_at >= datetime.now() - timedelta(days=days))
-    .select("number")
-    .distinct()
-    .count()
-    .to_pandas()
-)
-total_issues_closed_prev = (
-    issues.filter(ibis._.closed_at != None)
-    .filter(ibis._.closed_at <= datetime.now() - timedelta(days=days))
-    .filter(ibis._.closed_at >= datetime.now() - timedelta(days=days * 2))
-    .select("number")
-    .distinct()
-    .count()
-    .to_pandas()
-)
-total_pulls = (
-    pulls.filter(ibis._.created_at >= datetime.now() - timedelta(days=days))
-    .select("number")
-    .distinct()
-    .count()
-    .to_pandas()
-)
-total_pulls_prev = (
-    pulls.filter(ibis._.created_at <= datetime.now() - timedelta(days=days))
-    .filter(ibis._.created_at >= datetime.now() - timedelta(days=days * 2))
-    .select("number")
-    .distinct()
-    .count()
-    .to_pandas()
-)
-total_pulls_merged = (
-    pulls.filter(ibis._.merged_at != None)
-    .filter(ibis._.merged_at >= datetime.now() - timedelta(days=days))
-    .select("number")
-    .distinct()
-    .count()
-    .to_pandas()
-)
-total_pulls_merged_prev = (
-    pulls.filter(ibis._.merged_at != None)
-    .filter(ibis._.merged_at <= datetime.now() - timedelta(days=days))
-    .filter(ibis._.merged_at >= datetime.now() - timedelta(days=days * 2))
-    .select("number")
-    .distinct()
-    .count()
-    .to_pandas()
-)
-total_contributors = (
-    pulls.filter(ibis._.merged_at != None)
-    .filter(ibis._.merged_at >= datetime.now() - timedelta(days=days))
-    .select("login")
-    .distinct()
-    .count()
-    .to_pandas()
-)
-total_contributors_prev = (
-    pulls.filter(ibis._.merged_at != None)
-    .filter(ibis._.merged_at <= datetime.now() - timedelta(days=days))
-    .filter(ibis._.merged_at >= datetime.now() - timedelta(days=days * 2))
-    .select("login")
-    .distinct()
-    .count()
-    .to_pandas()
-)
-total_downloads = (
-    downloads.filter(ibis._.timestamp >= datetime.now() - timedelta(days=days))
-    .downloads.sum()
-    .to_pandas()
-)
-total_downloads_prev = (
-    downloads.filter(ibis._.timestamp <= datetime.now() - timedelta(days=days))
-    .filter(ibis._.timestamp >= datetime.now() - timedelta(days=days * 2))
-    .downloads.sum()
-    .to_pandas()
-)
+total_stars, total_stars_prev = stars.agg(
+    total_stars=ibis._.login.nunique(where=ibis._.starred_at >= STOP),
+    total_stars_prev=ibis._.login.nunique(where=ibis._.starred_at.between(START, STOP)),
+).to_pandas()
+
+total_forks, total_forks_prev = forks.agg(
+    total_forks=ibis._.login.nunique(where=ibis._.created_at >= STOP),
+    total_forks_prev=ibis._.login.nunique(where=ibis._.created_at.between(START, STOP)),
+).to_pandas()
+
+(
+    total_issues,
+    total_issues_prev,
+    total_issues_closed,
+    total_issues_closed_prev,
+) = issues.agg(
+    total_issues=ibis._.login.nunique(where=ibis._.created_at >= STOP),
+    total_issues_prev=issues.login.nunique(
+        where=ibis._.created_at.between(START, STOP)
+    ),
+    total_issues_closed=ibis._.number.nunique(where=ibis._.closed_at >= STOP),
+    total_issues_closed_prev=issues.number.nunique(
+        where=ibis._.closed_at.between(START, STOP)
+    ),
+).to_pandas()
+
+(
+    total_pulls,
+    total_pulls_prev,
+    total_pulls_merged,
+    total_pulls_merged_prev,
+    total_contributors,
+    total_contributors_prev,
+) = pulls.agg(
+    total_pulls=ibis._.number.nunique(where=ibis._.created_at >= STOP),
+    total_pulls_prev=ibis._.number.nunique(
+        where=ibis._.created_at.between(START, STOP)
+    ),
+    total_pulls_merged=ibis._.number.nunique(where=ibis._.merged_at >= STOP),
+    total_pulls_merged_prev=ibis._.number.nunique(
+        where=ibis._.merged_at.between(START, STOP)
+    ),
+    total_contributors=ibis._.login.nunique(where=ibis._.merged_at >= START),
+    total_contributors_prev=ibis._.login.nunique(
+        where=ibis._.merged_at.between(START, STOP)
+    ),
+).to_pandas()
+
+total_downloads, total_downloads_prev = downloads.agg(
+    total_downloads=ibis._.downloads.sum(where=ibis._.timestamp >= STOP),
+    total_downloads_prev=ibis._.downloads.sum(
+        where=ibis._.timestamp.between(START, STOP)
+    ),
+).to_pandas()
 
 f"""
 ## totals (last {days} days)
@@ -366,59 +275,55 @@ f"""
 ## data (last {days} days)
 """
 
-f"""
+"""
 ### downloads by system and version
 """
 c0 = px.bar(
-    downloads.filter(ibis._.timestamp > datetime.now() - timedelta(days=days))
-    .group_by([ibis._.system, ibis._.version])
-    .agg(ibis._.downloads.sum().name("downloads"))
+    downloads.group_by([ibis._.system, ibis._.version])
+    .agg(downloads=ibis._.downloads.sum(where=ibis._.timestamp > STOP))
     .order_by(ibis._.version.desc()),
     x="version",
     y="downloads",
     color="system",
-    title=f"downloads by system and version",
+    title="downloads by system and version",
 )
 st.plotly_chart(c0, use_container_width=True)
 
-f"""
+"""
 ### stars by company
 """
 st.dataframe(
-    stars.filter(ibis._.starred_at > datetime.now() - timedelta(days=days))
-    .group_by([ibis._.company])
-    .agg(ibis._.count().name("stars"))
+    stars.group_by(ibis._.company)
+    .agg(stars=ibis._.count(where=ibis._.starred_at > STOP))
     .order_by(ibis._.stars.desc())
     .to_pandas(),
     use_container_width=True,
 )
 
-f"""
+"""
 ### issues by login
 """
 c1 = px.bar(
-    issues.filter(ibis._.created_at > datetime.now() - timedelta(days=days))
-    .group_by([ibis._.login, ibis._.state])
-    .agg(ibis._.count().name("issues"))
+    issues.group_by([ibis._.login, ibis._.state])
+    .agg(issues=ibis._.count(where=ibis._.created_at > STOP))
     .order_by(ibis._.issues.desc()),
     x="login",
     y="issues",
     color="state",
-    title=f"issues by login",
+    title="issues by login",
 )
 st.plotly_chart(c1, use_container_width=True)
 
-f"""
+"""
 ### PRs by login
 """
 c2 = px.bar(
-    pulls.filter(ibis._.created_at > datetime.now() - timedelta(days=days))
-    .group_by([ibis._.login, ibis._.state])
-    .agg(ibis._.count().name("pulls"))
+    pulls.group_by([ibis._.login, ibis._.state])
+    .agg(pulls=pulls.ibis._.count(where=ibis._.created_at > STOP))
     .order_by(ibis._.pulls.desc()),
     x="login",
     y="pulls",
     color="state",
-    title=f"PRs by login",
+    title="PRs by login",
 )
 st.plotly_chart(c2, use_container_width=True)
