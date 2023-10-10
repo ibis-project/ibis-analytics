@@ -1,5 +1,6 @@
 # imports
 import os
+import toml
 import ibis
 import fnmatch
 
@@ -9,23 +10,25 @@ from datetime import datetime, timedelta, date
 
 import functions as f
 
+# config.toml
+config = toml.load("config.toml")["app"]
+
+# configure logging
 log.basicConfig(
     level=log.INFO,
 )
 
 
 def main():
-    log.info("Deploying to staging...")
+    log.info(f"Deploying to {config['database']}...")
     upload()
-    log.info("Deploying to prod...")
-    upload(stage="prod")
 
 
 def upload(stage: str = "staging") -> None:
     """
     Upload the data.
     """
-    target = ibis.duckdb.connect(f"md:{stage}_metrics")
+    target = ibis.duckdb.connect(f"{config['database']}")
     path = "data/system/duckdb"
 
     for root, dirs, files in os.walk(path):
@@ -37,7 +40,7 @@ def upload(stage: str = "staging") -> None:
                 table = con.table(tablename)
                 tablename = tablename.replace("load_", "")
 
-                log.info(f"\tDeploying {tablename} to md:{stage}_metrics...")
+                log.info(f"\tDeploying {tablename} to {config['database']}...")
                 target.create_table(tablename, table.to_pyarrow(), overwrite=True)
 
 
