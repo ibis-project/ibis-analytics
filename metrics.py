@@ -310,7 +310,7 @@ f"""
 """
 c0 = px.bar(
     downloads.group_by([ibis._.system, ibis._.version])
-    .agg(downloads=ibis._.downloads.sum(where=ibis._.timestamp > STOP))
+    .agg(downloads=lambda t: t.downloads.sum(where=t.timestamp > STOP))
     .order_by(ibis._.version.desc()),
     x="version",
     y="downloads",
@@ -324,7 +324,7 @@ st.plotly_chart(c0, use_container_width=True)
 """
 st.dataframe(
     stars.group_by(ibis._.company)
-    .agg(stars=ibis._.count(where=ibis._.starred_at > STOP))
+    .agg(stars=lambda t: t.count(where=t.starred_at > STOP))
     .order_by(ibis._.stars.desc())
     .to_pandas(),
     use_container_width=True,
@@ -335,7 +335,7 @@ st.dataframe(
 """
 c1 = px.bar(
     issues.group_by([ibis._.login, ibis._.state])
-    .agg(issues=ibis._.count(where=ibis._.created_at > STOP))
+    .agg(issues=lambda t: t.count(where=t.created_at > STOP))
     .order_by(ibis._.issues.desc()),
     x="login",
     y="issues",
@@ -349,7 +349,7 @@ st.plotly_chart(c1, use_container_width=True)
 """
 c2 = px.bar(
     pulls.group_by([ibis._.login, ibis._.state])
-    .agg(pulls=pulls.ibis._.count(where=ibis._.created_at > STOP))
+    .agg(pulls=lambda t: t.count(where=t.created_at > STOP))
     .order_by(ibis._.pulls.desc()),
     x="login",
     y="pulls",
