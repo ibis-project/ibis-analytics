@@ -142,10 +142,7 @@ downloads_all_time = downloads["downloads"].sum().to_pandas()
 
 col0, col1, col2 = st.columns(3)
 with col0:
-    st.metric(
-        label="GitHub stars",
-        value=f"{total_stars_all_time:,}",
-    )
+    st.metric("GitHub stars", f"{total_stars_all_time:,}")
     st.metric("PyPI downloads", f"{downloads_all_time:,}")
 with col1:
     st.metric("GitHub contributors", f"{total_contributors_all_time:,}")
