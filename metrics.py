@@ -4,6 +4,7 @@ import ibis
 
 import streamlit as st
 import plotly.express as px
+from prefixed import Float
 
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
@@ -142,14 +143,14 @@ downloads_all_time = downloads["downloads"].sum().to_pandas()
 
 col0, col1, col2 = st.columns(3)
 with col0:
-    st.metric("GitHub stars", f"{total_stars_all_time:,}")
-    st.metric("PyPI downloads", f"{downloads_all_time:,}")
+    st.metric(label="GitHub stars", value=f"{Float(total_stars_all_time):.2H}")
+    st.metric("PyPI downloads", f"{Float(downloads_all_time):.2H}")
 with col1:
-    st.metric("GitHub contributors", f"{total_contributors_all_time:,}")
-    st.metric("GitHub forks", f"{total_forks_all_time:,}")
+    st.metric("GitHub contributors", f"{Float(total_contributors_all_time):.2H}")
+    st.metric("GitHub forks", f"{Float(total_forks_all_time):.2H}")
 with col2:
-    st.metric("GitHub PRs merged", f"{total_merged_pulls_all_time:,}")
-    st.metric("GitHub issues closed", f"{total_closed_issues_all_time:,}")
+    st.metric("GitHub PRs merged", f"{Float(total_merged_pulls_all_time):.2H}")
+    st.metric("GitHub issues closed", f"{Float(total_closed_issues_all_time):.2H}")
 
 
 # variables
@@ -250,10 +251,14 @@ total_downloads, total_downloads_prev = (
 )
 
 
+def number(value):
+    return f"{Float(value):.2H}"
+
+
 def delta(current, previous):
     delta = current - previous
     pct_change = int(round(100.0 * delta / previous, 0))
-    return f"{delta:,} ({pct_change:d}%)"
+    return f"{number(delta)} ({pct_change:d}%)"
 
 
 f"""
@@ -263,45 +268,45 @@ col1, col2, col3, col4 = st.columns(4)
 with col1:
     st.metric(
         label="GitHub stars",
-        value=f"{total_stars:,}",
+        value=number(total_stars),
         delta=delta(total_stars, total_stars_prev),
     )
     st.metric(
         label="PyPI downloads",
-        value=f"{total_downloads:,}",
+        value=number(total_downloads),
         delta=delta(total_downloads, total_downloads_prev),
     )
 with col2:
     st.metric(
         label="GitHub contributors",
-        value=f"{total_contributors:,}",
+        value=number(total_contributors),
         delta=delta(total_contributors, total_contributors_prev),
     )
     st.metric(
         label="GitHub forks created",
-        value=f"{total_forks:,}",
+        value=number(total_forks),
         delta=delta(total_forks, total_forks_prev),
     )
 with col3:
     st.metric(
         label="GitHub PRs opened",
-        value=f"{total_pulls:,}",
+        value=number(total_pulls),
         delta=delta(total_pulls, total_pulls_prev),
     )
     st.metric(
         label="GitHub issues opened",
-        value=f"{total_issues:,}",
+        value=number(total_issues),
         delta=delta(total_issues, total_issues_prev),
     )
 with col4:
     st.metric(
         label="GitHub PRs merged",
-        value=f"{total_pulls_merged:,}",
+        value=number(total_pulls_merged),
         delta=delta(total_pulls_merged, total_pulls_merged_prev),
     )
     st.metric(
         label="GitHub issues closed",
-        value=f"{total_issues_closed:,}",
+        value=number(total_issues_closed),
         delta=delta(total_issues_closed, total_issues_closed_prev),
     )
 
