@@ -252,6 +252,12 @@ total_downloads, total_downloads_prev = (
     .squeeze()
 )
 
+
+def delta(current, previous):
+    pct_change = int(round(100.0 * ((current - previous) / previous), 0))
+    return f"{current:,} ({pct_change:d}%)"
+
+
 f"""
 ## totals (last {days} days)
 """
@@ -260,45 +266,45 @@ with col1:
     st.metric(
         label="GitHub stars",
         value=f"{total_stars:,}",
-        delta=f"{total_stars - total_stars_prev:,}",
+        delta=delta(total_stars, total_stars_prev),
     )
     st.metric(
         label="PyPI downloads",
         value=f"{total_downloads:,}",
-        delta=f"{total_downloads - total_downloads_prev:,}",
+        delta=delta(total_downloads, total_downloads_prev),
     )
 with col2:
     st.metric(
         label="GitHub contributors",
         value=f"{total_contributors:,}",
-        delta=f"{total_contributors - total_contributors_prev:,}",
+        delta=delta(total_contributors, total_contributors_prev),
     )
     st.metric(
         label="GitHub forks created",
         value=f"{total_forks:,}",
-        delta=f"{total_forks - total_forks_prev:,}",
+        delta=delta(total_forks, total_forks_prev),
     )
 with col3:
     st.metric(
         label="GitHub PRs opened",
         value=f"{total_pulls:,}",
-        delta=f"{total_pulls - total_pulls_prev:,}",
+        delta=delta(total_pulls, total_pulls_prev),
     )
     st.metric(
         label="GitHub issues opened",
         value=f"{total_issues:,}",
-        delta=f"{total_issues - total_issues_prev:,}",
+        delta=delta(total_issues, total_issues_prev),
     )
 with col4:
     st.metric(
         label="GitHub PRs merged",
         value=f"{total_pulls_merged:,}",
-        delta=f"{total_pulls_merged - total_pulls_merged_prev:,}",
+        delta=delta(total_pulls_merged, total_pulls_merged_prev),
     )
     st.metric(
         label="GitHub issues closed",
         value=f"{total_issues_closed:,}",
-        delta=f"{total_issues_closed - total_issues_closed_prev:,}",
+        delta=delta(total_issues_closed, total_issues_closed_prev),
     )
 
 f"""
