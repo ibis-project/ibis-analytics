@@ -329,6 +329,7 @@ st.plotly_chart(c0, use_container_width=True)
 st.dataframe(
     stars.group_by(ibis._.company)
     .agg(stars=lambda t: t.count(where=t.starred_at > STOP))
+    .filter(ibis._.stars > 0)
     .order_by(ibis._.stars.desc())
     .to_pandas(),
     use_container_width=True,
@@ -340,6 +341,7 @@ st.dataframe(
 c1 = px.bar(
     issues.group_by([ibis._.login, ibis._.state])
     .agg(issues=lambda t: t.count(where=t.created_at > STOP))
+    .filter(ibis._.issues > 0)
     .order_by(ibis._.issues.desc()),
     x="login",
     y="issues",
@@ -354,6 +356,7 @@ st.plotly_chart(c1, use_container_width=True)
 c2 = px.bar(
     pulls.group_by([ibis._.login, ibis._.state])
     .agg(pulls=lambda t: t.count(where=t.created_at > STOP))
+    .filter(ibis._.pulls > 0)
     .order_by(ibis._.pulls.desc()),
     x="login",
     y="pulls",
