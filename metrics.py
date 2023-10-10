@@ -123,16 +123,14 @@ total_stars_all_time = stars.login.nunique().to_pandas()
 total_forks_all_time = forks.login.nunique().to_pandas()
 
 total_closed_issues_all_time = issues.number.nunique(
-    where=ibis._.state == "closed"
+    where=issues.state == "closed"
 ).to_pandas()
 
 total_merged_pulls_all_time, total_contributors_all_time = (
     pulls.agg(
-        total_merged_pulls_all_time=ibis._.number.nunique(
-            where=ibis._.state == "merged"
-        ),
-        total_contributors_all_time=ibis._.login.nunique(
-            where=ibis._.merged_at.notnull()
+        total_merged_pulls_all_time=pulls.number.nunique(where=pulls.state == "merged"),
+        total_contributors_all_time=pulls.login.nunique(
+            where=pulls.merged_at.notnull()
         ),
     )
     .to_pandas()
@@ -177,9 +175,9 @@ STOP = datetime.now() - timedelta(days=days)
 # compute metrics
 total_stars, total_stars_prev = (
     stars.agg(
-        total_stars=ibis._.login.nunique(where=ibis._.starred_at >= STOP),
-        total_stars_prev=ibis._.login.nunique(
-            where=ibis._.starred_at.between(START, STOP)
+        total_stars=stars.login.nunique(where=stars.starred_at >= STOP),
+        total_stars_prev=stars.login.nunique(
+            where=stars.starred_at.between(START, STOP)
         ),
     )
     .to_pandas()
@@ -188,9 +186,9 @@ total_stars, total_stars_prev = (
 
 total_forks, total_forks_prev = (
     forks.agg(
-        total_forks=ibis._.login.nunique(where=ibis._.created_at >= STOP),
-        total_forks_prev=ibis._.login.nunique(
-            where=ibis._.created_at.between(START, STOP)
+        total_forks=forks.login.nunique(where=forks.created_at >= STOP),
+        total_forks_prev=forks.login.nunique(
+            where=forks.created_at.between(START, STOP)
         ),
     )
     .to_pandas()
@@ -204,13 +202,13 @@ total_forks, total_forks_prev = (
     total_issues_closed_prev,
 ) = (
     issues.agg(
-        total_issues=ibis._.login.nunique(where=ibis._.created_at >= STOP),
+        total_issues=issues.login.nunique(where=issues.created_at >= STOP),
         total_issues_prev=issues.login.nunique(
-            where=ibis._.created_at.between(START, STOP)
+            where=issues.created_at.between(START, STOP)
         ),
-        total_issues_closed=ibis._.number.nunique(where=ibis._.closed_at >= STOP),
+        total_issues_closed=issues.number.nunique(where=issues.closed_at >= STOP),
         total_issues_closed_prev=issues.number.nunique(
-            where=ibis._.closed_at.between(START, STOP)
+            where=issues.closed_at.between(START, STOP)
         ),
     )
     .to_pandas()
@@ -226,17 +224,17 @@ total_forks, total_forks_prev = (
     total_contributors_prev,
 ) = (
     pulls.agg(
-        total_pulls=ibis._.number.nunique(where=ibis._.created_at >= STOP),
-        total_pulls_prev=ibis._.number.nunique(
-            where=ibis._.created_at.between(START, STOP)
+        total_pulls=pulls.number.nunique(where=pulls.created_at >= STOP),
+        total_pulls_prev=pulls.number.nunique(
+            where=pulls.created_at.between(START, STOP)
         ),
-        total_pulls_merged=ibis._.number.nunique(where=ibis._.merged_at >= STOP),
-        total_pulls_merged_prev=ibis._.number.nunique(
-            where=ibis._.merged_at.between(START, STOP)
+        total_pulls_merged=pulls.number.nunique(where=pulls.merged_at >= STOP),
+        total_pulls_merged_prev=pulls.number.nunique(
+            where=pulls.merged_at.between(START, STOP)
         ),
-        total_contributors=ibis._.login.nunique(where=ibis._.merged_at >= START),
-        total_contributors_prev=ibis._.login.nunique(
-            where=ibis._.merged_at.between(START, STOP)
+        total_contributors=pulls.login.nunique(where=pulls.merged_at >= STOP),
+        total_contributors_prev=pulls.login.nunique(
+            where=pulls.merged_at.between(START, STOP)
         ),
     )
     .to_pandas()
@@ -245,9 +243,9 @@ total_forks, total_forks_prev = (
 
 total_downloads, total_downloads_prev = (
     downloads.agg(
-        total_downloads=ibis._.downloads.sum(where=ibis._.timestamp >= STOP),
-        total_downloads_prev=ibis._.downloads.sum(
-            where=ibis._.timestamp.between(START, STOP)
+        total_downloads=downloads.downloads.sum(where=downloads.timestamp >= STOP),
+        total_downloads_prev=downloads.downloads.sum(
+            where=downloads.timestamp.between(START, STOP)
         ),
     )
     .to_pandas()
