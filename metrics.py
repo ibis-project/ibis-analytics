@@ -254,8 +254,9 @@ total_downloads, total_downloads_prev = (
 
 
 def delta(current, previous):
-    pct_change = int(round(100.0 * ((current - previous) / previous), 0))
-    return f"{current:,} ({pct_change:d}%)"
+    delta = current - previous
+    pct_change = int(round(100.0 * delta / previous, 0))
+    return f"{delta:,} ({pct_change:d}%)"
 
 
 f"""
