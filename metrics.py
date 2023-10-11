@@ -4,6 +4,7 @@ import ibis
 
 import streamlit as st
 import plotly.express as px
+from prefixed import Float
 
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
@@ -105,12 +106,17 @@ with st.expander("show `metrics.py` (source for this page)", expanded=False):
 ## supported backends
 """
 
+
+def fmt_number(value):
+    return f"{Float(value):.2H}"
+
+
 current_backends_total = (
     backends.filter(backends.ingested_at == backends.ingested_at.max())
     .num_backends.max()
     .to_pandas()
 )
-current_backends = ibis.memtable(backends.backends.unnest()).rename(backends="col0")
+current_backends = backends.backends.unnest().name("backends").as_table()
 
 st.metric("Total", f"{current_backends_total:,}")
 st.dataframe(current_backends, use_container_width=True)
@@ -142,14 +148,38 @@ downloads_all_time = downloads["downloads"].sum().to_pandas()
 
 col0, col1, col2 = st.columns(3)
 with col0:
-    st.metric("GitHub stars", f"{total_stars_all_time:,}")
-    st.metric("PyPI downloads", f"{downloads_all_time:,}")
+    st.metric(
+        label="GitHub stars",
+        value=fmt_number(total_stars_all_time),
+        help=f"{total_stars_all_time:,}",
+    )
+    st.metric(
+        label="PyPI downloads",
+        value=fmt_number(downloads_all_time),
+        help=f"{downloads_all_time:,}",
+    )
 with col1:
-    st.metric("GitHub contributors", f"{total_contributors_all_time:,}")
-    st.metric("GitHub forks", f"{total_forks_all_time:,}")
+    st.metric(
+        label="GitHub contributors",
+        value=fmt_number(total_contributors_all_time),
+        help=f"{total_contributors_all_time:,}",
+    )
+    st.metric(
+        label="GitHub forks",
+        value=fmt_number(total_forks_all_time),
+        help=f"{total_forks_all_time:,}",
+    )
 with col2:
-    st.metric("GitHub PRs merged", f"{total_merged_pulls_all_time:,}")
-    st.metric("GitHub issues closed", f"{total_closed_issues_all_time:,}")
+    st.metric(
+        label="GitHub PRs merged",
+        value=fmt_number(total_merged_pulls_all_time),
+        help=f"{total_merged_pulls_all_time:,}",
+    )
+    st.metric(
+        label="GitHub issues closed",
+        value=fmt_number(total_closed_issues_all_time),
+        help=f"{total_closed_issues_all_time:,}",
+    )
 
 
 # variables
@@ -253,7 +283,7 @@ total_downloads, total_downloads_prev = (
 def delta(current, previous):
     delta = current - previous
     pct_change = int(round(100.0 * delta / previous, 0))
-    return f"{delta:,} ({pct_change:d}%)"
+    return f"{fmt_number(delta)} ({pct_change:d}%)"
 
 
 f"""
@@ -263,46 +293,54 @@ col1, col2, col3, col4 = st.columns(4)
 with col1:
     st.metric(
         label="GitHub stars",
-        value=f"{total_stars:,}",
+        value=fmt_number(total_stars),
         delta=delta(total_stars, total_stars_prev),
+        help=f"{total_stars:,}",
     )
     st.metric(
         label="PyPI downloads",
-        value=f"{total_downloads:,}",
+        value=fmt_number(total_downloads),
         delta=delta(total_downloads, total_downloads_prev),
+        help=f"{total_downloads:,}",
     )
 with col2:
     st.metric(
         label="GitHub contributors",
-        value=f"{total_contributors:,}",
+        value=fmt_number(total_contributors),
         delta=delta(total_contributors, total_contributors_prev),
+        help=f"{total_contributors:,}",
     )
     st.metric(
         label="GitHub forks created",
-        value=f"{total_forks:,}",
+        value=fmt_number(total_forks),
         delta=delta(total_forks, total_forks_prev),
+        help=f"{total_forks:,}",
     )
 with col3:
     st.metric(
         label="GitHub PRs opened",
-        value=f"{total_pulls:,}",
+        value=fmt_number(total_pulls),
         delta=delta(total_pulls, total_pulls_prev),
+        help=f"{total_pulls:,}",
     )
     st.metric(
         label="GitHub issues opened",
-        value=f"{total_issues:,}",
+        value=fmt_number(total_issues),
         delta=delta(total_issues, total_issues_prev),
+        help=f"{total_issues:,}",
     )
 with col4:
     st.metric(
         label="GitHub PRs merged",
-        value=f"{total_pulls_merged:,}",
+        value=fmt_number(total_pulls_merged),
         delta=delta(total_pulls_merged, total_pulls_merged_prev),
+        help=f"{total_pulls_merged:,}",
     )
     st.metric(
         label="GitHub issues closed",
-        value=f"{total_issues_closed:,}",
+        value=fmt_number(total_issues_closed),
         delta=delta(total_issues_closed, total_issues_closed_prev),
+        help=f"{total_issues_closed:,}",
     )
 
 f"""
