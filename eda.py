@@ -4,8 +4,6 @@ import os
 import sys
 import toml
 import ibis
-import openai
-import marvin
 import requests
 
 import ibis.selectors as s
@@ -18,11 +16,6 @@ from enum import Enum
 from rich import print
 from dotenv import load_dotenv
 from datetime import datetime, timedelta, date
-
-from azure.identity import DefaultAzureCredential as DAC
-from azure.storage.blob import BlobServiceClient as BSC
-from azure.storage.filedatalake import DataLakeServiceClient as DLSC
-from azure.storage.filedatalake import DataLakeFileClient as DLFC
 
 ## local imports
 import dag.functions as f
@@ -41,22 +34,6 @@ load_dotenv()
 
 ## ibis config
 ibis.options.interactive = True
-
-## ai config
-model = "azure_openai/gpt-4"
-marvin.settings.llm_model = model
-
-## cloud config
-account_name = "notonedrive"
-account_url = f"https://{account_name}.blob.core.windows.net/"
-storage_token = os.getenv("AZURE_STORAGE_KEY")
-credential = {"account_name": account_name, "account_key": storage_token}
-
-bsc = BSC(account_url=account_url, credential=credential)
-dlsc = DLSC(account_url=account_url, credential=credential)
-bs = bsc.get_blob_client("eda", "cache.ddb")
-dlfc = dlsc.get_file_system_client("eda")
-dldc = dlfc.get_directory_client("eda")
 
 # variables
 NOW = datetime.now()
