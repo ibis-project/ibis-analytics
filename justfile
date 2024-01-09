@@ -9,6 +9,7 @@ module := "dag"
 # aliases
 alias fmt:=format
 alias open:=open-dash
+alias dag-open:=open-dag
 alias preview:=app
 
 # list justfile recipes

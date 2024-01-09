@@ -2,12 +2,19 @@
 ruff
 python-dotenv
 
+# numeric formatting
+prefixed
+
+# web clients
+zulip
+PyGithub # unused for now
+
 # data
 duckdb>=0.9.0
 ibis-framework[duckdb,bigquery,deltalake] @ git+https://github.com/ibis-project/ibis
 
-# numeric formatting
-prefixed
+# ML
+ibisml @ git+https://github.com/ibis-project/ibisml # unused for now
 
 # viz
 plotly
