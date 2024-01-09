@@ -7,6 +7,7 @@ set dotenv-load
 module := "dag"
 
 # aliases
+alias fmt:=format
 alias open:=open-dash
 alias preview:=app
 
@@ -16,7 +17,7 @@ default:
 
 # setup
 setup:
-    @pip install -r requirements.txt
+    @pip install --upgrade -r requirements.txt
 
 # install
 install:
@@ -106,9 +107,13 @@ test:
 app:
     @streamlit run metrics.py
 
+# format
+format:
+    @ruff format .
+
 # smoke-test
 smoke-test:
-    @black --check .
+    @ruff format --check .
 
 # clean
 clean:
