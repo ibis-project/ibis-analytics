@@ -63,7 +63,8 @@ with col1:
 
 # viz
 c0 = px.line(
-    members.filter(ibis._.date_joined > datetime.now() - timedelta(days=days)),
+    # members.filter(ibis._.date_joined > datetime.now() - timedelta(days=days)),
+    members,
     x="date_joined",
     y="total_members",
     title=f"members over time",
@@ -72,9 +73,10 @@ st.plotly_chart(c0, use_container_width=True)
 
 c1 = px.line(
     # TODO: investigate hack here
-    messages.filter(ibis._.timestamp > datetime.now() - timedelta(days=days)).order_by(
-        ibis._.timestamp.desc()
-    ),
+    # messages.filter(ibis._.timestamp > datetime.now() - timedelta(days=days)).order_by(
+    #    ibis._.timestamp.desc()
+    # ),
+    messages.order_by(ibis._.timestamp.desc()),
     x="timestamp",
     y="total_messages",
     title=f"messages over time",

@@ -135,6 +135,10 @@ open-dash:
 cicd:
     @gh workflow run cicd.yaml
 
+# ssh
+ssh:
+    @gcloud compute ssh --zone "us-central1-a" "ibis-analytics-cicd" --project "voltrondata-demo"
+
 # temp
 temp:
     @gh workflow run temp.yaml
