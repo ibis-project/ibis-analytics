@@ -13,3 +13,12 @@ def extract_zulip_users():
     """
     users = f.clean_data(ibis.read_json("data/ingest/zulip/users.json"))
     return users
+
+
+@dagster.asset
+def extract_zulip_messages():
+    """
+    Extract the ingested Zulip messages data.
+    """
+    messages = f.clean_data(ibis.read_json("data/ingest/zulip/messages.json"))
+    return messages

@@ -308,18 +308,48 @@ def ingest_zulip():
     r = client.get_members()
     if r["result"] != "success":
         log.error(f"Failed to get users: {r}")
-        return
+    else:
+        users = r["members"]
+        # make sure the directory exists
+        os.makedirs("data/ingest/zulip", exist_ok=True)
 
-    users = r["members"]
+        # write the users to a file
+        filename = "users.json"
+        output_path = os.path.join("data", "ingest", "zulip", filename)
+        log.info(f"Writing users to: {output_path}")
+        write_json(users, output_path)
 
-    # make sure the directory exists
-    os.makedirs("data/ingest/zulip", exist_ok=True)
+    # get the messages
+    all_messages = []
+    r = client.get_messages({"anchor": "newest", "num_before": 100, "num_after": 0})
+    if r["result"] != "success":
+        log.error(f"Failed to get messages: {r}")
+    else:
+        messages = r["messages"]
+        all_messages.extend(messages)
+        while len(messages) > 1:
+            r = client.get_messages(
+                {
+                    "anchor": messages[0]["id"],
+                    "num_before": 100,
+                    "num_after": 0,
+                }
+            )
+            if r["result"] != "success":
+                log.error(f"Failed to get messages: {r}")
+                break
+            else:
+                messages = r["messages"]
+                all_messages.extend(messages)
 
-    # write the users to a file
-    filename = "users.json"
-    output_path = os.path.join("data", "ingest", "zulip", filename)
-    log.info(f"Writing users to: {output_path}")
-    write_json(users, output_path)
+        # make sure the directory exists
+        os.makedirs("data/ingest/zulip", exist_ok=True)
+
+        # write the messages to a file
+        filename = "messages.json"
+        output_path = os.path.join("data", "ingest", "zulip", filename)
+        log.info(f"Writing messages to: {output_path}")
+        write_json(all_messages, output_path)
 
 
 if __name__ == "__main__":
