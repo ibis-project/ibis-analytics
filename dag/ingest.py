@@ -301,6 +301,8 @@ def ingest_zulip():
     # load environment variables
     zulip_key = os.getenv("ZULIP_KEY")
 
+    assert len(zulip_key) > 0, "Zulip key is empty"
+
     # create the client
     client = zulip.Client(email=email, site=site, api_key=zulip_key)
 
