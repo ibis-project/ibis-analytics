@@ -16,6 +16,7 @@ def transform_zulip_members(extract_zulip_members):
     )
     members = members.order_by(ibis._.date_joined.desc())
     members = members.relocate("full_name", "date_joined", "timezone")
+    members = members.mutate(total_members=ibis._.count().over(rows=(0, None)))
     return members
 
 
@@ -29,7 +30,7 @@ def transform_zulip_messages(extract_zulip_messages):
         last_edit_timestamp=ibis._.last_edit_timestamp.cast("timestamp"),
     )
     messages = messages.order_by(
-        [ibis._.timestamp.desc(), ibis._.last_edit_timestamp.desc()]
+        ibis._.timestamp.desc(),
     )
     messages = messages.relocate(
         "sender_full_name",
@@ -38,4 +39,5 @@ def transform_zulip_messages(extract_zulip_messages):
         "timestamp",
         "last_edit_timestamp",
     )
+    messages = messages.mutate(total_messages=ibis._.count().over(rows=(0, None)))
     return messages
