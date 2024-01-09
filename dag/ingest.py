@@ -29,8 +29,8 @@ def main():
     load_dotenv()
 
     # ingest data
-    # ingest_gh()
-    # ingest_pypi()
+    ingest_gh()
+    ingest_pypi()
     # ingest_ci() # TODO: fix permissions, add assets
     ingest_zulip()
 
