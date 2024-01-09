@@ -1,8 +1,9 @@
 # imports
-import ibis
 import os
+import ibis
 import toml
 import json
+import inspect
 import requests
 
 import logging as log
@@ -227,6 +228,7 @@ def ingest_pypi():
         BETWEEN DATE_SUB(CURRENT_DATE(), INTERVAL {backfill} DAY)
         AND CURRENT_DATE()
         """.strip()
+        query = inspect.cleandoc(query)
 
         # connect to bigquery and execute query
         con = ibis.connect(f"bigquery://{project_id}")
