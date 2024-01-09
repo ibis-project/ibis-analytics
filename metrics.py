@@ -23,12 +23,14 @@ st.set_page_config(layout="wide")
 con = ibis.connect(f"duckdb://{config['database']}", read_only=True)
 
 # use precomputed data
-stars = con.tables.stars
-forks = con.tables.forks
-pulls = con.tables.pulls
-issues = con.tables.issues
-backends = con.tables.backends
-downloads = con.tables.downloads
+stars = con.table("stars")
+forks = con.table("forks")
+pulls = con.table("pulls")
+issues = con.table("issues")
+backends = con.table("backends")
+downloads = con.table("downloads")
+members = con.table("zulip_members")
+messages = con.table("zulip_messages")
 
 # display header stuff
 with open("readme.md") as f:
@@ -145,8 +147,11 @@ total_merged_pulls_all_time, total_contributors_all_time = (
 
 downloads_all_time = downloads["downloads"].sum().to_pandas()
 
+total_members_all_time = members.user_id.nunique().to_pandas()
+total_messages_all_time = messages.id.nunique().to_pandas()
 
-col0, col1, col2 = st.columns(3)
+
+col0, col1, col2, col3 = st.columns(4)
 with col0:
     st.metric(
         label="GitHub stars",
@@ -180,7 +185,17 @@ with col2:
         value=fmt_number(total_closed_issues_all_time),
         help=f"{total_closed_issues_all_time:,}",
     )
-
+with col3:
+    st.metric(
+        label="Zulip members",
+        value=fmt_number(total_members_all_time),
+        help=f"{total_members_all_time:,}",
+    )
+    st.metric(
+        label="Zulip messages",
+        value=fmt_number(total_messages_all_time),
+        help=f"{total_messages_all_time:,}",
+    )
 
 # variables
 with st.form(key="app"):

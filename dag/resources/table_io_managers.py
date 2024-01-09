@@ -9,8 +9,8 @@ class ParquetIOManager(ConfigurableIOManager):
     Manage tables as parquet files.
     """
 
-    extension = "parquet"
-    base_path = os.path.join("data", "system", "parquet")
+    extension: str = "parquet"
+    base_path: str = os.path.join("data", "system", "parquet")
 
     def handle_output(self, context, obj):
         dirname, filename = self._get_paths(context)
@@ -37,9 +37,9 @@ class DeltaIOManager(ConfigurableIOManager):
     Manage tables as delta tables.
     """
 
-    extension = "delta"
-    base_path = os.path.join("data", "system", "delta")
-    delta_write_mode = "overwrite"
+    extension: str = "delta"
+    base_path: str = os.path.join("data", "system", "delta")
+    delta_write_mode: str = "overwrite"
 
     def handle_output(self, context, obj):
         dirname, filename = self._get_paths(context)
@@ -66,8 +66,8 @@ class DuckDBIOManager(ConfigurableIOManager):
     Manage tables as duckdb files.
     """
 
-    extension = "ddb"
-    base_path = os.path.join("data", "system", "duckdb")
+    extension: str = "ddb"
+    base_path: str = os.path.join("data", "system", "duckdb")
 
     def handle_output(self, context, obj):
         dirname, filename = self._get_paths(context)

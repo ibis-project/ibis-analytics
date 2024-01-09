@@ -7,7 +7,9 @@ set dotenv-load
 module := "dag"
 
 # aliases
+alias fmt:=format
 alias open:=open-dash
+alias dag-open:=open-dag
 alias preview:=app
 
 # list justfile recipes
@@ -16,7 +18,7 @@ default:
 
 # setup
 setup:
-    @pip install -r requirements.txt
+    @pip install --upgrade -r requirements.txt
 
 # install
 install:
@@ -106,9 +108,13 @@ test:
 app:
     @streamlit run metrics.py
 
+# format
+format:
+    @ruff format .
+
 # smoke-test
 smoke-test:
-    @black --check .
+    @ruff format --check .
 
 # clean
 clean:
@@ -128,6 +134,10 @@ open-dash:
 # cicd
 cicd:
     @gh workflow run cicd.yaml
+
+# ssh
+ssh:
+    @gcloud compute ssh --zone "us-central1-a" "ibis-analytics-cicd" --project "voltrondata-demo"
 
 # temp
 temp:

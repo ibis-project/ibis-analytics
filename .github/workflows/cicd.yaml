@@ -26,11 +26,11 @@ jobs:
           python-version: 3.11
       - name: install requirements
         run: just setup
-      - name: load backup data
-        run: just download
-        env:
-          AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_KEY }}
-          AZURE_STORAGE_CONTAINER: prod
+      #- name: load backup data
+      #  run: just download
+      #  env:
+      #    AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_KEY }}
+      #    AZURE_STORAGE_CONTAINER: prod
       - name: ingest
         run: just ingest
         env:
@@ -41,10 +41,10 @@ jobs:
       - name: backup and sync to cloud(s)
         run: |
           just backup
-          just sync
-        env:
-          AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_KEY }}
-          AZURE_STORAGE_CONTAINER: prod
+        #  just sync
+        #env:
+        #  AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_KEY }}
+        #  AZURE_STORAGE_CONTAINER: prod
       - name: deploy to prod
         run: just deploy
         env:

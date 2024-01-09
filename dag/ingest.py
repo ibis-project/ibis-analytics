@@ -1,8 +1,10 @@
 # imports
-import ibis
 import os
+import ibis
 import toml
 import json
+import zulip
+import inspect
 import requests
 
 import logging as log
@@ -21,15 +23,29 @@ from graphql_queries import (
 )
 
 
+# main function
 def main():
-    ingest_gh()
-    ingest_pypi()
+    # load environment variables
+    load_dotenv()
+
+    # ingest data
+    # ingest_gh()
+    # ingest_pypi()
     # ingest_ci() # TODO: fix permissions, add assets
+    ingest_zulip()
 
 
+# helper functions
+def write_json(data, filename):
+    # write the data to a file
+    with open(filename, "w") as f:
+        json.dump(data, f, indent=4)
+
+
+# ingest functions
 def ingest_gh():
     """
-    Load the GitHub data.
+    Ingest the GitHub data.
     """
     # configure logger
     log.basicConfig(level=log.INFO)
@@ -38,7 +54,6 @@ def ingest_gh():
     GRAPH_URL = "https://api.github.com/graphql"
 
     # load environment variables
-    load_dotenv()
     GH_TOKEN = os.getenv("GITHUB_TOKEN")
 
     # load config
@@ -64,11 +79,6 @@ def ingest_gh():
     def get_filename(query_name, page):
         # return the filename
         return f"{query_name}.{page:06}.json"
-
-    def write_json(data, filename):
-        # write the data to a file
-        with open(filename, "w") as f:
-            json.dump(data, f, indent=4)
 
     def get_next_link(link_header):
         # if there is no link header, return None
@@ -189,6 +199,9 @@ def ingest_gh():
 
 
 def ingest_pypi():
+    """
+    Ingest the PyPI data.
+    """
     # constants
     # set DEFAULT_BACKFILL to the number of days
     # since July 19th, 2015 until today
@@ -199,7 +212,6 @@ def ingest_pypi():
     log.basicConfig(level=log.INFO)
 
     # load environment variables
-    load_dotenv()
     project_id = os.getenv("BQ_PROJECT_ID")
     log.info(f"Project ID: {project_id}")
 
@@ -227,6 +239,7 @@ def ingest_pypi():
         BETWEEN DATE_SUB(CURRENT_DATE(), INTERVAL {backfill} DAY)
         AND CURRENT_DATE()
         """.strip()
+        query = inspect.cleandoc(query)
 
         # connect to bigquery and execute query
         con = ibis.connect(f"bigquery://{project_id}")
@@ -241,6 +254,9 @@ def ingest_pypi():
 
 
 def ingest_ci():
+    """
+    Ingest the CI data.
+    """
     # constants
     # set DEFAULT_BACKFILL to the number of days
     # since July 19th, 2015 until today
@@ -250,7 +266,6 @@ def ingest_ci():
     log.basicConfig(level=log.INFO)
 
     # load environment variables
-    load_dotenv()
     project_id = os.getenv("BQ_PROJECT_ID")
     log.info(f"Project ID: {project_id}")
 
@@ -272,6 +287,69 @@ def ingest_ci():
     for table in bq_con.list_tables():
         log.info(f"Writing table: {table}")
         con.create_table(table, bq_con.table(table).to_pyarrow(), overwrite=True)
+
+
+def ingest_zulip():
+    """Ingest the Zulip data."""
+    # constants
+    email = "cody@dkdc.dev"
+    site = "https://ibis-project.zulipchat.com"
+
+    # configure logger
+    log.basicConfig(level=log.INFO)
+
+    # load environment variables
+    zulip_key = os.getenv("ZULIP_KEY")
+
+    # create the client
+    client = zulip.Client(email=email, site=site, api_key=zulip_key)
+
+    # get the users
+    r = client.get_members()
+    if r["result"] != "success":
+        log.error(f"Failed to get users: {r}")
+    else:
+        members = r["members"]
+        # make sure the directory exists
+        os.makedirs("data/ingest/zulip", exist_ok=True)
+
+        # write the users to a file
+        filename = "members.json"
+        output_path = os.path.join("data", "ingest", "zulip", filename)
+        log.info(f"Writing members to: {output_path}")
+        write_json(members, output_path)
+
+    # get the messages
+    all_messages = []
+    r = client.get_messages({"anchor": "newest", "num_before": 100, "num_after": 0})
+    if r["result"] != "success":
+        log.error(f"Failed to get messages: {r}")
+    else:
+        messages = r["messages"]
+        all_messages.extend(messages)
+        while len(messages) > 1:
+            r = client.get_messages(
+                {
+                    "anchor": messages[0]["id"],
+                    "num_before": 100,
+                    "num_after": 0,
+                }
+            )
+            if r["result"] != "success":
+                log.error(f"Failed to get messages: {r}")
+                break
+            else:
+                messages = r["messages"]
+                all_messages.extend(messages)
+
+        # make sure the directory exists
+        os.makedirs("data/ingest/zulip", exist_ok=True)
+
+        # write the messages to a file
+        filename = "messages.json"
+        output_path = os.path.join("data", "ingest", "zulip", filename)
+        log.info(f"Writing messages to: {output_path}")
+        write_json(all_messages, output_path)
 
 
 if __name__ == "__main__":
