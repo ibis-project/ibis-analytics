@@ -7,14 +7,16 @@ from dag import functions as f
 
 # assets
 @dagster.asset
-def transform_zulip_users(extract_zulip_users):
+def transform_zulip_members(extract_zulip_members):
     """
-    Transform the Zulip users data.
+    Transform the Zulip members data.
     """
-    users = extract_zulip_users.mutate(date_joined=ibis._.date_joined.cast("timestamp"))
-    users = users.order_by(ibis._.date_joined.desc())
-    users = users.relocate("full_name", "date_joined", "timezone")
-    return users
+    members = extract_zulip_members.mutate(
+        date_joined=ibis._.date_joined.cast("timestamp")
+    )
+    members = members.order_by(ibis._.date_joined.desc())
+    members = members.relocate("full_name", "date_joined", "timezone")
+    return members
 
 
 @dagster.asset

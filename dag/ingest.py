@@ -309,15 +309,15 @@ def ingest_zulip():
     if r["result"] != "success":
         log.error(f"Failed to get users: {r}")
     else:
-        users = r["members"]
+        members = r["members"]
         # make sure the directory exists
         os.makedirs("data/ingest/zulip", exist_ok=True)
 
         # write the users to a file
-        filename = "users.json"
+        filename = "members.json"
         output_path = os.path.join("data", "ingest", "zulip", filename)
-        log.info(f"Writing users to: {output_path}")
-        write_json(users, output_path)
+        log.info(f"Writing members to: {output_path}")
+        write_json(members, output_path)
 
     # get the messages
     all_messages = []

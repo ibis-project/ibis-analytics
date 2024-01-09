@@ -1,6 +1,6 @@
 [app]
-#database="data/backup.ddb"
-database="md:ibis_analytics_update"
+database="data/app.ddb"
+#database="md:ibis_analytics_update"
 
 [eda]
 #database="md:ibis_analytics_update"

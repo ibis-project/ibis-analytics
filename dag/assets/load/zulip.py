@@ -7,11 +7,11 @@ from dag import functions as f
 
 # assets
 @dagster.asset
-def load_zulip_users(transform_zulip_users):
+def load_zulip_members(transform_zulip_members):
     """
-    Finalize the Zulip users data.
+    Finalize the Zulip members data.
     """
-    return transform_zulip_users
+    return transform_zulip_members
 
 
 @dagster.asset

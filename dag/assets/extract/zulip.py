@@ -7,12 +7,12 @@ from dag import functions as f
 
 # assets
 @dagster.asset
-def extract_zulip_users():
+def extract_zulip_members():
     """
-    Extract the ingested Zulip users data.
+    Extract the ingested Zulip members data.
     """
-    users = f.clean_data(ibis.read_json("data/ingest/zulip/users.json"))
-    return users
+    members = f.clean_data(ibis.read_json("data/ingest/zulip/members.json"))
+    return members
 
 
 @dagster.asset
