@@ -34,6 +34,8 @@ load_dotenv()
 
 ## ibis config
 ibis.options.interactive = True
+ibis.options.repr.interactive.max_rows = 20
+ibis.options.repr.interactive.max_columns = None
 
 # variables
 NOW = datetime.now()

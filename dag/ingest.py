@@ -323,7 +323,7 @@ def ingest_zulip():
 
     # get the messages
     all_messages = []
-    r = client.get_messages({"anchor": "newest", "num_before": 100, "num_after": 0})
+    r = client.get_messages({"anchor": "newest", "num_before": 100, "num_after": 0, "type": "stream"})
     if r["result"] != "success":
         log.error(f"Failed to get messages: {r}")
     else:
@@ -335,6 +335,7 @@ def ingest_zulip():
                     "anchor": messages[0]["id"],
                     "num_before": 100,
                     "num_after": 0,
+                    "type": "stream",
                 }
             )
             if r["result"] != "success":
