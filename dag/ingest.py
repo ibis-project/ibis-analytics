@@ -30,8 +30,8 @@ def main():
 
     # ingest data
     ingest_zulip()
-    ingest_gh()
     ingest_pypi()
+    ingest_gh()
     # ingest_ci() # TODO: fix permissions, add assets
 
 
