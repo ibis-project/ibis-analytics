@@ -102,7 +102,8 @@ test:
     @python metrics.py
     @python pages/0_github.py
     @python pages/1_pypi.py
-    @python pages/2_about.py
+    @python pages/2_zulip.py
+    @python pages/3_about.py
 
 # streamlit stuff
 app:
