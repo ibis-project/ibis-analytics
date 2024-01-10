@@ -36,6 +36,7 @@ jobs:
         env:
           BQ_PROJECT_ID: voltrondata-demo
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ZULIP_KEY: ${{ secrets.ZULIP_KEY }}
       - name: run ETL job
         run: just run
       - name: backup and sync to cloud(s)
