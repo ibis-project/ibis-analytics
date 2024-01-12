@@ -1,0 +1,58 @@
+--- 
+title: "Ibis adoption metrics"
+#author: "Ibis team"
+logo: logo.svg
+format:
+  dashboard:
+    theme: darkly
+--- 
+
+```{python}
+# | echo: false
+import ibis
+
+import plotly.express as px
+
+from itables import show
+from dotenv import load_dotenv
+
+load_dotenv()
+
+ibis.options.interactive = True
+
+con = ibis.connect("duckdb://md:ibis_analytics")
+
+stars = con.table("stars")
+
+show(stars.to_pandas())
+```
+
+## Row {height=100%}
+
+```{python}
+# | title: Stars over time
+px.line(
+    stars,
+    x="starred_at",
+    y="total_stars",
+    title="cumulative stars",
+    template="plotly_dark",
+)
+```
+
+```{python}
+# | title: Stars by company
+timescale = "week"
+px.bar(
+    stars.mutate(ibis._.company[:20].name("company"))
+    .group_by(
+        [ibis._.starred_at.truncate(timescale).name("starred_at"), ibis._.company]
+    )
+    .agg(ibis._.count().name("stars")),
+    x="starred_at",
+    y="stars",
+    color="company",
+    title="stars by company",
+    template="plotly_dark",
+)
+```
