@@ -2,9 +2,6 @@
 ruff
 python-dotenv
 
-# numeric formatting
-prefixed
-
 # web clients
 zulip
 PyGithub # unused for now

@@ -15,19 +15,18 @@ log.basicConfig(
 
 
 def main():
-    backup()
-    # backup(storage="azure")
+    postprocess()
 
 
-def backup(storage: str = "local") -> None:
+def postprocess() -> None:
     """
-    Backup the data.
+    Postprocess the data.
     """
 
     # backup loaded data as Delta Lake tables
     # and a DuckDB Database
     source_path = "data/system/duckdb"
-    target_path = "data/backup.ddb"
+    target_path = "data/data.ddb"
 
     os.makedirs(source_path, exist_ok=True)
 
@@ -44,12 +43,12 @@ def backup(storage: str = "local") -> None:
                 table = con.table(tablename)
                 tablename = tablename.replace("load_", "")
 
-                log.info(f"Backing up {tablename} to backup.ddb...")
+                log.info(f"Backing up {tablename} to {target_path}...")
                 target.create_table(tablename, table.to_pyarrow(), overwrite=True)
 
                 log.info(f"Backing up {tablename} to data/backup/{tablename}.delta...")
                 table.mutate(ingested_at=ingested_at).to_delta(
-                    f"data/backup/{tablename}.delta", mode="append"
+                    f"data/backup/{tablename}.delta", mode="overwrite"
                 )
 
 

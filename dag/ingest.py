@@ -293,7 +293,10 @@ def ingest_zulip():
     """Ingest the Zulip data."""
     # constants
     email = "cody@dkdc.dev"
-    site = "https://ibis-project.zulipchat.com"
+
+    # load config
+    config = toml.load("config.toml")["ingest"]["zulip"]
+    log.info(f"Using url: {config['url']}")
 
     # configure logger
     log.basicConfig(level=log.INFO)
@@ -301,10 +304,8 @@ def ingest_zulip():
     # load environment variables
     zulip_key = os.getenv("ZULIP_KEY")
 
-    assert len(zulip_key) > 0, "Zulip key is empty"
-
     # create the client
-    client = zulip.Client(email=email, site=site, api_key=zulip_key)
+    client = zulip.Client(email=email, site=config["url"], api_key=zulip_key)
 
     # get the users
     r = client.get_members()
@@ -323,7 +324,9 @@ def ingest_zulip():
 
     # get the messages
     all_messages = []
-    r = client.get_messages({"anchor": "newest", "num_before": 100, "num_after": 0, "type": "stream"})
+    r = client.get_messages(
+        {"anchor": "newest", "num_before": 100, "num_after": 0, "type": "stream"}
+    )
     if r["result"] != "success":
         log.error(f"Failed to get messages: {r}")
     else:

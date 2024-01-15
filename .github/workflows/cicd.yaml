@@ -4,12 +4,12 @@ on:
   workflow_dispatch:
   schedule:
     - cron: "0 0/3 * * *"
-  #pull_request:
-  #  paths:
-  #    - '.github/workflows/cicd.yaml'
-  #    - 'requirements.txt'
-  #    - '**.py'
-  #    - 'justfile'
+  pull_request:
+    paths:
+      - '.github/workflows/cicd.yaml'
+      - 'requirements.txt'
+      - '**.py'
+      - 'justfile'
 
 jobs:
 
@@ -26,11 +26,6 @@ jobs:
           python-version: 3.11
       - name: install requirements
         run: just setup
-      #- name: load backup data
-      #  run: just download
-      #  env:
-      #    AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_KEY }}
-      #    AZURE_STORAGE_CONTAINER: prod
       - name: ingest
         run: just ingest
         env:
@@ -39,13 +34,8 @@ jobs:
           ZULIP_KEY: ${{ secrets.ZULIP_KEY }}
       - name: run ETL job
         run: just run
-      - name: backup and sync to cloud(s)
-        run: |
-          just backup
-        #  just sync
-        #env:
-        #  AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_KEY }}
-        #  AZURE_STORAGE_CONTAINER: prod
+      - name: postprocess
+        run: just postprocess
       - name: deploy to prod
         run: just deploy
         env:

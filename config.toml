@@ -32,3 +32,5 @@ endpoints = [
     "issues",
     "contributors",
 ]
+[ingest.zulip]
+url = "https://ibis-project.zulipchat.com"
