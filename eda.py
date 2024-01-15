@@ -11,8 +11,6 @@ import logging as log
 import plotly.io as pio
 import plotly.express as px
 
-from enum import Enum
-
 from rich import print
 from dotenv import load_dotenv
 from datetime import datetime, timedelta, date
