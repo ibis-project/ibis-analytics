@@ -25,14 +25,9 @@ smoke-test:
 default:
     just --list
 
-# install
-install:
-    @pip install -e '.[dev]'
-
 # setup
 setup:
     @pip install --upgrade -r requirements.txt
-    just install
 
 # ingest
 ingest:
