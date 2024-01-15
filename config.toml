@@ -4,7 +4,7 @@ database="md:ibis_analytics"
 
 [eda]
 database="md:ibis_analytics"
-#database="data/backup.ddb"
+#database="data/data.ddb"
 
 [ingest.pypi]
 packages = [
