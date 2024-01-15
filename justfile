@@ -8,9 +8,18 @@ module := "dag"
 
 # aliases
 alias fmt:=format
+alias etl:=run
 alias open:=open-dash
 alias dag-open:=open-dag
 alias preview:=app
+
+# format
+format:
+    @ruff format .
+
+# smoke-test
+smoke-test:
+    @ruff format --check .
 
 # list justfile recipes
 default:
@@ -28,74 +37,17 @@ install:
 ingest:
     @python {{module}}/ingest.py
 
-# deploy
-deploy:
-    @python {{module}}/deploy.py
-
-# backup
-backup:
-    @python {{module}}/backup.py
-
-# upload
-upload:
-    az storage azcopy blob upload \
-        --account-name ibisanalytics \
-        --container $AZURE_STORAGE_CONTAINER \
-        --source 'data/*' \
-        --destination 'data' \
-        --recursive
-
-# DANGER
-upload-prod:
-    az storage azcopy blob upload \
-        --account-name ibisanalytics \
-        --container prod \
-        --source 'data/*' \
-        --destination 'data' \
-        --recursive
-
-# download
-download:
-    rm -r data |ta| true
-    az storage azcopy blob download \
-        --account-name ibisanalytics \
-        --container $AZURE_STORAGE_CONTAINER \
-        --source 'data/*' \
-        --destination 'data' \
-        --recursive
-
-download-prod:
-    rm -r data || true
-    az storage azcopy blob download \
-        --account-name ibisanalytics \
-        --container prod \
-        --source 'data/*' \
-        --destination 'data' \
-        --recursive
-
-
-# sync
-sync:
-    az storage azcopy blob sync \
-        --account-name ibisanalytics \
-        --container $AZURE_STORAGE_CONTAINER \
-        --source 'data' \
-        --destination 'data'
-
-sync-prod:
-    az storage azcopy blob sync \
-        --account-name ibisanalytics \
-        --container prod \
-        --source 'data' \
-        --destination 'data'
-
-# dag
-dag:
-    @dagster dev -m {{module}}
-
 # run
 run:
     @dagster job execute -j all_assets -m {{module}}
+
+# postprocess
+postprocess:
+    @python {{module}}/postprocess.py
+
+# deploy
+deploy:
+    @python {{module}}/deploy.py
 
 # test
 test:
@@ -105,17 +57,13 @@ test:
     @python pages/2_zulip.py
     @python pages/3_about.py
 
+# dag
+dag:
+    @dagster dev -m {{module}}
+
 # streamlit stuff
 app:
     @streamlit run metrics.py
-
-# format
-format:
-    @ruff format .
-
-# smoke-test
-smoke-test:
-    @ruff format --check .
 
 # clean
 clean:
@@ -136,15 +84,6 @@ open-dash:
 cicd:
     @gh workflow run cicd.yaml
 
-# temp
-temp:
-    @gh workflow run temp.yaml
-
-
-# start vm
-vm-start:
-    @az vm start -n cicd -g ibis-analytics
-
 # wip below here
 goat:
     #!/bin/bash +x
@@ -153,5 +92,3 @@ goat:
         --header 'Content-Type: application/json' \
         --header "Authorization: Bearer $GOAT_TOKEN" \
         "$api/export"
-
-#

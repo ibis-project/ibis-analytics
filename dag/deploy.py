@@ -10,26 +10,29 @@ from datetime import datetime, timedelta, date
 
 import functions as f
 
-# config.toml
-config = toml.load("config.toml")["app"]
-
-# configure logging
-log.basicConfig(
-    level=log.INFO,
-)
-
 
 def main():
-    log.info(f"Deploying to {config['database']}...")
-    upload()
+    deploy()
 
 
-def upload(stage: str = "staging") -> None:
+def deploy() -> None:
     """
-    Upload the data.
+    Deploy the data.
     """
-    target = ibis.duckdb.connect(f"{config['database']}")
+    # constants
     path = "data/system/duckdb"
+
+    # configure logging
+    log.basicConfig(
+        level=log.INFO,
+    )
+
+    # load config
+    config = toml.load("config.toml")["app"]
+    log.info(f"Deploying to {config['database']}...")
+
+    # connect to the database
+    target = ibis.duckdb.connect(f"{config['database']}")
 
     for root, dirs, files in os.walk(path):
         for file in files:

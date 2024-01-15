@@ -24,7 +24,7 @@ st.set_page_config(layout="wide")
 con = ibis.connect(f"duckdb://{config['database']}", read_only=True)
 
 # use precomputed data
-downloads = con.tables.downloads
+downloads = con.table("downloads")
 
 # display metrics
 """

@@ -4,7 +4,6 @@ import ibis
 
 import streamlit as st
 import plotly.express as px
-from prefixed import Float
 
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
@@ -111,7 +110,7 @@ with st.expander("show `metrics.py` (source for this page)", expanded=False):
 
 
 def fmt_number(value):
-    return f"{Float(value):.2H}"
+    return f"{value:,}"
 
 
 current_backends_total = (
