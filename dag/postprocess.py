@@ -8,7 +8,7 @@ import logging as log
 from datetime import datetime, timedelta, date
 
 ## local imports
-from dag import functions as f
+import functions as f
 
 
 def main():
