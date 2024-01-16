@@ -4,4 +4,4 @@
 
 This is an end-to-end analytics project for [Ibis](https://ibis-project.org), ingesting and processing >10M rows of data at little to no cost.
 
-Blog/demo coming soon!
+[Check out the blog](https://ibis-project.org/posts/ibis-analytics/) or [the dashboard](https://ibis-analytics.streamlit.app/).

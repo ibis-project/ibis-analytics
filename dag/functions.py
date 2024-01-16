@@ -1,7 +1,7 @@
 # imports
 import re
-import datetime
 import ibis
+import datetime
 
 import ibis.selectors as s
 

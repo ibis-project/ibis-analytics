@@ -7,11 +7,8 @@ import logging as log
 
 from datetime import datetime, timedelta, date
 
-import functions as f
-
-log.basicConfig(
-    level=log.INFO,
-)
+## local imports
+from dag import functions as f
 
 
 def main():
@@ -22,9 +19,12 @@ def postprocess() -> None:
     """
     Postprocess the data.
     """
+    # configure logger
+    log.basicConfig(
+        level=log.INFO,
+    )
 
-    # backup loaded data as Delta Lake tables
-    # and a DuckDB Database
+    # backup loaded data as Delta Lake tables and a DuckDB database
     source_path = "data/system/duckdb"
     target_path = "data/data.ddb"
 

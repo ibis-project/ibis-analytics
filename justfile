@@ -29,6 +29,10 @@ default:
 setup:
     @pip install --upgrade -r requirements.txt
 
+# eda
+eda:
+    @ipython -i eda.py
+
 # ingest
 ingest:
     @python {{module}}/ingest.py

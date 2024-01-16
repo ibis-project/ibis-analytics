@@ -6,9 +6,9 @@ import toml
 import ibis
 import requests
 
-import ibis.selectors as s
 import logging as log
 import plotly.io as pio
+import ibis.selectors as s
 import plotly.express as px
 
 from rich import print
@@ -16,8 +16,7 @@ from dotenv import load_dotenv
 from datetime import datetime, timedelta, date
 
 ## local imports
-import dag.functions as f
-
+from dag import functions as f
 from dag.assets import extract, load, transform
 
 # configuration
