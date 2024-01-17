@@ -36,37 +36,13 @@ with open("readme.md") as f:
     readme_code = f.read()
 
 f"""
-{readme_code} See [the about page](/about) for more details.
+{readme_code} See [the about page](/about) for more details on tools and services used.
 """
-
-with open("requirements.txt") as f:
-    metrics_code = f.read()
-
-with st.expander("show `requirements.txt`", expanded=False):
-    st.code(metrics_code, line_numbers=True, language="python")
-
-with open("config.toml") as f:
-    config_code = f.read()
-
-with st.expander("show `config.toml`", expanded=False):
-    st.code(config_code, line_numbers=True, language="toml")
-
-with open("justfile") as f:
-    justfile_code = f.read()
-
-with st.expander("show `justfile`", expanded=False):
-    st.code(justfile_code, line_numbers=True, language="makefile")
-
-with open(".github/workflows/cicd.yaml") as f:
-    cicd_code = f.read()
-
-with st.expander("show `cicd.yaml`", expanded=False):
-    st.code(cicd_code, line_numbers=True, language="yaml")
 
 with open("metrics.py") as f:
     metrics_code = f.read()
 
-with st.expander("show `metrics.py` (source for this page)", expanded=False):
+with st.expander("Show source code", expanded=False):
     st.code(metrics_code, line_numbers=True, language="python")
 
 """
