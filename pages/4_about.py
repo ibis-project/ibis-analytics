@@ -63,5 +63,5 @@ with col1:
 
 """
 
-:violet[**Note**]: data is refreshed every 3 hours. Check [the CI/CD pipeline for the latest run](https://github.com/ibis-project/ibis-analytics/actions/workflows/cicd.yaml).
+:violet[**Note**]: data is refreshed every 6 hours. Check [the CI/CD pipeline for the latest run](https://github.com/ibis-project/ibis-analytics/actions/workflows/cicd.yaml).
 """
