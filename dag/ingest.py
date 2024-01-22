@@ -400,7 +400,7 @@ def ingest_docs():
     while True:
         log.info(f"Checking export status...")
         r = httpx.get(url + endpoint + f"/{export_id}", headers=headers)
-        if r.status_code != 200:
+        if r.status_code != 200 or r.status_code != 202:
             log.error(f"Failed to get export status: {r}")
             return
 
