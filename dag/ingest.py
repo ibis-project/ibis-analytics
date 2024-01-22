@@ -396,6 +396,9 @@ def ingest_docs():
     export_id = r.json()["id"]
     log.info(f"Export ID: {export_id}")
 
+    # wait a few seconds
+    time.sleep(5)
+
     # wait for the export to finish
     while True:
         log.info(f"Checking export status...")
