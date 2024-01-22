@@ -1,8 +1,10 @@
 # imports
 import os
 import ibis
+import time
 import toml
 import json
+import httpx
 import zulip
 import inspect
 import requests
@@ -31,6 +33,7 @@ def main():
     # ingest data
     ingest_zulip()
     ingest_pypi()
+    ingest_docs()
     ingest_gh()
     # ingest_ci() # TODO: fix permissions, add assets
 
@@ -356,6 +359,71 @@ def ingest_zulip():
         output_path = os.path.join("data", "ingest", "zulip", filename)
         log.info(f"Writing messages to: {output_path}")
         write_json(all_messages, output_path)
+
+
+def ingest_docs():
+    """Ingest the docs data."""
+    # (not so) constants
+    endpoint = "/api/v0/export"
+
+    # configure logger
+    log.basicConfig(level=log.INFO)
+
+    # load config
+    config = toml.load("config.toml")["ingest"]["docs"]
+    log.info(f"Using url: {config['url']}")
+    url = config["url"]
+
+    # load environment variables
+    goat_token = os.getenv("GOAT_TOKEN")
+
+    # create the headers
+    headers = {
+        "Authorization": f"Bearer {goat_token}",
+        "Content-Type": "application/json",
+    }
+
+    # start the .csv.gz export
+    log.info(f"Starting export...")
+    r = httpx.post(url + endpoint, headers=headers)
+
+    # check the response
+    if r.status_code != 200:
+        log.error(f"Failed to start export: {r}")
+        return
+
+    # get the export id
+    export_id = r.json()["id"]
+    log.info(f"Export ID: {export_id}")
+
+    # wait for the export to finish
+    while True:
+        log.info(f"Checking export status...")
+        r = httpx.get(url + endpoint + f"/{export_id}", headers=headers)
+        if r.status_code != 200:
+            log.error(f"Failed to get export status: {r}")
+            return
+
+        # check the status
+        status = r.json()["status"]
+        log.info(f"Status: {status}")
+        if status == "finished":
+            break
+
+        # sleep for 10 seconds
+        time.sleep(10)
+
+    # download the export
+    log.info(f"Downloading export...")
+    r = httpx.get(url + endpoint + f"/{export_id}/download", headers=headers)
+    if r.status_code != 200:
+        log.error(f"Failed to download export: {r}")
+        return
+
+    # write the export to a file
+    filename = os.path.join("data", "ingest", "docs", "goatcounter.csv.gz")
+    with open(filename, "wb") as f:
+        f.write(r.content)
 
 
 if __name__ == "__main__":

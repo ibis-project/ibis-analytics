@@ -1,6 +1,7 @@
 # imports
 import os
 import ibis
+import shutil
 import fnmatch
 
 import logging as log
@@ -27,6 +28,7 @@ def postprocess() -> None:
     # backup loaded data as Delta Lake tables and a DuckDB database
     source_path = "data/system/duckdb"
     target_path = "data/data.ddb"
+    app_path = "data/app.ddb"
 
     os.makedirs(source_path, exist_ok=True)
 
@@ -46,10 +48,14 @@ def postprocess() -> None:
                 log.info(f"Backing up {tablename} to {target_path}...")
                 target.create_table(tablename, table.to_pyarrow(), overwrite=True)
 
-                log.info(f"Backing up {tablename} to data/backup/{tablename}.delta...")
-                table.mutate(ingested_at=ingested_at).to_delta(
-                    f"data/backup/{tablename}.delta", mode="overwrite"
-                )
+                # TODO: disabling for now, causing issues, not used anywhere
+                # log.info(f"Backing up {tablename} to data/backup/{tablename}.delta...")
+                # table.mutate(ingested_at=ingested_at).to_delta(
+                #     f"data/backup/{tablename}.delta", mode="overwrite"
+                # )
+
+    log.info(f"Copying {target_path} to {app_path}...")
+    shutil.copy(target_path, app_path)
 
 
 if __name__ == "__main__":

@@ -34,3 +34,5 @@ endpoints = [
 ]
 [ingest.zulip]
 url = "https://ibis-project.zulipchat.com"
+[ingest.docs]
+url = "https://ibis.goatcounter.com"
