@@ -4,6 +4,7 @@ import os
 import sys
 import toml
 import ibis
+import httpx
 import requests
 
 import logging as log

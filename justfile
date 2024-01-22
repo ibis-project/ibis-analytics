@@ -55,7 +55,8 @@ test:
     @python pages/0_github.py
     @python pages/1_pypi.py
     @python pages/2_zulip.py
-    @python pages/3_about.py
+    @python pages/3_docs.py
+    @python pages/4_about.py
 
 # dag
 dag:
@@ -84,11 +85,3 @@ open-dash:
 cicd:
     @gh workflow run cicd.yaml
 
-# wip below here
-goat:
-    #!/bin/bash +x
-    api="https://ibis.goatcounter.com/api/v0"
-    curl -v -X POST \
-        --header 'Content-Type: application/json' \
-        --header "Authorization: Bearer $GOAT_TOKEN" \
-        "$api/export"

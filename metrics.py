@@ -22,6 +22,7 @@ st.set_page_config(layout="wide")
 con = ibis.connect(f"duckdb://{config['database']}", read_only=True)
 
 # use precomputed data
+docs = con.table("docs")
 stars = con.table("stars")
 forks = con.table("forks")
 pulls = con.table("pulls")
@@ -95,8 +96,10 @@ downloads_all_time = downloads["downloads"].sum().to_pandas()
 total_members_all_time = members.user_id.nunique().to_pandas()
 total_messages_all_time = messages.id.nunique().to_pandas()
 
+total_visits_all_time = docs.count().to_pandas()
+total_first_visits_all_time = docs.first_visit.sum().to_pandas()
 
-col0, col1, col2, col3 = st.columns(4)
+col0, col1, col2, col3, col4 = st.columns(5)
 with col0:
     st.metric(
         label="GitHub stars",
@@ -140,6 +143,17 @@ with col3:
         label="Zulip messages",
         value=fmt_number(total_messages_all_time),
         help=f"{total_messages_all_time:,}",
+    )
+with col4:
+    st.metric(
+        label="Unique docs visits",
+        value=fmt_number(total_visits_all_time),
+        help=f"{total_visits_all_time:,}",
+    )
+    st.metric(
+        label="Unique docs first visits",
+        value=fmt_number(total_first_visits_all_time),
+        help=f"{total_first_visits_all_time:,}",
     )
 
 # variables
