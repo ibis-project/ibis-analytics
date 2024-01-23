@@ -289,7 +289,9 @@ with col4:
 
 # viz
 c0 = px.line(
-    stars.filter(ibis._.starred_at > datetime.now() - timedelta(days=days)),
+    stars.filter(ibis._.starred_at > datetime.now() - timedelta(days=days)).order_by(
+        ibis._.starred_at.desc()
+    ),
     x="starred_at",
     y="total_stars",
     title="cumulative stars",
@@ -302,7 +304,8 @@ c1 = px.bar(
     .group_by(
         [ibis._.starred_at.truncate(timescale).name("starred_at"), ibis._.company]
     )
-    .agg(ibis._.count().name("stars")),
+    .agg(ibis._.count().name("stars"))
+    .order_by(ibis._.stars.desc()),
     x="starred_at",
     y="stars",
     color="company",
@@ -320,7 +323,9 @@ st.dataframe(
 )
 
 c3 = px.line(
-    forks.filter(ibis._.created_at > datetime.now() - timedelta(days=days)),
+    forks.filter(ibis._.created_at > datetime.now() - timedelta(days=days)).order_by(
+        ibis._.created_at.desc()
+    ),
     x="created_at",
     y="total_forks",
     title="cumulative forks",
@@ -328,7 +333,9 @@ c3 = px.line(
 st.plotly_chart(c3, use_container_width=True)
 
 c4 = px.line(
-    pulls.filter(ibis._.created_at > datetime.now() - timedelta(days=days)),
+    pulls.filter(ibis._.created_at > datetime.now() - timedelta(days=days)).order_by(
+        ibis._.created_at.desc()
+    ),
     x="created_at",
     y="total_pulls",
     title="cumulative pull requests",
@@ -336,7 +343,9 @@ c4 = px.line(
 st.plotly_chart(c4, use_container_width=True)
 
 c5 = px.line(
-    issues.filter(ibis._.created_at > datetime.now() - timedelta(days=days)),
+    issues.filter(ibis._.created_at > datetime.now() - timedelta(days=days)).order_by(
+        ibis._.created_at.desc()
+    ),
     x="created_at",
     y="total_issues",
     title="cumulative issues",
@@ -344,7 +353,9 @@ c5 = px.line(
 st.plotly_chart(c5, use_container_width=True)
 
 c6 = px.line(
-    commits.filter(ibis._.committed_date > datetime.now() - timedelta(days=days)),
+    commits.filter(
+        ibis._.committed_date > datetime.now() - timedelta(days=days)
+    ).order_by(ibis._.committed_date.desc()),
     x="committed_date",
     y="total_commits",
     title="cumulative commits",
