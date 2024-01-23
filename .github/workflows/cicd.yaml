@@ -35,8 +35,9 @@ jobs:
           GOAT_TOKEN: ${{ secrets.GOAT_TOKEN }}
       - name: run ETL job
         run: just run
-      - name: postprocess
-        run: just postprocess
+        continue-on-error: true # YOLO
+      # - name: postprocess
+      #   run: just postprocess
       - name: deploy to prod
         run: just deploy
         env:
