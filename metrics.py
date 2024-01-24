@@ -22,7 +22,11 @@ st.set_page_config(layout="wide")
 con = ibis.connect(f"duckdb://{config['database']}", read_only=True)
 
 # use precomputed data
-docs = con.table("docs")
+# TODO: remove dirty hack
+try:
+    docs = con.table("docs")
+except:
+    docs = None
 stars = con.table("stars")
 forks = con.table("forks")
 pulls = con.table("pulls")
@@ -96,8 +100,13 @@ downloads_all_time = downloads["downloads"].sum().to_pandas()
 total_members_all_time = members.user_id.nunique().to_pandas()
 total_messages_all_time = messages.id.nunique().to_pandas()
 
-total_visits_all_time = docs.count().to_pandas()
-total_first_visits_all_time = docs.first_visit.sum().to_pandas()
+# TODO: remove dirty hack
+if docs is not None:
+    total_visits_all_time = docs.count().to_pandas()
+    total_first_visits_all_time = docs.first_visit.sum().to_pandas()
+else:
+    total_visits_all_time = 0
+    total_first_visits_all_time = 0
 
 col0, col1, col2, col3, col4 = st.columns(5)
 with col0:
