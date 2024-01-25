@@ -42,7 +42,15 @@ with open("readme.md") as f:
 
 f"""
 {readme_code} See [the about page](/about) for more details on tools and services used.
+
+
 """
+
+# TODO: remove after docs are working
+st.warning(
+    "Documentation metrics are broken as I fight with rate limiting, check back soon!",
+    icon="⚠️",
+)
 
 with open("metrics.py") as f:
     metrics_code = f.read()
@@ -157,12 +165,14 @@ with col4:
     st.metric(
         label="Unique docs visits",
         value=fmt_number(total_visits_all_time),
-        help=f"{total_visits_all_time:,}",
+        help="Currently broken, check back soon!",
+        # help=f"{total_visits_all_time:,}",
     )
     st.metric(
         label="Unique docs first visits",
         value=fmt_number(total_first_visits_all_time),
-        help=f"{total_first_visits_all_time:,}",
+        help="Currently broken, check back soon!",
+        # help=f"{total_first_visits_all_time:,}",
     )
 
 # variables

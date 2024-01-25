@@ -20,6 +20,12 @@ config = toml.load("config.toml")["app"]
 ## streamlit config
 st.set_page_config(layout="wide")
 
+# TODO: remove after docs are working
+st.warning(
+    "Documentation metrics are broken as I fight with rate limiting, check back soon!",
+    icon="⚠️",
+)
+
 ## ibis config
 con = ibis.connect(f"duckdb://{config['database']}", read_only=True)
 
