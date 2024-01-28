@@ -388,7 +388,7 @@ def ingest_docs():
     r = httpx.post(url + endpoint, headers=headers)
 
     # check the response
-    if r.status_code != 200:
+    if r.status_code != 200 or r.status_code != 202:
         log.error(f"Failed to start export: {r}")
         return
 
@@ -420,7 +420,7 @@ def ingest_docs():
     # download the export
     log.info(f"Downloading export...")
     r = httpx.get(url + endpoint + f"/{export_id}/download", headers=headers)
-    if r.status_code != 200:
+    if r.status_code != 200 or r.status_code != 202:
         log.error(f"Failed to download export: {r}")
         log.error(f"Response: {r.text}")
         return
