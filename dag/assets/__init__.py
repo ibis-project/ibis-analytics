@@ -23,7 +23,7 @@ from dag.constants import EXTRACT, TRANSFORM, LOAD
 
 # load assets
 extract_modules = [
-    extract_docs,
+    # extract_docs,
     extract_pypi,
     extract_zulip,
     extract_github,
@@ -32,7 +32,7 @@ extract_modules = [
 extract_assets = load_assets_from_modules(extract_modules, group_name=EXTRACT)
 
 transform_modules = [
-    transform_docs,
+    # transform_docs,
     transform_pypi,
     transform_zulip,
     transform_github,
@@ -40,7 +40,7 @@ transform_modules = [
 ]
 transform_assets = load_assets_from_modules(transform_modules, group_name=TRANSFORM)
 
-load_modules = [load_docs, load_pypi, load_zulip, load_github, load_backends]
+load_modules = [load_pypi, load_zulip, load_github, load_backends]  # load_docs
 load_assets = load_assets_from_modules(load_modules, group_name=LOAD)
 
 assets = [*extract_assets, *transform_assets, *load_assets]

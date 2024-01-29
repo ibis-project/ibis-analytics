@@ -31,9 +31,9 @@ def main():
     load_dotenv()
 
     # ingest data
+    # ingest_docs()
     ingest_zulip()
     ingest_pypi()
-    ingest_docs()
     ingest_gh()
     # ingest_ci() # TODO: fix permissions, add assets
 
@@ -389,6 +389,7 @@ def ingest_docs():
 
     # check the response
     if r.status_code != 200 or r.status_code != 202:
+        log.error(f"Status code: {r.status_code}")
         log.error(f"Failed to start export: {r}")
         return
 
