@@ -31,10 +31,10 @@ def main():
     load_dotenv()
 
     # ingest data
-    # ingest_docs()
-    ingest_zulip()
-    ingest_pypi()
-    ingest_gh()
+    ingest_docs()
+    #ingest_zulip()
+    #ingest_pypi()
+    #ingest_gh()
     # ingest_ci() # TODO: fix permissions, add assets
 
 
@@ -386,6 +386,7 @@ def ingest_docs():
     # start the .csv.gz export
     log.info(f"Starting export...")
     r = httpx.post(url + endpoint, headers=headers)
+    breakpoint()
 
     # check the response
     if r.status_code != 200 or r.status_code != 202:
@@ -404,6 +405,7 @@ def ingest_docs():
     while True:
         log.info(f"Checking export status...")
         r = httpx.get(url + endpoint + f"/{export_id}", headers=headers)
+        breakpoint()
         if r.status_code != 200 or r.status_code != 202:
             log.error(f"Failed to get export status: {r}")
             log.error(f"Response: {r.text}")
@@ -421,6 +423,7 @@ def ingest_docs():
     # download the export
     log.info(f"Downloading export...")
     r = httpx.get(url + endpoint + f"/{export_id}/download", headers=headers)
+    breakpoint()
     if r.status_code != 200 or r.status_code != 202:
         log.error(f"Failed to download export: {r}")
         log.error(f"Response: {r.text}")
