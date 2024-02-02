@@ -3,7 +3,7 @@ name: cicd
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 0/3 * * *"
+    - cron: "0 9 * * *"
 #  pull_request:
 #    paths:
 #      - '.github/workflows/cicd.yaml'

@@ -31,10 +31,10 @@ def main():
     load_dotenv()
 
     # ingest data
+    ingest_zulip()
+    ingest_pypi()
+    ingest_gh()
     ingest_docs()
-    #ingest_zulip()
-    #ingest_pypi()
-    #ingest_gh()
     # ingest_ci() # TODO: fix permissions, add assets
 
 
@@ -386,17 +386,17 @@ def ingest_docs():
     # start the .csv.gz export
     log.info(f"Starting export...")
     r = httpx.post(url + endpoint, headers=headers)
-    breakpoint()
-
-    # check the response
-    if r.status_code != 200 or r.status_code != 202:
-        log.error(f"Status code: {r.status_code}")
-        log.error(f"Failed to start export: {r}")
-        return
+    log.info(f"Status code: {r.status_code}")
+    log.info(f"Response: {r.text}")
 
     # get the export id
-    export_id = r.json()["id"]
-    log.info(f"Export ID: {export_id}")
+    try:
+        export_id = r.json()["id"]
+        log.info(f"Export ID: {export_id}")
+    except:
+        log.error(f"Failed to get export id: {r}")
+        log.error(f"Response: {r.text}")
+        return
 
     # wait a few seconds
     time.sleep(5)
@@ -405,17 +405,19 @@ def ingest_docs():
     while True:
         log.info(f"Checking export status...")
         r = httpx.get(url + endpoint + f"/{export_id}", headers=headers)
-        breakpoint()
-        if r.status_code != 200 or r.status_code != 202:
-            log.error(f"Failed to get export status: {r}")
-            log.error(f"Response: {r.text}")
-            return
+        log.info(f"Status code: {r.status_code}")
+        log.info(f"Response: {r.text}")
 
         # check the status
-        status = r.json()["status"]
-        log.info(f"Status: {status}")
-        if status == "finished":
-            break
+        try:
+            status = r.json()["finished_at"]
+            log.info(f"Status: {status}")
+            if status is not None:
+                break
+        except:
+            log.error(f"Failed to get status: {r}")
+            log.error(f"Response: {r.text}")
+            return
 
         # sleep for 10 seconds
         time.sleep(10)
@@ -423,16 +425,17 @@ def ingest_docs():
     # download the export
     log.info(f"Downloading export...")
     r = httpx.get(url + endpoint + f"/{export_id}/download", headers=headers)
-    breakpoint()
-    if r.status_code != 200 or r.status_code != 202:
-        log.error(f"Failed to download export: {r}")
-        log.error(f"Response: {r.text}")
-        return
+    log.info(f"Status code: {r.status_code}")
 
     # write the export to a file
-    filename = os.path.join("data", "ingest", "docs", "goatcounter.csv.gz")
-    with open(filename, "wb") as f:
-        f.write(r.content)
+    try:
+        filename = os.path.join("data", "ingest", "docs", "goatcounter.csv.gz")
+        with open(filename, "wb") as f:
+            f.write(r.content)
+    except:
+        log.error(f"Failed to write export to file: {r}")
+        log.error(f"Response: {r.text}")
+        return
 
 
 if __name__ == "__main__":
