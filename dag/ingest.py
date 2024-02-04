@@ -31,10 +31,10 @@ def main():
     load_dotenv()
 
     # ingest data
+    ingest_docs()
     ingest_zulip()
     ingest_pypi()
     ingest_gh()
-    ingest_docs()
     # ingest_ci() # TODO: fix permissions, add assets
 
 
