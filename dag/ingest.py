@@ -429,12 +429,12 @@ def ingest_docs():
 
     # write the export to a file
     try:
+        os.makedirs("data/ingest/docs", exist_ok=True)
         filename = os.path.join("data", "ingest", "docs", "goatcounter.csv.gz")
         with open(filename, "wb") as f:
             f.write(r.content)
     except:
         log.error(f"Failed to write export to file: {r}")
-        log.error(f"Response: {r.text}")
         return
 
 

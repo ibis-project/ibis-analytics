@@ -52,6 +52,9 @@ def transform_pulls(extract_pulls):
         .end()
     )
     pulls = pulls.mutate(pull_state.name("state"))
+    pulls = pulls.mutate(
+        merged_at=ibis._.merged_at.cast("timestamp")
+    )  # TODO: temporary fix
     return pulls
 
 
