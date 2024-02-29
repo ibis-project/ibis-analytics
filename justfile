@@ -85,3 +85,6 @@ open-dash:
 cicd:
     @gh workflow run cicd.yaml
 
+# docs-hack: manually upload docs data
+docs-hack:
+    @python docs_hack.py

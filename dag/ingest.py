@@ -15,7 +15,7 @@ from ibis import _
 from dotenv import load_dotenv
 from datetime import datetime, timedelta, date
 
-from graphql_queries import (
+from dag.graphql_queries import (
     issues_query,
     pulls_query,
     forks_query,

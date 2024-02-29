@@ -8,7 +8,7 @@ import logging as log
 
 from datetime import datetime, timedelta, date
 
-import functions as f
+import dag.functions as f
 
 
 def main():
