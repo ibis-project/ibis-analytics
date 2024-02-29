@@ -29,10 +29,10 @@ log.info(f"Deploying to {config['database']}...")
 target = ibis.duckdb.connect(f"{config['database']}")
 
 # ensure fresh data
-# shutil.rmtree("data/system/duckdb", ignore_errors=True)
+shutil.rmtree("data/system/duckdb", ignore_errors=True)
 
 # ingest
-# ingest_docs()
+ingest_docs()
 
 # ETL
 docs = load_docs(transform_docs(extract_docs()))
