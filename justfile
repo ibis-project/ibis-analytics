@@ -28,6 +28,7 @@ default:
 # setup
 setup:
     @pip install --upgrade -r requirements.txt
+    @pip install -e .
 
 # eda
 eda:

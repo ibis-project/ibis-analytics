@@ -1,5 +1,6 @@
 # python
 ruff
+build
 python-dotenv
 
 # web clients

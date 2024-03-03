@@ -1,0 +1,8 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "dag"
+version = "0.1.0"
+
