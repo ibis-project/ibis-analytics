@@ -157,6 +157,7 @@ query($owner: String!, $repo: String!, $num_items: Int!, $cursor: String) {
                         id
                         login
                         name
+                        bio
                         company
                         createdAt
                         updatedAt
