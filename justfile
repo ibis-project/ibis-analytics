@@ -13,6 +13,10 @@ alias open:=open-dash
 alias dag-open:=open-dag
 alias preview:=app
 
+# list justfile recipes
+default:
+    just --list
+
 # format
 format:
     @ruff format .
@@ -20,10 +24,6 @@ format:
 # smoke-test
 smoke-test:
     @ruff format --check .
-
-# list justfile recipes
-default:
-    just --list
 
 # setup
 setup:
