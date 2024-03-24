@@ -20,5 +20,5 @@ plotly
 streamlit
 
 # ops
-dagster
-dagster-webserver
+dagster==1.6.11
+dagster-webserver==1.6.11
