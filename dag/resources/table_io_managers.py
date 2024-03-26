@@ -24,10 +24,10 @@ class ParquetIOManager(ConfigurableIOManager):
         return ibis.read_parquet(input_path)
 
     def _get_paths(self, context):
-        group_name = context.step_context.job_def.asset_layer.assets_def_for_asset(
-            context.asset_key
-        ).group_names_by_key[context.asset_key]
-        dirname = os.path.join(self.base_path, group_name, *context.asset_key.path[:-1])
+        # group_name = context.step_context.job_def.asset_layer.assets_def_for_asset(
+        #     context.asset_key
+        # ).group_names_by_key[context.asset_key]
+        dirname = os.path.join(self.base_path, *context.asset_key.path[:-1])
         filename = f"{context.asset_key.path[-1]}.{self.extension}"
         return dirname, filename
 
@@ -53,9 +53,9 @@ class DeltaIOManager(ConfigurableIOManager):
         return ibis.read_delta(input_path)
 
     def _get_paths(self, context):
-        group_name = context.step_context.job_def.asset_layer.assets_def_for_asset(
-            context.asset_key
-        ).group_names_by_key[context.asset_key]
+        # group_name = context.step_context.job_def.asset_layer.assets_def_for_asset(
+        #     context.asset_key
+        # ).group_names_by_key[context.asset_key]
         dirname = os.path.join(self.base_path, *context.asset_key.path)
         filename = f"{context.asset_key.path[-1]}.{self.extension}"
         return dirname, filename
@@ -83,9 +83,10 @@ class DuckDBIOManager(ConfigurableIOManager):
         return con.table(context.asset_key.path[-1])
 
     def _get_paths(self, context):
-        group_name = context.step_context.job_def.asset_layer.assets_def_for_asset(
-            context.asset_key
-        ).group_names_by_key[context.asset_key]
+        # group_name = context.step_context.job_def.asset_layer.assets_def_for_asset(
+        #    context.asset_key
+        # ).group_names_by_key[context.asset_key]
+        # group_name = context.assets_def.group_names_by_key[context.asset_key]
         dirname = os.path.join(self.base_path, *context.asset_key.path)
         filename = f"{context.asset_key.path[-1]}.{self.extension}"
         return dirname, filename
