@@ -113,7 +113,25 @@ downloads_last_x_days_by_groupers = (
 st.dataframe(downloads_last_x_days_by_groupers, use_container_width=True)
 
 # viz
-c0 = px.bar(
+c0 = px.line(
+    downloads.filter(ibis._.timestamp >= datetime.now() - timedelta(days=days))
+    .group_by(ibis._.timestamp.truncate(timescale).name("timestamp"))
+    .agg(ibis._.downloads.sum().name("downloads"))
+    .order_by(ibis._.timestamp.desc())
+    .mutate(
+        ibis._.downloads.sum()
+        .over(rows=(0, None), order_by=ibis._.timestamp.desc())
+        .name("total_downloads")
+    )
+    .order_by(ibis._.timestamp.desc()),
+    x="timestamp",
+    y="total_downloads",
+    # log_y=True,
+    title="cumulative downloads",
+)
+st.plotly_chart(c0, use_container_width=True)
+
+c1 = px.bar(
     downloads.filter(ibis._.timestamp >= datetime.now() - timedelta(days=days))
     .group_by(
         [ibis._.timestamp.truncate(timescale).name("timestamp"), ibis._[groupers[0]]]
@@ -131,9 +149,9 @@ c0 = px.bar(
     color=groupers[0],
     title=f"downloads by {groupers[0]}",
 )
-st.plotly_chart(c0, use_container_width=True)
+st.plotly_chart(c1, use_container_width=True)
 
-c1 = px.line(
+c2 = px.line(
     downloads.filter(ibis._.timestamp >= datetime.now() - timedelta(days=days))
     .group_by(
         [ibis._.timestamp.truncate(timescale).name("timestamp"), ibis._[groupers[0]]]
@@ -152,4 +170,4 @@ c1 = px.line(
     color=groupers[0],
     title=f"cumulative downloads by {groupers[0]}",
 )
-st.plotly_chart(c1, use_container_width=True)
+st.plotly_chart(c2, use_container_width=True)
