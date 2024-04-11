@@ -273,6 +273,34 @@ total_downloads, total_downloads_prev = (
 )
 
 
+new_issue_contributors, new_issue_contributors_prev = (
+    issues.agg(
+        new_issue_contributors=issues.login.nunique(
+            where=(issues.created_at >= STOP) & (issues.is_first_issue == True)
+        ),
+        new_issue_contributors_prev=issues.login.nunique(
+            where=(issues.created_at.between(START, STOP))
+            & (issues.is_first_issue == True)
+        ),
+    )
+    .to_pandas()
+    .squeeze()
+)
+new_pulls_contributors, new_pulls_contributors_prev = (
+    pulls.agg(
+        new_pulls_contributors=pulls.login.nunique(
+            where=(pulls.created_at >= STOP) & (pulls.is_first_pull == True)
+        ),
+        new_pulls_contributors_prev=pulls.login.nunique(
+            where=(pulls.created_at.between(START, STOP))
+            & (pulls.is_first_pull == True)
+        ),
+    )
+    .to_pandas()
+    .squeeze()
+)
+
+
 def delta(current, previous):
     delta = current - previous
     pct_change = int(round(100.0 * delta / previous, 0))
@@ -282,7 +310,7 @@ def delta(current, previous):
 f"""
 ## totals (last {days} days)
 """
-col1, col2, col3, col4 = st.columns(4)
+col1, col2, col3, col4, col5 = st.columns(5)
 with col1:
     st.metric(
         label="GitHub stars",
@@ -334,6 +362,19 @@ with col4:
         value=fmt_number(total_issues_closed),
         delta=delta(total_issues_closed, total_issues_closed_prev),
         help=f"{total_issues_closed:,}",
+    )
+with col5:
+    st.metric(
+        label="New issue contributors",
+        value=fmt_number(new_issue_contributors),
+        delta=delta(new_issue_contributors, new_issue_contributors_prev),
+        help=f"{new_issue_contributors:,}",
+    )
+    st.metric(
+        label="New PR contributors",
+        value=fmt_number(new_pulls_contributors),
+        delta=delta(new_pulls_contributors, new_pulls_contributors_prev),
+        help=f"{new_pulls_contributors:,}",
     )
 
 f"""

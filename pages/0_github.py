@@ -361,3 +361,30 @@ c6 = px.line(
     title="cumulative commits",
 )
 st.plotly_chart(c6, use_container_width=True)
+
+# new contributors over time
+c7 = px.bar(
+    issues.filter(ibis._.created_at > datetime.now() - timedelta(days=days))
+    .filter(ibis._.is_first_issue == True)
+    .group_by([ibis._.created_at.truncate(timescale).name("created_at")])
+    .agg(
+        ibis._.login.nunique().name("new_contributors"),
+    ),
+    x="created_at",
+    y="new_contributors",
+    title="new contributors (issues)",
+)
+st.plotly_chart(c7, use_container_width=True)
+
+c8 = px.bar(
+    pulls.filter(ibis._.created_at > datetime.now() - timedelta(days=days))
+    .filter(ibis._.is_first_pull == True)
+    .group_by([ibis._.created_at.truncate(timescale).name("created_at")])
+    .agg(
+        ibis._.login.nunique().name("new_contributors"),
+    ),
+    x="created_at",
+    y="new_contributors",
+    title="new contributors (pull requests)",
+)
+st.plotly_chart(c8, use_container_width=True)
