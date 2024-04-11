@@ -25,6 +25,20 @@ def transform_issues(extract_issues):
     issues = issues.mutate(ibis._.count().over(rows=(0, None)).name("total_issues"))
     issue_state = ibis.case().when(issues.is_closed, "closed").else_("open").end()
     issues = issues.mutate(issue_state.name("state"))
+
+    # add first issues by login
+    issues = (
+        issues.mutate(
+            is_first_issue=(
+                ibis.row_number().over(
+                    ibis.window(group_by="login", order_by=issues["created_at"])
+                )
+                == 0
+            )
+        )
+        .relocate("is_first_issue", "login", "created_at")
+        .order_by(issues["created_at"].desc())
+    )
     return issues
 
 
@@ -55,6 +69,20 @@ def transform_pulls(extract_pulls):
     pulls = pulls.mutate(
         merged_at=ibis._.merged_at.cast("timestamp")
     )  # TODO: temporary fix
+
+    # add first pull by login
+    pulls = (
+        pulls.mutate(
+            is_first_pull=(
+                ibis.row_number().over(
+                    ibis.window(group_by="login", order_by=pulls["created_at"])
+                )
+                == 0
+            )
+        )
+        .relocate("is_first_pull", "login", "created_at")
+        .order_by(pulls["created_at"].desc())
+    )
     return pulls
 
 
