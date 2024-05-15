@@ -6,14 +6,10 @@ python-dotenv
 # web clients
 httpx
 zulip
-PyGithub # unused for now
 
 # data
-duckdb==0.9.2
+duckdb==0.10.2
 ibis-framework[duckdb,bigquery,deltalake] @ git+https://github.com/ibis-project/ibis
-
-# ML
-ibisml # @ git+https://github.com/ibis-project/ibisml # unused for now
 
 # viz
 plotly
@@ -22,3 +18,4 @@ streamlit
 # ops
 dagster
 dagster-webserver
+
