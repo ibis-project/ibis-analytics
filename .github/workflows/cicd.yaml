@@ -23,7 +23,7 @@ jobs:
       - uses: extractions/setup-just@v1
       - uses: actions/setup-python@v4
         with:
-          python-version: 3.11
+          python-version: 3.12
       - name: install requirements
         run: just setup
       - name: ingest
