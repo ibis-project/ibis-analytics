@@ -89,3 +89,8 @@ cicd:
 # docs-hack: manually upload docs data
 docs-hack:
     @python docs_hack.py
+
+# ssh
+ssh:
+    @gcloud compute ssh --zone "us-central1-c" --project "voltrondata-demo" --tunnel-through-iap "ibis-analytics"
+
