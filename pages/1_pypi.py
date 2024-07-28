@@ -148,6 +148,30 @@ c00 = px.line(
             )
         )
     },
+    title="downloads (28 days rolling) by version",
+)
+st.plotly_chart(c00, use_container_width=True)
+
+t = (
+    downloads.mutate(
+        timestamp=downloads["timestamp"].truncate("D"),
+    )
+    .group_by("timestamp")
+    .agg(downloads=ibis._["downloads"].sum())
+    .select(
+        "timestamp",
+        downloads=ibis._["downloads"]
+        .sum()
+        .over(ibis.window(order_by="timestamp", preceding=28, following=0)),
+    )
+    .filter((ibis._["timestamp"] >= datetime.now() - timedelta(days=days)))
+    .order_by("timestamp")
+)
+
+c00 = px.line(
+    t,
+    x="timestamp",
+    y="downloads",
     title="downloads (28 days rolling)",
 )
 st.plotly_chart(c00, use_container_width=True)
