@@ -113,6 +113,45 @@ downloads_last_x_days_by_groupers = (
 st.dataframe(downloads_last_x_days_by_groupers, use_container_width=True)
 
 # viz
+t = (
+    downloads.mutate(
+        timestamp=downloads["timestamp"].truncate("D"),
+        version=downloads["version"].split(".")[0],
+    )
+    .group_by("timestamp", "version")
+    .agg(downloads=ibis._["downloads"].sum())
+    .select(
+        "timestamp",
+        "version",
+        downloads=ibis._["downloads"]
+        .sum()
+        .over(
+            ibis.window(
+                order_by="timestamp", group_by="version", preceding=28, following=0
+            )
+        ),
+    )
+    .filter((ibis._["timestamp"] >= datetime.now() - timedelta(days=days)))
+    .order_by("timestamp")
+)
+
+c00 = px.line(
+    t,
+    x="timestamp",
+    y="downloads",
+    color="version",
+    category_orders={
+        "version": reversed(
+            sorted(
+                t.distinct(on="version")["version"].to_pyarrow().to_pylist(),
+                key=lambda x: int(x),
+            )
+        )
+    },
+    title="downloads (28 days rolling)",
+)
+st.plotly_chart(c00, use_container_width=True)
+
 c0 = px.line(
     downloads.filter(ibis._.timestamp >= datetime.now() - timedelta(days=days))
     .group_by(ibis._.timestamp.truncate(timescale).name("timestamp"))
