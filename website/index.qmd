@@ -16,13 +16,13 @@ This project uses:
 
 1. **User interface**: [Ibis](https://github.com/ibis-project/ibis) (Python dataframe code and/or SQL)
 2. **Execution engine**: [DuckDB](https://github.com/duckdb/duckdb) (local) and [ClickHouse](https://github.com/clickhouse/clickhouse) (remote)
-3. **Data storage**: [Delta Lake](https://github.com/delta-io/delta) tables (local or cloud object storage)
+3. **Data storage**: [Delta Lake](https://github.com/delta-io/delta) tables (local and/orcloud object storage)
 
 You can mix and match these components as needed.
 
 ## Setup
 
-Install [`gh`](https://github.com/cli/cli) and [`just`](https://github.com/casey/just), then:
+Install [`gh`](https://github.com/cli/cli) and [`just`](https://github.com/casey/just) and [`uv`](https://github.com/astral-sh/uv), then:
 
 ```bash
 gh repo clone ibis-project/ibis-analytics
