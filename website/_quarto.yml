@@ -14,7 +14,7 @@ website:
   reader-mode: false
   twitter-card: true
   back-to-top-navigation: true
-  repo-url: https://github.com/lostmygithubaccount/ibis-analytics
+  repo-url: https://github.com/ibis-project/ibis-analytics
 
   # footer
   page-footer:
@@ -22,7 +22,7 @@ website:
     center: "Python analytics accelerator"
     right:
       - icon: github
-        href: https://github.com/lostmygithubaccount/ibis-analytics
+        href: https://github.com/ibis-project/ibis-analytics
 
 # theme
 format:

@@ -62,4 +62,4 @@ docs-preview:
 
 # open
 open:
-    @open https://lostmygithubaccount.github.io/ibis-analytics
+    @open https://ibis-project.github.io/ibis-analytics

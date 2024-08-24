@@ -4,7 +4,7 @@
 
 ## Getting started
 
-[See the documentation](https://lostmygithubaccount.github.io/ibis-analytics).
+[See the documentation](https://ibis-project.github.io/ibis-analytics).
 
 ## Contributing
 

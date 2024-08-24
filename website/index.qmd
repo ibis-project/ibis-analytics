@@ -5,7 +5,7 @@ about:
   links:
     - icon: github
       text: github
-      href: https://github.com/lostmygithubaccount/ibis-analytics
+      href: https://github.com/ibis-project/ibis-analytics
 ---
 
 ***Ibis analytics with Ibis.***
@@ -25,7 +25,7 @@ You can mix and match these components as needed.
 Install [`gh`](https://github.com/cli/cli) and [`just`](https://github.com/casey/just), then:
 
 ```bash
-gh repo clone lostmygithubaccount/ibis-analytics
+gh repo clone ibis-project/ibis-analytics
 cd ibis-analytics
 just setup
 . .venv/bin/activate
