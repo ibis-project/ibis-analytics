@@ -135,12 +135,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <ol type="1">
 <li><strong>User interface</strong>: <a href="https://github.com/ibis-project/ibis">Ibis</a> (Python dataframe code and/or SQL)</li>
 <li><strong>Execution engine</strong>: <a href="https://github.com/duckdb/duckdb">DuckDB</a> (local) and <a href="https://github.com/clickhouse/clickhouse">ClickHouse</a> (remote)</li>
-<li><strong>Data storage</strong>: <a href="https://github.com/delta-io/delta">Delta Lake</a> tables (local or cloud object storage)</li>
+<li><strong>Data storage</strong>: <a href="https://github.com/delta-io/delta">Delta Lake</a> tables (local and/orcloud object storage)</li>
 </ol>
 <p>You can mix and match these components as needed.</p>
 <section id="setup" class="level2">
 <h2 data-anchor-id="setup">Setup</h2>
-<p>Install <a href="https://github.com/cli/cli"><code>gh</code></a> and <a href="https://github.com/casey/just"><code>just</code></a>, then:</p>
+<p>Install <a href="https://github.com/cli/cli"><code>gh</code></a> and <a href="https://github.com/casey/just"><code>just</code></a> and <a href="https://github.com/astral-sh/uv"><code>uv</code></a>, then:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">gh</span> repo clone ibis-project/ibis-analytics</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ibis-analytics</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">just</span> setup</span>
