@@ -11,7 +11,21 @@
     "href": "index.html#setup",
     "title": "Ibis analytics",
     "section": "Setup",
-    "text": "Setup\nInstall gh and just and uv, then:\ngh repo clone ibis-project/ibis-analytics\ncd ibis-analytics\njust setup\n. .venv/bin/activate"
+    "text": "Setup"
+  },
+  {
+    "objectID": "index.html#development",
+    "href": "index.html#development",
+    "title": "Ibis analytics",
+    "section": "Development",
+    "text": "Development\nInstall gh and just and uv, then:\ngh repo clone ibis-project/ibis-analytics\ncd ibis-analytics\njust setup\n. .venv/bin/activate"
+  },
+  {
+    "objectID": "index.html#pip",
+    "href": "index.html#pip",
+    "title": "Ibis analytics",
+    "section": "Pip",
+    "text": "Pip\npip install ibis-analytics"
   },
   {
     "objectID": "index.html#usage",
@@ -21,8 +35,8 @@
     "text": "Usage\nUse the CLI:\nia\nOpen the dashboard:\nia dash"
   },
   {
-    "objectID": "index.html#development",
-    "href": "index.html#development",
+    "objectID": "index.html#development-1",
+    "href": "index.html#development-1",
     "title": "Ibis analytics",
     "section": "Development",
     "text": "Development\nFormat your code:\njust fmt"
