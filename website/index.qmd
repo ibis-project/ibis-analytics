@@ -22,7 +22,7 @@ You can mix and match execution engines and data storage with Ibis.
 
 ## Setup
 
-::: {.tabset-panel}
+::: {.panel-tabset}
 
 ## Development
 
