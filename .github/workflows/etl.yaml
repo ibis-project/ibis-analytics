@@ -1,0 +1,44 @@
+name: etl
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 9 * * *"
+
+jobs:
+
+  ingest-etl:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+          fetch-depth: 0
+
+      - uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCLOUD_JSON }}
+
+      - uses: extractions/setup-just@v1
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.12
+
+      - uses: quarto-dev/quarto-actions/setup@v2
+
+      - name: install requirements
+        run: |
+          pip install uv
+          just setup
+
+      - name: ingest and etl
+        run: |
+          . .venv/bin/activate
+          ia ingest
+          ia etl
+        env:
+          BQ_PROJECT_ID: voltrondata-demo
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ZULIP_KEY: ${{ secrets.ZULIP_KEY }}
+          GOAT_TOKEN: ${{ secrets.GOAT_TOKEN }}

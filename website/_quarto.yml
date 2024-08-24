@@ -1,0 +1,31 @@
+project:
+  type: website
+  output-dir: _output
+
+# website
+website:
+  # basics
+  title: "Ibis Analytics"
+  description: "Ibis analytics with Ibis."
+  #favicon: logo.png
+  search: false
+
+  # options
+  reader-mode: false
+  twitter-card: true
+  back-to-top-navigation: true
+  repo-url: https://github.com/lostmygithubaccount/ibis-analytics
+
+  # footer
+  page-footer:
+    border: false
+    center: "Python analytics accelerator"
+    right:
+      - icon: github
+        href: https://github.com/lostmygithubaccount/ibis-analytics
+
+# theme
+format:
+  html:
+    theme: minty
+    toc: true
