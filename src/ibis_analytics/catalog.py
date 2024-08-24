@@ -17,6 +17,9 @@ def delta_table_path(table_name: str) -> str:
 def read_table(table_name: str) -> ibis.Table:
     if CLOUD:
         import gcsfs
+        import warnings
+
+        warnings.filterwarnings("ignore")
 
         fs = gcsfs.GCSFileSystem(token="anon")
         ibis.get_backend().register_filesystem(fs)
@@ -31,6 +34,9 @@ def read_table(table_name: str) -> ibis.Table:
 def write_table(t: ibis.Table, table_name: str) -> None:
     if CLOUD:
         import gcsfs
+        import warnings
+
+        warnings.filterwarnings("ignore")
 
         fs = gcsfs.GCSFileSystem()
         ibis.get_backend().register_filesystem(fs)

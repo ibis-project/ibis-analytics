@@ -1,2 +1,2 @@
-#-e .
-ibis-analytics==0.3.0
+-e .
+#ibis-analytics==0.3.0

@@ -16,6 +16,9 @@ from ibis_analytics.config import (
     GH_ISSUES_TABLE,
     GH_COMMITS_TABLE,
     GH_WATCHERS_TABLE,
+    DOCS_TABLE,
+    ZULIP_MEMBERS_TABLE,
+    ZULIP_MESSAGES_TABLE,
 )
 
 TYPER_KWARGS = {
@@ -23,7 +26,7 @@ TYPER_KWARGS = {
     "add_completion": False,
     "context_settings": {"help_option_names": ["-h", "--help"]},
 }
-app = typer.Typer(help="ia", **TYPER_KWARGS)
+app = typer.Typer(help="acc", **TYPER_KWARGS)
 clean_app = typer.Typer(help="Clean the data lake.", **TYPER_KWARGS)
 
 ## add subcommands
@@ -35,11 +38,19 @@ app.add_typer(clean_app, name="c", hidden=True)
 
 # commands
 @app.command()
-def ingest():
+def ingest(
+    gh: bool = typer.Option(True, "--gh", help="Ingest GitHub data", show_default=True),
+    zulip: bool = typer.Option(
+        True, "--zulip", help="Ingest Zulip data", show_default=True
+    ),
+    docs: bool = typer.Option(
+        False, "--docs", help="Ingest docs data", show_default=True
+    ),
+):
     """Ingest source data."""
     # ensure project config exists
     try:
-        ingest_main()
+        ingest_main(gh=gh, zulip=zulip, docs=docs)
     except KeyboardInterrupt:
         typer.echo("stopping...")
 
@@ -49,15 +60,26 @@ def ingest():
 
 @app.command()
 @app.command("etl", hidden=True)
-def run():
+def run(
+    gh: bool = typer.Option(True, "--gh", help="Run GitHub ETL", show_default=True),
+    zulip: bool = typer.Option(
+        True, "--zulip", help="Run Zulip ETL", show_default=True
+    ),
+    docs: bool = typer.Option(False, "--docs", help="Run docs ETL", show_default=True),
+):
     """Run ETL."""
 
-    try:
-        etl_main()
-    except KeyboardInterrupt:
-        typer.echo("stopping...")
-    except Exception as e:
-        typer.echo(f"error: {e}")
+    etl_main(gh=gh, zulip=zulip, docs=docs)
+    # ensure data is ingested
+    # if not override and not check_ingested_data_exists():
+    #     return
+
+    # try:
+    #     etl_main()
+    # except KeyboardInterrupt:
+    #     typer.echo("stopping...")
+    # except Exception as e:
+    #     typer.echo(f"error: {e}")
 
 
 @app.command()
@@ -82,6 +104,9 @@ def clean_lake():
         GH_ISSUES_TABLE,
         GH_COMMITS_TABLE,
         GH_WATCHERS_TABLE,
+        DOCS_TABLE,
+        ZULIP_MEMBERS_TABLE,
+        ZULIP_MESSAGES_TABLE,
     ]
 
     for table in tables:
@@ -97,7 +122,6 @@ def clean_ingest(
     ),
 ):
     """Clean the raw data."""
-    # ensure the data ingested exists
     if confirm:
         typer.confirm("Are you sure you want to delete the ingested data?", abort=True)
 

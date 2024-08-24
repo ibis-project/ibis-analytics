@@ -6,6 +6,7 @@ import json
 import time
 import httpx
 import zulip
+import typer
 import tomllib as toml
 import requests
 
@@ -40,7 +41,7 @@ log.basicConfig(level=log.INFO)
 
 
 # main function
-def main():
+def main(gh: bool, zulip: bool, docs: bool):
     """
     Ingest data.
     """
@@ -48,9 +49,15 @@ def main():
     load_dotenv()
 
     # ingest data
-    ingest_gh(gh_repo=GH_REPO)
-    ingest_zulip(zulip_url=ZULIP_URL)
-    ingest_docs(docs_url=DOCS_URL)
+    if gh:
+        typer.echo("Ingesting GitHub data...")
+        ingest_gh(gh_repo=GH_REPO)
+    if zulip:
+        typer.echo("Ingesting Zulip data...")
+        ingest_zulip(zulip_url=ZULIP_URL)
+    if docs:
+        typer.echo("Ingesting docs data...")
+        ingest_docs(docs_url=DOCS_URL)
 
 
 # helper functions
@@ -233,7 +240,6 @@ def ingest_zulip(zulip_url, zulip_email: str = "cody@dkdc.dev"):
         log.error(f"Failed to get users: {r}")
     else:
         members = r["members"]
-
         # write the users to a file
         filename = "members.json"
         output_dir = os.path.join(DATA_DIR, RAW_DATA_DIR, RAW_DATA_ZULIP_DIR)
@@ -343,9 +349,7 @@ def ingest_docs(docs_url):
     try:
         output_dir = os.path.join(DATA_DIR, RAW_DATA_DIR, RAW_DATA_DOCS_DIR)
         os.makedirs(output_dir, exist_ok=True)
-        output_path = os.path.join(
-            DATA_DIR, RAW_DATA_DIR, RAW_DATA_DOCS_DIR, "goatcounter.csv.gz"
-        )
+        output_path = os.path.join(output_dir, "goatcounter.csv.gz")
         with open(output_path, "wb") as f:
             f.write(r.content)
     except:
