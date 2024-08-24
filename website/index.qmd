@@ -18,7 +18,7 @@ This project uses:
 2. **Execution engine**: [DuckDB](https://github.com/duckdb/duckdb) (local) and [ClickHouse](https://github.com/clickhouse/clickhouse) (remote)
 3. **Data storage**: [Delta Lake](https://github.com/delta-io/delta) tables (local and/orcloud object storage)
 
-You can mix and match these components as needed.
+You can mix and match execution engines and data storage with Ibis.
 
 ## Setup
 
