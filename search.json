@@ -11,7 +11,7 @@
     "href": "index.html#setup",
     "title": "Ibis analytics",
     "section": "Setup",
-    "text": "Setup\nInstall gh and just, then:\ngh repo clone lostmygithubaccount/ibis-analytics\ncd ibis-analytics\njust setup\n. .venv/bin/activate"
+    "text": "Setup\nInstall gh and just, then:\ngh repo clone ibis-project/ibis-analytics\ncd ibis-analytics\njust setup\n. .venv/bin/activate"
   },
   {
     "objectID": "index.html#usage",
