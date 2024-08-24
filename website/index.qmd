@@ -22,6 +22,10 @@ You can mix and match execution engines and data storage with Ibis.
 
 ## Setup
 
+::: {.tabset-panel}
+
+## Development
+
 Install [`gh`](https://github.com/cli/cli) and [`just`](https://github.com/casey/just) and [`uv`](https://github.com/astral-sh/uv), then:
 
 ```bash
@@ -30,6 +34,14 @@ cd ibis-analytics
 just setup
 . .venv/bin/activate
 ```
+
+## Pip
+
+```bash
+pip install ibis-analytics
+```
+
+:::
 
 ## Usage
 
