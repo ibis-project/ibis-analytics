@@ -34,7 +34,6 @@ ch_con = ibis.clickhouse.connect(
 catalog = Catalog()
 
 # get source tables
-# TODO: use table names from config
 pulls_t = catalog.table(GH_PRS_TABLE).cache()
 stars_t = catalog.table(GH_STARS_TABLE).cache()
 forks_t = catalog.table(GH_FORKS_TABLE).cache()

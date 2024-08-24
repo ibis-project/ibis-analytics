@@ -27,6 +27,10 @@ t
 
 ```{python}
 t = transform_zulip_messages(t)
-t.head()
+t
+```
+
+```{python}
+t.alias("t").sql("select * from t")
 ```
 
