@@ -26,7 +26,7 @@ TYPER_KWARGS = {
     "add_completion": False,
     "context_settings": {"help_option_names": ["-h", "--help"]},
 }
-app = typer.Typer(help="acc", **TYPER_KWARGS)
+app = typer.Typer(help="ia", **TYPER_KWARGS)
 clean_app = typer.Typer(help="Clean the data lake.", **TYPER_KWARGS)
 
 ## add subcommands
@@ -69,17 +69,12 @@ def run(
 ):
     """Run ETL."""
 
-    etl_main(gh=gh, zulip=zulip, docs=docs)
-    # ensure data is ingested
-    # if not override and not check_ingested_data_exists():
-    #     return
-
-    # try:
-    #     etl_main()
-    # except KeyboardInterrupt:
-    #     typer.echo("stopping...")
-    # except Exception as e:
-    #     typer.echo(f"error: {e}")
+    try:
+        etl_main(gh=gh, zulip=zulip, docs=docs)
+    except KeyboardInterrupt:
+        typer.echo("stopping...")
+    except Exception as e:
+        typer.echo(f"error: {e}")
 
 
 @app.command()
