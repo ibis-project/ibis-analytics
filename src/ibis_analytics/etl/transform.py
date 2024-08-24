@@ -1,5 +1,4 @@
 # imports
-import re
 import ibis
 import ibis.selectors as s
 

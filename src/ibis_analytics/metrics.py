@@ -1,6 +1,5 @@
 # imports
 import ibis
-from ibis_analytics.catalog import Catalog
 import ibis.selectors as s
 
 from ibis_analytics.config import (
@@ -15,6 +14,7 @@ from ibis_analytics.config import (
     ZULIP_MEMBERS_TABLE,
     ZULIP_MESSAGES_TABLE,
 )
+from ibis_analytics.catalog import Catalog
 
 
 # connect to PyPI data in the ClickHouse Cloud playground

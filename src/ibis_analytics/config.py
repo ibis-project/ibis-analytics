@@ -1,6 +1,5 @@
 GH_REPO = "ibis-project/ibis"
 PYPI_PACKAGE = "ibis-framework"
-
 ZULIP_URL = "https://ibis-project.zulipchat.com"
 DOCS_URL = "https://ibis.goatcounter.com"
 
@@ -21,6 +20,5 @@ GH_ISSUES_TABLE = "gh_issues"
 GH_COMMITS_TABLE = "gh_commits"
 GH_WATCHERS_TABLE = "gh_watchers"
 DOCS_TABLE = "docs"
-PYPI_TABLE = "pypi"
 ZULIP_MEMBERS_TABLE = "zulip_members"
 ZULIP_MESSAGES_TABLE = "zulip_messages"

@@ -1,11 +1,10 @@
 import os
 import typer
-import httpx
 import subprocess
 
-from ibis_analytics.etl import main as etl_main
-from ibis_analytics.ingest import main as ingest_main
 from ibis_analytics.catalog import delta_table_path
+from ibis_analytics.etl.run import main as etl_main
+from ibis_analytics.ingest.run import main as ingest_main
 
 from ibis_analytics.config import (
     DATA_DIR,
