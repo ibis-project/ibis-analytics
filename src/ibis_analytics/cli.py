@@ -1,4 +1,5 @@
 import os
+import httpx
 import typer
 import subprocess
 
@@ -81,6 +82,21 @@ def run(
 @app.command("metrics", hidden=True)
 def dashboard():
     """Open the dashboard."""
+
+    if not os.path.exists("dashboard.py"):
+        url = "https://raw.githubusercontent.com/ibis-project/ibis-analytics/main/dashboard.py"
+
+        response = httpx.get(url)
+        if response.status_code != 200:
+            typer.echo(f"error: {response.text}")
+            return
+        dashboard_code = response.text
+
+        typer.echo("creating dashboard.py...")
+        with open("dashboard.py", "w") as f:
+            f.write(dashboard_code)
+    else:
+        typer.echo("found dashboard.py")
 
     typer.echo("opening dashboard...")
     cmd = "shiny run dashboard.py -b"
