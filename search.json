@@ -1,0 +1,30 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Ibis analytics",
+    "section": "",
+    "text": "Ibis analytics with Ibis.\nThis project uses:\nYou can mix and match these components as needed."
+  },
+  {
+    "objectID": "index.html#setup",
+    "href": "index.html#setup",
+    "title": "Ibis analytics",
+    "section": "Setup",
+    "text": "Setup\nInstall gh and just, then:\ngh repo clone lostmygithubaccount/ibis-analytics\ncd ibis-analytics\njust setup\n. .venv/bin/activate"
+  },
+  {
+    "objectID": "index.html#usage",
+    "href": "index.html#usage",
+    "title": "Ibis analytics",
+    "section": "Usage",
+    "text": "Usage\nUse the CLI:\nia"
+  },
+  {
+    "objectID": "index.html#development",
+    "href": "index.html#development",
+    "title": "Ibis analytics",
+    "section": "Development",
+    "text": "Development\nFormat your code:\njust fmt"
+  }
+]
