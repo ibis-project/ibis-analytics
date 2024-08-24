@@ -1,0 +1,32 @@
+```{python}
+import ibis
+
+import ibis.selectors as s
+import plotly.express as px
+
+from ibis_analytics.etl.extract import (
+    zulip_members as extract_zulip_members,
+    zulip_messages as extract_zulip_messages,
+)
+from ibis_analytics.etl.transform import (
+    zulip_members as transform_zulip_members,
+    zulip_messages as transform_zulip_messages,
+)
+
+ibis.options.interactive = True
+ibis.options.repr.interactive.max_rows = 5
+ibis.options.repr.interactive.max_columns = None
+
+px.defaults.template = "plotly_dark"
+```
+
+```{python}
+t = extract_zulip_messages()
+t
+```
+
+```{python}
+t = transform_zulip_messages(t)
+t.head()
+```
+

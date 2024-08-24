@@ -1,0 +1,49 @@
+name: docs
+
+permissions:
+  contents: write
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'justfile'
+      - 'website/**'
+      - 'dev-requirements.txt'
+      - '.github/workflows/docs.yaml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+          fetch-depth: 0
+
+      - uses: extractions/setup-just@v1
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.12
+
+      - uses: quarto-dev/quarto-actions/setup@v2
+
+      - name: install requirements
+        run: |
+          pip install uv
+          just setup
+
+      - name: build site
+        run: |
+          . .venv/bin/activate
+          just docs-build
+
+      - name: deploy
+        uses: peaceiris/actions-gh-pages@v3
+        if: github.ref == 'refs/heads/main'
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: website/_output

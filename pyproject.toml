@@ -2,7 +2,49 @@
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-[project]
-name = "dag"
-version = "0.1.0"
+[tool.hatch.metadata]
+allow-direct-references = true
 
+[project]
+name = "ibis-analytics"
+version = "0.1.0"
+authors = [{ name = "Cody", email = "cody@dkdc.dev" }]
+description = "Ibis analytics with Ibis"
+readme = "readme.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    # secret management
+    'python-dotenv',
+    # http
+    'zulip',
+    'httpx',
+    'requests',
+    # cli
+    'typer',
+    # cloud
+    'gcsfs',
+    # data
+    'ibis-framework[duckdb,polars,clickhouse,deltalake]',
+    # visualization
+    'plotly',
+    'great-tables',
+    # dashboards and apps
+    'shiny>=1.0.0',
+    'shinywidgets>=0.3.3',
+    'shinyswatch>=0.7.0',
+]
+
+[project.urls]
+"Homepage" = "https://github.com/lostmygithubaccount/ibis-analytics"
+"Bug Tracker" = "https://github.com/lostmygithubaccount/ibis-analytics/issues"
+
+[project.scripts]
+ia = "ibis_analytics.cli:app"
+
+[tool.ruff]
+extend-include = ["*.ipynb"]

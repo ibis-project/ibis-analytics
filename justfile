@@ -4,93 +4,62 @@
 set dotenv-load
 
 # variables
-module := "dag"
+package := "ibis-analytics"
 
 # aliases
 alias fmt:=format
-alias etl:=run
-alias open:=open-dash
-alias dag-open:=open-dag
-alias preview:=app
+alias render:=docs-build
+alias preview:=docs-preview
 
 # list justfile recipes
 default:
     just --list
 
+# build
+build:
+    just clean-dist
+    @python -m build
+
+# setup
+setup:
+    @uv venv
+    @. .venv/bin/activate
+    @uv pip install --upgrade --resolution=highest -r dev-requirements.txt
+
+# install
+install:
+    @uv pip install -r dev-requirements.txt
+
+# uninstall
+uninstall:
+    @pip uninstall -y {{package}}
+
 # format
 format:
     @ruff format .
 
-# smoke-test
-smoke-test:
-    @ruff format --check .
+# publish-test
+release-test:
+    just build
+    @twine upload --repository testpypi dist/* -u __token__ -p ${PYPI_TEST_TOKEN}
 
-# setup
-setup:
-    @pip install --upgrade -r requirements.txt
-    @pip install -e .
+# publish
+release:
+    just build
+    @twine upload dist/* -u __token__ -p ${PYPI_TOKEN}
 
-# eda
-eda:
-    @ipython -i eda.py
+# clean dist
+clean-dist:
+    @rm -rf dist
 
-# ingest
-ingest:
-    @python {{module}}/ingest.py
+# docs-build
+docs-build:
+    @quarto render website
 
-# run
-run:
-    @dagster job execute -j all_assets -m {{module}}
+# docs-preview
+docs-preview:
+    @quarto preview website
 
-# postprocess
-postprocess:
-    @python {{module}}/postprocess.py
-
-# deploy
-deploy:
-    @python {{module}}/deploy.py
-
-# test
-test:
-    @python metrics.py
-    @python pages/0_github.py
-    @python pages/1_pypi.py
-    @python pages/2_zulip.py
-    @python pages/3_docs.py
-    @python pages/4_about.py
-
-# dag
-dag:
-    @dagster dev -m {{module}}
-
-# streamlit stuff
-app:
-    @streamlit run metrics.py
-
-# clean
-clean:
-    @rm -r *.ddb* || true
-    @rm -r data/system || true
-    @rm -r data/backup || true
-    @rm data/backup.ddb || true
-
-# open dag
-open-dag:
-    @open http://localhost:3000/asset-groups
-
-# open dash
-open-dash:
-    @open https://ibis-analytics.streamlit.app
-
-# cicd
-cicd:
-    @gh workflow run cicd.yaml
-
-# docs-hack: manually upload docs data
-docs-hack:
-    @python docs_hack.py
-
-# ssh
-ssh:
-    @gcloud compute ssh --zone "us-central1-c" --project "voltrondata-demo" --tunnel-through-iap "ibis-analytics"
-
+# open
+open:
+    @open https://lostmygithubaccount.github.io/ibis-analytics

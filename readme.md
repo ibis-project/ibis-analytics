@@ -1,7 +1,11 @@
-# ibis-analytics
+# Ibis analytics
 
-[![cicd](https://github.com/ibis-project/ibis-analytics/workflows/cicd/badge.svg)](https://github.com/ibis-project/ibis-analytics/actions/workflows/cicd.yaml)
+***Ibis analytics with Ibis.***
 
-This is an end-to-end analytics project for [Ibis](https://ibis-project.org), ingesting and processing >10M rows of data at little to no cost.
+## Getting started
 
-[Check out the blog](https://ibis-project.org/posts/ibis-analytics/) or [the dashboard](https://ibis-analytics.streamlit.app/).
+[See the documentation](https://lostmygithubaccount.github.io/ibis-analytics).
+
+## Contributing
+
+Contributions welcome.

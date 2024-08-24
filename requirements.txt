@@ -1,21 +1,2 @@
-# python
-ruff
-build
-python-dotenv
-
-# web clients
-httpx
-zulip
-
-# data
-duckdb==0.10.2
-ibis-framework[duckdb,bigquery,deltalake] @ git+https://github.com/ibis-project/ibis
-
-# viz
-plotly
-streamlit
-
-# ops
-dagster
-dagster-webserver
-
+-e .
+#ibis-analytics
