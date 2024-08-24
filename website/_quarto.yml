@@ -19,7 +19,7 @@ website:
   # footer
   page-footer:
     border: false
-    center: "Python analytics accelerator"
+    center: "Ibis analytics"
     right:
       - icon: github
         href: https://github.com/ibis-project/ibis-analytics
