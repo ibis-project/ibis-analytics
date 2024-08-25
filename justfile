@@ -63,3 +63,7 @@ docs-preview:
 # open
 open:
     @open https://ibis-project.github.io/ibis-analytics
+
+# run
+run:
+    @gh workflow run etl.yaml
