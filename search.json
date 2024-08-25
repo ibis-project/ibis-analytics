@@ -4,7 +4,7 @@
     "href": "index.html",
     "title": "Ibis analytics",
     "section": "",
-    "text": "Ibis analytics with Ibis.\nThis project uses:\nYou can mix and match execution engines and data storage with Ibis."
+    "text": "Ibis analytics with Ibis.\nThis project uses:\nYou can mix and match execution engines and data storage via Ibis."
   },
   {
     "objectID": "index.html#setup",
