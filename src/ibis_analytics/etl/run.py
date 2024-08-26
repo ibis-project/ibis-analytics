@@ -61,6 +61,7 @@ def main(gh: bool, docs, zulip: bool):
         extract_zulip_members_t = extract_zulip_members()
         extract_zulip_messages_t = extract_zulip_messages()
 
+    # transform
     if gh:
         typer.echo("Transforming GitHub data...")
         transform_gh_prs_t = transform_gh_prs(extract_gh_prs_t)
