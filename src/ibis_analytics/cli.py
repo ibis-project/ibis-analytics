@@ -78,6 +78,7 @@ def run(
 
 
 @app.command()
+@app.command("app", hidden=True)
 @app.command("dash", hidden=True)
 @app.command("metrics", hidden=True)
 def dashboard():

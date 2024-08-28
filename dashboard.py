@@ -8,7 +8,10 @@ from shiny.express import input, ui
 
 from datetime import datetime, timedelta
 
-from ibis_analytics.metrics import (
+import ibis_analytics.plots as plots
+import ibis_analytics.metrics as metrics
+
+from ibis_analytics.tables import (
     pulls_t,
     stars_t,
     forks_t,
@@ -68,40 +71,35 @@ with ui.nav_panel("GitHub metrics"):
 
             @render.express
             def total_stars():
-                val = stars_data().count().to_pyarrow().as_py()
-                f"{val:,}"
+                f"{metrics.total(stars_data()):,}"
 
         with ui.value_box():
             "Total pulls"
 
             @render.express
             def total_pulls():
-                val = pulls_data().count().to_pyarrow().as_py()
-                f"{val:,}"
+                f"{metrics.total(pulls_data()):,}"
 
         with ui.value_box():
             "Total issues"
 
             @render.express
             def total_issues():
-                val = issues_data().count().to_pyarrow().as_py()
-                f"{val:,}"
+                f"{metrics.total(issues_data()):,}"
 
         with ui.value_box():
             "Total forks"
 
             @render.express
             def total_forks():
-                val = forks_data().count().to_pyarrow().as_py()
-                f"{val:,}"
+                f"{metrics.total(forks_data()):,}"
 
         with ui.value_box():
             "Total commits"
 
             @render.express
             def total_commits():
-                val = commits_data().count().to_pyarrow().as_py()
-                f"{val:,}"
+                f"{metrics.total(commits_data()):,}"
 
     with ui.layout_columns():
         with ui.card(full_screen=True):
@@ -109,14 +107,8 @@ with ui.nav_panel("GitHub metrics"):
 
             @render_plotly
             def stars_line():
-                t = stars_data().order_by("starred_at")
-
-                c = px.line(
-                    t,
-                    x="starred_at",
-                    y="total_stars",
-                )
-
+                t = stars_data()
+                c = plots.line(t, x="starred_at", y="total_stars")
                 return c
 
         with ui.card(full_screen=True):
@@ -124,27 +116,16 @@ with ui.nav_panel("GitHub metrics"):
 
             @render_plotly
             def stars_roll():
+                start_date, end_date = input.date_range()
+
                 t = stars_t
+                t = metrics.stars_rolling(t, days=28)
+                t = t.filter(t["timestamp"] >= start_date, t["timestamp"] <= end_date)
 
-                t = (
-                    t.mutate(starred_at=t["starred_at"].truncate("D"))
-                    .group_by("starred_at")
-                    .agg(stars=ibis._.count())
-                )
-                t = t.select(
-                    timestamp="starred_at",
-                    rolling_stars=ibis._["stars"]
-                    .sum()
-                    .over(
-                        ibis.window(order_by="starred_at", preceding=28, following=0)
-                    ),
-                ).order_by("timestamp")
-
-                c = px.line(
+                c = plots.line(
                     t,
                     x="timestamp",
                     y="rolling_stars",
-                    range_x=[str(x) for x in date_range()],
                 )
 
                 return c
@@ -177,7 +158,8 @@ with ui.nav_panel("GitHub metrics"):
             t = t.group_by(["starred_at", group_by] if group_by else "starred_at").agg(
                 stars=ibis._.count()
             )
-            if group_by:
+            # this is for plotly legend display reasons
+            if group_by == "company":
                 t = t.mutate(company=t["company"][:16])
             t = t.order_by("starred_at", ibis.desc("stars"))
 
@@ -208,12 +190,7 @@ with ui.nav_panel("PyPI metrics"):
 
             @render.express
             def total_versions():
-                val = (
-                    downloads_data()
-                    .distinct(on="version")["version"]
-                    .to_pyarrow()
-                    .to_pylist()
-                )
+                val = metrics.get_categories(downloads_data(), "version")
                 f"{len(val):,}"
 
     with ui.card(full_screen=True):
@@ -244,26 +221,10 @@ with ui.nav_panel("PyPI metrics"):
                 t = downloads_t
                 min_date, max_date = input.date_range()
 
-                t = t.mutate(
-                    timestamp=t["date"].cast("timestamp"),
-                )
-                t = t.group_by("timestamp").agg(downloads=ibis._["count"].sum())
-                t = (
-                    t.select(
-                        "timestamp",
-                        rolling_downloads=ibis._["downloads"]
-                        .sum()
-                        .over(
-                            ibis.window(
-                                order_by="timestamp",
-                                preceding=28,
-                                following=0,
-                            )
-                        ),
-                    )
-                    .filter(t["timestamp"] >= min_date, t["timestamp"] <= max_date)
-                    .order_by("timestamp")
-                )
+                t = metrics.downloads_rolling(t, days=28)
+                t = t.filter(
+                    t["timestamp"] >= min_date, t["timestamp"] <= max_date
+                ).order_by("timestamp")
 
                 c = px.line(
                     t,
