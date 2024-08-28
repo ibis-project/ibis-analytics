@@ -3,6 +3,7 @@ import ibis
 
 import ibis.selectors as s
 import plotly.express as px
+import ibis_analytics.metrics as metrics
 
 from ibis_analytics.etl.extract import (
     zulip_members as extract_zulip_members,
@@ -13,11 +14,72 @@ from ibis_analytics.etl.transform import (
     zulip_messages as transform_zulip_messages,
 )
 
+from ibis_analytics.tables import (
+    ch_con,
+    pulls_t,
+    stars_t,
+    forks_t,
+    issues_t,
+    commits_t,
+    watchers_t,
+    downloads_t,
+    docs_t,
+    zulip_members_t,
+    zulip_messages_t,
+)
+
 ibis.options.interactive = True
-ibis.options.repr.interactive.max_rows = 5
+ibis.options.repr.interactive.max_rows = 40
 ibis.options.repr.interactive.max_columns = None
 
 px.defaults.template = "plotly_dark"
+```
+
+```{python}
+ch_con.list_tables()
+```
+
+```{python}
+t = ch_con.table("pypi_downloads_per_day_by_version_by_python").filter(
+    ibis._["project"] == "ibis-framework"
+)
+t
+```
+
+```{python}
+t
+```
+
+```{python}
+t.group_by("date", "python_minor").agg(count=ibis._["count"].sum()).order_by(
+    ibis.desc("date"), ibis.desc("count")
+)
+```
+
+```{python}
+ch_con.table(
+    "pypi_downloads_per_day_by_version_by_installer_by_type_by_country_mv"
+).schema()
+```
+
+
+```{python}
+t = downloads_t
+t
+```
+
+```{python}
+t.schema()
+```
+
+```{python}
+downloads_t.group_by("date").agg(count=downloads_t["count"].sum()).order_by(
+    ibis.desc("count")
+)
+```
+
+```{python}
+metrics.total(pulls_t)
 ```
 
 ```{python}

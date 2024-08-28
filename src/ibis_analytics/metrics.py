@@ -1,48 +1,48 @@
 # imports
 import ibis
-import ibis.selectors as s
-
-from ibis_analytics.config import (
-    PYPI_PACKAGE,
-    GH_PRS_TABLE,
-    GH_FORKS_TABLE,
-    GH_STARS_TABLE,
-    GH_ISSUES_TABLE,
-    GH_COMMITS_TABLE,
-    GH_WATCHERS_TABLE,
-    DOCS_TABLE,
-    ZULIP_MEMBERS_TABLE,
-    ZULIP_MESSAGES_TABLE,
-)
-from ibis_analytics.catalog import Catalog
 
 
-# connect to PyPI data in the ClickHouse Cloud playground
-host = "clickpy-clickhouse.clickhouse.com"
-port = 443
-user = "play"
-database = "pypi"
+# define metrics
+def get_categories(t: ibis.Table, column: str) -> list:
+    return t.distinct(on=column)[column].to_pandas().tolist()
 
-ch_con = ibis.clickhouse.connect(
-    host=host,
-    port=port,
-    user=user,
-    database=database,
-)
 
-# connect to catalog
-catalog = Catalog()
+def total(t: ibis.Table) -> int:
+    return t.count().to_pyarrow().as_py()
 
-# get source tables
-pulls_t = catalog.table(GH_PRS_TABLE).cache()
-stars_t = catalog.table(GH_STARS_TABLE).cache()
-forks_t = catalog.table(GH_FORKS_TABLE).cache()
-issues_t = catalog.table(GH_ISSUES_TABLE).cache()
-commits_t = catalog.table(GH_COMMITS_TABLE).cache()
-watchers_t = catalog.table(GH_WATCHERS_TABLE).cache()
-downloads_t = ch_con.table(
-    "pypi_downloads_per_day_by_version_by_installer_by_type_by_country"
-).filter(ibis._["project"] == PYPI_PACKAGE)
-docs_t = catalog.table(DOCS_TABLE).cache()
-zulip_members_t = catalog.table(ZULIP_MEMBERS_TABLE).cache()
-zulip_messages_t = catalog.table(ZULIP_MESSAGES_TABLE).cache()
+
+def stars_rolling(t: ibis.Table, days: int = 28) -> ibis.Table:
+    t = (
+        t.mutate(starred_at=t["starred_at"].truncate("D"))
+        .group_by("starred_at")
+        .agg(stars=ibis._.count())
+    )
+    t = t.select(
+        timestamp="starred_at",
+        rolling_stars=ibis._["stars"]
+        .sum()
+        .over(ibis.window(order_by="starred_at", preceding=days, following=0)),
+    ).order_by("timestamp")
+
+    return t
+
+
+def downloads_rolling(t: ibis.Table, days: int = 28) -> ibis.Table:
+    t = t.mutate(
+        timestamp=t["date"].cast("timestamp"),
+    )
+    t = t.group_by("timestamp").agg(downloads=ibis._["count"].sum())
+    t = t.select(
+        "timestamp",
+        rolling_downloads=ibis._["downloads"]
+        .sum()
+        .over(
+            ibis.window(
+                order_by="timestamp",
+                preceding=28,
+                following=0,
+            )
+        ),
+    ).order_by("timestamp")
+
+    return t
