@@ -41,8 +41,8 @@ with ui.sidebar(open="desktop"):
     ui.input_date_range(
         "date_range",
         "Date range",
-        start=(datetime.now() - timedelta(days=28)).strftime("%Y-%m-%d"),
-        end=datetime.now().strftime("%Y-%m-%d"),
+        start=(datetime.now() - timedelta(days=28)),
+        end=datetime.now() + timedelta(days=1),
     )
     ui.input_action_button("last_7d", "Last 7 days")
     ui.input_action_button("last_14d", "Last 14 days")
@@ -59,7 +59,7 @@ with ui.sidebar(open="desktop"):
         @render.express
         def total_days():
             start_date, end_date = date_range()
-            days = (end_date - start_date).days
+            days = (end_date - start_date).days - 1  # YOLO
             f"{days:,}"
 
 
@@ -366,14 +366,56 @@ with ui.nav_panel("Docs metrics"):
                 val = docs_t.count().to_pyarrow().as_py()
                 f"{val:,}"
 
-    with ui.card(full_screen=True):
-        "Docs"
+    with ui.card_header(class_="d-flex justify-content-between align-items-center"):
+        with ui.layout_columns():
+            ui.input_select(
+                "truncate_to_docs",
+                "Truncate to:",
+                ["D", "W", "M", "Q", "Y"],
+            )
+            ui.input_select(
+                "group_by_docs",
+                "Group by:",
+                [
+                    None,
+                    "path",
+                    "browser",
+                    "system",
+                    "bot",
+                    "referrer",
+                    "location",
+                    "first_visit",
+                ],
+                selected=None,
+            )
 
-        @render.data_frame
-        def docs_grid():
-            t = docs_t
+    @render_plotly
+    def docs_flex():
+        group_by = input.group_by_docs()
+        truncate_to = input.truncate_to_docs()
 
-            return render.DataGrid(t.limit(10_000).to_polars())
+        t = docs_data()
+        t = t.mutate(timestamp=t["timestamp"].truncate(truncate_to))
+        t = t.group_by(["timestamp", group_by] if group_by else "timestamp").agg(
+            count=ibis._.count()
+        )
+        t = t.order_by("timestamp", ibis.desc("count"))
+
+        if group_by in ["path", "referrer"]:
+            t = t.mutate(**{group_by: t[group_by][:10]})
+
+        c = px.bar(
+            t,
+            x="timestamp",
+            y="count",
+            color=group_by if group_by else None,
+            barmode="stack",
+        )
+
+        # no legend
+        # c.update_layout(showlegend=False)
+
+        return c
 
 
 with ui.nav_panel("Zulip metrics"):
@@ -448,6 +490,17 @@ def downloads_data(downloads_t=downloads_t):
 
 
 @reactive.calc
+def docs_data(docs_t=docs_t):
+    start_date, end_date = input.date_range()
+
+    t = docs_t.filter(
+        docs_t["timestamp"] >= start_date, docs_t["timestamp"] <= end_date
+    )
+
+    return t
+
+
+@reactive.calc
 def issues_data(issues_t=issues_t):
     start_date, end_date = input.date_range()
 
@@ -470,74 +523,56 @@ def commits_data(commits_t=commits_t):
     return t
 
 
+def _update_date_range(days):
+    start_date = datetime.now() - timedelta(days=days)
+    end_date = datetime.now() + timedelta(days=1)
+    ui.update_date_range(
+        "date_range",
+        start=start_date.strftime("%Y-%m-%d"),
+        end=end_date.strftime("%Y-%m-%d"),
+    )
+
+
 @reactive.effect
 @reactive.event(input.last_7d)
 def _():
-    ui.update_date_range(
-        "date_range",
-        start=(datetime.now() - timedelta(days=7)).strftime("%Y-%m-%d"),
-        end=datetime.now().strftime("%Y-%m-%d"),
-    )
+    _update_date_range(days=7)
 
 
 @reactive.effect
 @reactive.event(input.last_14d)
 def _():
-    ui.update_date_range(
-        "date_range",
-        start=(datetime.now() - timedelta(days=14)).strftime("%Y-%m-%d"),
-        end=datetime.now().strftime("%Y-%m-%d"),
-    )
+    _update_date_range(days=14)
 
 
 @reactive.effect
 @reactive.event(input.last_28d)
 def _():
-    ui.update_date_range(
-        "date_range",
-        start=(datetime.now() - timedelta(days=28)).strftime("%Y-%m-%d"),
-        end=datetime.now().strftime("%Y-%m-%d"),
-    )
+    _update_date_range(days=28)
 
 
 @reactive.effect
 @reactive.event(input.last_91d)
 def _():
-    ui.update_date_range(
-        "date_range",
-        start=(datetime.now() - timedelta(days=91)).strftime("%Y-%m-%d"),
-        end=datetime.now().strftime("%Y-%m-%d"),
-    )
+    _update_date_range(days=91)
 
 
 @reactive.effect
 @reactive.event(input.last_182d)
 def _():
-    ui.update_date_range(
-        "date_range",
-        start=(datetime.now() - timedelta(days=182)).strftime("%Y-%m-%d"),
-        end=datetime.now().strftime("%Y-%m-%d"),
-    )
+    _update_date_range(days=182)
 
 
 @reactive.effect
 @reactive.event(input.last_365d)
 def _():
-    ui.update_date_range(
-        "date_range",
-        start=(datetime.now() - timedelta(days=365)).strftime("%Y-%m-%d"),
-        end=datetime.now().strftime("%Y-%m-%d"),
-    )
+    _update_date_range(days=365)
 
 
 @reactive.effect
 @reactive.event(input.last_730d)
 def _():
-    ui.update_date_range(
-        "date_range",
-        start=(datetime.now() - timedelta(days=730)).strftime("%Y-%m-%d"),
-        end=datetime.now().strftime("%Y-%m-%d"),
-    )
+    _update_date_range(days=730)
 
 
 @reactive.effect

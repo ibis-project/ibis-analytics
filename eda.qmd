@@ -36,6 +36,34 @@ px.defaults.template = "plotly_dark"
 ```
 
 ```{python}
+t = docs_t
+t
+```
+
+```{python}
+t.count()
+```
+
+
+```{python}
+t = (
+    t.mutate(timestamp=t["timestamp"].truncate("D"))
+    .relocate("extracted_at", "timestamp")
+    .group_by("timestamp")
+    .agg(count=ibis._.count())
+    .order_by(ibis.desc("timestamp"))
+)
+```
+
+```{python}
+px.bar(
+    t,
+    x="timestamp",
+    y="count",
+)
+```
+
+```{python}
 ch_con.list_tables()
 ```
 
