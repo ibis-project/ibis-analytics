@@ -6,4 +6,5 @@ jupyter
 nbclient
 ipykernel
 
--r requirements.txt
+-e .
+#-r requirements.txt
