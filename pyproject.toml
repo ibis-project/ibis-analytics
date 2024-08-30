@@ -7,7 +7,7 @@ allow-direct-references = true
 
 [project]
 name = "ibis-analytics"
-version = "0.9.1"
+version = "0.9.2"
 authors = [{ name = "Cody", email = "cody@dkdc.dev" }]
 description = "Ibis analytics with Ibis"
 readme = "readme.md"
