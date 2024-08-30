@@ -17,9 +17,9 @@ def delta_table_path(table_name: str) -> str:
 def read_table(table_name: str) -> ibis.Table:
     if CLOUD:
         import gcsfs
-        #import warnings
+        import warnings
 
-        #warnings.filterwarnings("ignore")
+        warnings.filterwarnings("ignore")
 
         fs = gcsfs.GCSFileSystem(token="anon")
         ibis.get_backend().register_filesystem(fs)

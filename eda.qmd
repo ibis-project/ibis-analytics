@@ -44,6 +44,15 @@ t
 t.count()
 ```
 
+```{python}
+paths = t.distinct(on="path")["path"].to_pyarrow().to_pylist()
+paths
+```
+
+```{python}
+len(paths)
+```
+
 
 ```{python}
 t = (

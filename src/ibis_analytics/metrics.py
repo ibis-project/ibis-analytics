@@ -46,3 +46,79 @@ def downloads_rolling(t: ibis.Table, days: int = 28) -> ibis.Table:
     ).order_by("timestamp")
 
     return t
+
+
+def downloads_rolling_by_version(
+    t: ibis.Table, version_style=None, days: int = 28
+) -> ibis.Table:
+    t = t.mutate(
+        version=t["version"].split(".")[0]
+        if version_style == "major"
+        else t["version"].split(".")[0] + "." + t["version"].split(".")[1]
+        if version_style == "major.minor"
+        else t["version"],
+        timestamp=t["date"].cast("timestamp"),
+    )
+    t = t.group_by("timestamp", "version").agg(downloads=ibis._["count"].sum())
+    t = t.filter(~t["version"].startswith("v"))
+    t = t.filter(~t["version"].contains("dev"))
+    t = t.select(
+        "timestamp",
+        "version",
+        rolling_downloads=ibis._["downloads"]
+        .sum()
+        .over(
+            ibis.window(
+                order_by="timestamp",
+                group_by="version",
+                preceding=28,
+                following=0,
+            )
+        ),
+    ).order_by("timestamp")
+
+    return t
+
+
+def docs_rolling(t: ibis.Table, days: int = 28) -> ibis.Table:
+    t = t.mutate(
+        timestamp=t["timestamp"].cast("timestamp").truncate("D"),
+    )
+    t = t.group_by("timestamp").agg(docs=ibis._.count())
+    t = t.select(
+        "timestamp",
+        rolling_docs=ibis._["docs"]
+        .sum()
+        .over(
+            ibis.window(
+                order_by="timestamp",
+                preceding=28,
+                following=0,
+            )
+        ),
+    ).order_by("timestamp")
+
+    return t
+
+
+def docs_rolling_by_path(t: ibis.Table, days: int = 28) -> ibis.Table:
+    t = t.mutate(
+        timestamp=t["timestamp"].cast("timestamp").truncate("D"),
+    )
+    t = t.group_by("timestamp", "path").agg(docs=ibis._.count())
+    t = t.select(
+        "timestamp",
+        "path",
+        rolling_docs=ibis._["docs"]
+        .sum()
+        .over(
+            ibis.window(
+                order_by="timestamp",
+                group_by="path",
+                preceding=28,
+                following=0,
+            )
+        ),
+    ).order_by("timestamp")
+
+    return t

@@ -255,37 +255,12 @@ with ui.nav_panel("PyPI metrics"):
 
                 t = downloads_t
 
-                t = t.mutate(
-                    version=t["version"].split(".")[0]
-                    if version_style == "major"
-                    else t["version"].split(".")[0] + "." + t["version"].split(".")[1]
-                    if version_style == "major.minor"
-                    else t["version"],
-                    timestamp=t["date"].cast("timestamp"),
+                t = metrics.downloads_rolling_by_version(
+                    t, version_style=version_style, days=28
                 )
-                t = t.group_by("timestamp", "version").agg(
-                    downloads=ibis._["count"].sum()
-                )
-                t = t.filter(~t["version"].startswith("v"))
-                t = t.filter(~t["version"].contains("dev"))
-                t = (
-                    t.select(
-                        "timestamp",
-                        "version",
-                        rolling_downloads=ibis._["downloads"]
-                        .sum()
-                        .over(
-                            ibis.window(
-                                order_by="timestamp",
-                                group_by="version",
-                                preceding=28,
-                                following=0,
-                            )
-                        ),
-                    )
-                    .filter(t["timestamp"] >= min_date, t["timestamp"] <= max_date)
-                    .order_by("timestamp")
-                )
+                t = t.filter(
+                    t["timestamp"] >= min_date, t["timestamp"] <= max_date
+                ).order_by("timestamp")
 
                 c = px.line(
                     t,
@@ -366,6 +341,54 @@ with ui.nav_panel("Docs metrics"):
                 val = docs_t.count().to_pyarrow().as_py()
                 f"{val:,}"
 
+    with ui.card(full_screen=True):
+        with ui.layout_columns():
+            with ui.card(full_screen=True):
+                "Rolling 28d docs"
+
+                @render_plotly
+                def docs_roll():
+                    t = docs_t
+                    min_date, max_date = input.date_range()
+
+                    t = metrics.docs_rolling(t, days=28)
+                    t = t.filter(
+                        t["timestamp"] >= min_date, t["timestamp"] <= max_date
+                    ).order_by("timestamp")
+
+                    c = px.line(
+                        t,
+                        x="timestamp",
+                        y="rolling_docs",
+                    )
+
+                    return c
+
+            with ui.card(full_screen=True):
+                "Rolling 28d docs by path"
+
+                @render_plotly
+                def docs_by_path_roll():
+                    t = docs_t
+                    min_date, max_date = input.date_range()
+
+                    t = metrics.docs_rolling_by_path(t, days=28)
+                    t = t.filter(
+                        t["timestamp"] >= min_date, t["timestamp"] <= max_date
+                    ).order_by("timestamp")
+
+                    c = px.line(
+                        t,
+                        x="timestamp",
+                        y="rolling_docs",
+                        color="path",
+                    )
+
+                    # no legend
+                    c.update_layout(showlegend=False)
+
+                    return c
+
     with ui.card_header(class_="d-flex justify-content-between align-items-center"):
         with ui.layout_columns():
             ui.input_select(
@@ -417,6 +440,39 @@ with ui.nav_panel("Docs metrics"):
 
         return c
 
+    with ui.card(full_screen=True):
+        "Referrer by path"
+        with ui.card_header(class_="d-flex justify-content-between align-items-center"):
+            with ui.layout_columns():
+                paths = (
+                    docs_t.group_by("path")
+                    .agg(count=ibis._.count())
+                    .mutate(rank=ibis.row_number().over(order_by=ibis.desc("count")))[
+                        "path"
+                    ]
+                    .to_pyarrow()
+                    .to_pylist()
+                )
+                ui.input_select(
+                    "docs_path",
+                    "Doc page:",
+                    paths,
+                    selected=paths[0],
+                )
+
+        with ui.card(full_screen=True):
+
+            @render.data_frame
+            def docs_referrer_table():
+                path = input.docs_path()
+
+                t = docs_data()
+                t = t.filter(t["path"] == path)
+                t = t.group_by("referrer").agg(count=ibis._.count())
+                t = t.order_by(ibis.desc("count"))
+
+                return render.DataGrid(t.to_polars())
+
 
 with ui.nav_panel("Zulip metrics"):
     with ui.layout_columns():
@@ -435,6 +491,34 @@ with ui.nav_panel("Zulip metrics"):
             def total_members():
                 val = zulip_members_t.count().to_pyarrow().as_py()
                 f"{val:,}"
+
+    with ui.card(full_screen=True):
+        "Members over time"
+
+        @render_plotly
+        def members_line():
+            t = zulip_members_data()
+            t = (
+                t.mutate(timestamp=t["date_joined"].cast("date"))
+                .group_by("timestamp")
+                .agg(total_members=ibis._["total_members"].max())
+                .order_by(ibis.desc("timestamp"))
+            )
+
+            # c = plots.line(t.to_polars(), x="timestamp", y="total_members")
+            c = px.line(t.to_polars(), x="timestamp", y="total_members")
+            return c
+
+    with ui.card(full_screen=True):
+        "Messages over time"
+
+        @render_plotly
+        def messages_line():
+            t = zulip_messages_data()
+            t = t.mutate(timestamp=t["timestamp"].cast("timestamp"))
+
+            c = plots.line(t, x="timestamp", y="total_messages")
+            return c
 
 
 # reactive calculations and effects
@@ -518,6 +602,30 @@ def commits_data(commits_t=commits_t):
     t = commits_t.filter(
         commits_t["committed_date"] >= start_date,
         commits_t["committed_date"] <= end_date,
+    )
+
+    return t
+
+
+@reactive.calc
+def zulip_messages_data(zulip_messages_t=zulip_messages_t):
+    start_date, end_date = input.date_range()
+
+    t = zulip_messages_t.filter(
+        zulip_messages_t["timestamp"] >= start_date,
+        zulip_messages_t["timestamp"] <= end_date,
+    )
+
+    return t
+
+
+@reactive.calc
+def zulip_members_data(zulip_members_t=zulip_members_t):
+    start_date, end_date = input.date_range()
+
+    t = zulip_members_t.filter(
+        zulip_members_t["date_joined"].cast("date") >= start_date,
+        zulip_members_t["date_joined"].cast("date") <= end_date,
     )
 
     return t
