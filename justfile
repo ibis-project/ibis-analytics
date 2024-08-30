@@ -67,3 +67,7 @@ open:
 # run
 run:
     @gh workflow run etl.yaml
+
+# run-docs
+run-docs:
+    @gh workflow run etl-docs.yaml
