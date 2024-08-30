@@ -21,7 +21,7 @@ def read_table(table_name: str) -> ibis.Table:
 
         warnings.filterwarnings("ignore")
 
-        fs = gcsfs.GCSFileSystem(token="anon")
+        fs = gcsfs.GCSFileSystem()#token="anon")
         ibis.get_backend().register_filesystem(fs)
 
         table_path = f"gs://{BUCKET}/{delta_table_path(table_name)}"
