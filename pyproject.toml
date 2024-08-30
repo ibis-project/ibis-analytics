@@ -7,7 +7,7 @@ allow-direct-references = true
 
 [project]
 name = "ibis-analytics"
-version = "0.8.0"
+version = "0.9.0"
 authors = [{ name = "Cody", email = "cody@dkdc.dev" }]
 description = "Ibis analytics with Ibis"
 readme = "readme.md"
@@ -29,7 +29,7 @@ dependencies = [
     # cloud
     'gcsfs',
     # data
-    'ibis-framework[duckdb,polars,clickhouse,deltalake]',
+    'ibis-framework[duckdb,polars,clickhouse,deltalake]==9.3.0',
     # visualization
     'plotly',
     'great-tables',
