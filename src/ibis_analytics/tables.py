@@ -40,7 +40,7 @@ issues_t = catalog.table(GH_ISSUES_TABLE).cache().alias(GH_ISSUES_TABLE)
 commits_t = catalog.table(GH_COMMITS_TABLE).cache().alias(GH_COMMITS_TABLE)
 watchers_t = catalog.table(GH_WATCHERS_TABLE).cache().alias(GH_WATCHERS_TABLE)
 downloads_t = ch_con.table(
-    "pypi_downloads_per_day_by_version_by_installer_by_type_by_country"
+    "pypi_downloads_per_day_by_version_by_system_by_country"
 ).filter(ibis._["project"] == PYPI_PACKAGE)
 docs_t = catalog.table(DOCS_TABLE).cache().alias(DOCS_TABLE)
 zulip_members_t = catalog.table(ZULIP_MEMBERS_TABLE).cache().alias(ZULIP_MEMBERS_TABLE)

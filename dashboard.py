@@ -291,7 +291,7 @@ with ui.nav_panel("PyPI metrics"):
                 ui.input_select(
                     "group_by_downloads",
                     "Group by:",
-                    [None, "version", "country_code", "installer", "type"],
+                    [None, "version", "system", "country_code"],
                     selected="version",
                 )
 
@@ -568,7 +568,7 @@ def downloads_data(downloads_t=downloads_t):
 
     t = downloads_t.filter(
         downloads_t["date"] >= start_date, downloads_t["date"] <= end_date
-    )
+    ).mutate(system=ibis.ifelse(ibis._["system"] == "", "unknown", ibis._["system"]))
 
     return t
 
