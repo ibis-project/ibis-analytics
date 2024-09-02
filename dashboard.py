@@ -138,7 +138,7 @@ with ui.nav_panel("GitHub metrics"):
                 ui.input_select(
                     "truncate_by_stars",
                     "Truncate to:",
-                    ["D", "W", "M", "Y"],
+                    ["D", "W", "M", "Q", "Y"],
                     selected="D",
                 )
                 ui.input_select(
@@ -341,137 +341,135 @@ with ui.nav_panel("Docs metrics"):
                 val = docs_t.count().to_pyarrow().as_py()
                 f"{val:,}"
 
+    with ui.layout_columns():
+        with ui.card(full_screen=True):
+            "Rolling 28d docs"
+
+            @render_plotly
+            def docs_roll():
+                t = docs_t
+                min_date, max_date = input.date_range()
+
+                t = metrics.docs_rolling(t, days=28)
+                t = t.filter(
+                    t["timestamp"] >= min_date, t["timestamp"] <= max_date
+                ).order_by("timestamp")
+
+                c = px.line(
+                    t,
+                    x="timestamp",
+                    y="rolling_docs",
+                )
+
+                return c
+
+        with ui.card(full_screen=True):
+            "Rolling 28d docs by path"
+
+            @render_plotly
+            def docs_by_path_roll():
+                t = docs_t
+                min_date, max_date = input.date_range()
+
+                t = metrics.docs_rolling_by_path(t, days=28)
+                t = t.filter(
+                    t["timestamp"] >= min_date, t["timestamp"] <= max_date
+                ).order_by("timestamp")
+
+                c = px.line(
+                    t,
+                    x="timestamp",
+                    y="rolling_docs",
+                    color="path",
+                )
+
+                # no legend
+                c.update_layout(showlegend=False)
+
+                return c
+
     with ui.card(full_screen=True):
-        with ui.layout_columns():
-            with ui.card(full_screen=True):
-                "Rolling 28d docs"
+        with ui.card(full_screen=True):
+            with ui.layout_columns():
+                ui.input_select(
+                    "truncate_to_docs",
+                    "Truncate to:",
+                    ["D", "W", "M", "Q", "Y"],
+                )
+                ui.input_select(
+                    "group_by_docs",
+                    "Group by:",
+                    [
+                        None,
+                        "path",
+                        "browser",
+                        "system",
+                        "bot",
+                        "referrer",
+                        "location",
+                        "first_visit",
+                    ],
+                    selected=None,
+                )
 
-                @render_plotly
-                def docs_roll():
-                    t = docs_t
-                    min_date, max_date = input.date_range()
+        @render_plotly
+        def docs_flex():
+            group_by = input.group_by_docs()
+            truncate_to = input.truncate_to_docs()
 
-                    t = metrics.docs_rolling(t, days=28)
-                    t = t.filter(
-                        t["timestamp"] >= min_date, t["timestamp"] <= max_date
-                    ).order_by("timestamp")
-
-                    c = px.line(
-                        t,
-                        x="timestamp",
-                        y="rolling_docs",
-                    )
-
-                    return c
-
-            with ui.card(full_screen=True):
-                "Rolling 28d docs by path"
-
-                @render_plotly
-                def docs_by_path_roll():
-                    t = docs_t
-                    min_date, max_date = input.date_range()
-
-                    t = metrics.docs_rolling_by_path(t, days=28)
-                    t = t.filter(
-                        t["timestamp"] >= min_date, t["timestamp"] <= max_date
-                    ).order_by("timestamp")
-
-                    c = px.line(
-                        t,
-                        x="timestamp",
-                        y="rolling_docs",
-                        color="path",
-                    )
-
-                    # no legend
-                    c.update_layout(showlegend=False)
-
-                    return c
-
-    with ui.card_header(class_="d-flex justify-content-between align-items-center"):
-        with ui.layout_columns():
-            ui.input_select(
-                "truncate_to_docs",
-                "Truncate to:",
-                ["D", "W", "M", "Q", "Y"],
+            t = docs_data()
+            t = t.mutate(timestamp=t["timestamp"].truncate(truncate_to))
+            t = t.group_by(["timestamp", group_by] if group_by else "timestamp").agg(
+                count=ibis._.count()
             )
-            ui.input_select(
-                "group_by_docs",
-                "Group by:",
-                [
-                    None,
-                    "path",
-                    "browser",
-                    "system",
-                    "bot",
-                    "referrer",
-                    "location",
-                    "first_visit",
-                ],
-                selected=None,
+            t = t.order_by("timestamp", ibis.desc("count"))
+
+            if group_by in ["path", "referrer"]:
+                t = t.mutate(**{group_by: t[group_by][:10]})
+
+            c = px.bar(
+                t,
+                x="timestamp",
+                y="count",
+                color=group_by if group_by else None,
+                barmode="stack",
             )
 
-    @render_plotly
-    def docs_flex():
-        group_by = input.group_by_docs()
-        truncate_to = input.truncate_to_docs()
+            # no legend
+            # c.update_layout(showlegend=False)
 
-        t = docs_data()
-        t = t.mutate(timestamp=t["timestamp"].truncate(truncate_to))
-        t = t.group_by(["timestamp", group_by] if group_by else "timestamp").agg(
-            count=ibis._.count()
-        )
-        t = t.order_by("timestamp", ibis.desc("count"))
-
-        if group_by in ["path", "referrer"]:
-            t = t.mutate(**{group_by: t[group_by][:10]})
-
-        c = px.bar(
-            t,
-            x="timestamp",
-            y="count",
-            color=group_by if group_by else None,
-            barmode="stack",
-        )
-
-        # no legend
-        # c.update_layout(showlegend=False)
-
-        return c
+            return c
 
     with ui.card(full_screen=True):
         "Referrer by path"
-        with ui.card_header(class_="d-flex justify-content-between align-items-center"):
-            with ui.layout_columns():
-                paths = (
-                    docs_t.group_by("path")
-                    .agg(count=ibis._.count())
-                    .mutate(rank=ibis.row_number().over(order_by=ibis.desc("count")))[
-                        "path"
-                    ]
-                    .to_pyarrow()
-                    .to_pylist()
-                )
-                ui.input_select(
-                    "docs_path",
-                    "Doc page:",
-                    paths,
-                    selected=paths[0],
-                )
 
-        with ui.card(full_screen=True):
+        with ui.layout_columns():
+            paths = (
+                docs_t.group_by("path")
+                .agg(count=ibis._.count())
+                .mutate(rank=ibis.row_number().over(order_by=ibis.desc("count")))[
+                    "path"
+                ]
+                .to_pyarrow()
+                .to_pylist()
+            )
+            ui.input_select(
+                "docs_path",
+                "Doc page:",
+                paths,
+                selected=paths[0],
+            )
 
-            @render.data_frame
-            def docs_referrer_table():
-                path = input.docs_path()
+        @render.data_frame
+        def docs_referrer_table():
+            path = input.docs_path()
 
-                t = docs_data()
-                t = t.filter(t["path"] == path)
-                t = t.group_by("referrer").agg(count=ibis._.count())
-                t = t.order_by(ibis.desc("count"))
+            t = docs_data()
+            t = t.filter(t["path"] == path)
+            t = t.group_by("referrer").agg(count=ibis._.count())
+            t = t.order_by(ibis.desc("count"))
 
-                return render.DataGrid(t.to_polars())
+            return render.DataGrid(t.to_polars())
 
 
 with ui.nav_panel("Zulip metrics"):
