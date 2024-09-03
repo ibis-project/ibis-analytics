@@ -128,6 +128,8 @@ def ingest_gh(gh_repo):
 
         # while True
         while True:
+            # wait
+            time.sleep(0.1)
             # request data
             try:
                 log.info(f"\t\tFetching page {page}...")
