@@ -35,16 +35,13 @@ jobs:
           pip install uv
           just setup
 
-      - name: ingest 
+      - name: ingest and etl
         run: |
           . .venv/bin/activate
           ia ingest --gh --zulip --docs
+          ia etl --gh --zulip --docs
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ZULIP_KEY: ${{ secrets.ZULIP_KEY }}
           GOAT_TOKEN: ${{ secrets.GOAT_TOKEN }}
       
-      - name: etl
-        run: |
-          . .venv/bin/activate
-          ia etl --gh --zulip --docs
