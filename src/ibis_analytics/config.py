@@ -10,7 +10,6 @@ DATA_DIR = "datalake"
 RAW_DATA_DIR = "_raw"
 RAW_DATA_GH_DIR = "github"
 RAW_DATA_DOCS_DIR = "docs"
-RAW_DATA_PYPI_DIR = "pypi"
 RAW_DATA_ZULIP_DIR = "zulip"
 
 GH_PRS_TABLE = "gh_prs"

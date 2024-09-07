@@ -5,7 +5,7 @@ project:
 # website
 website:
   # basics
-  title: "Ibis Analytics"
+  title: "Ibis analytics"
   description: "Ibis analytics with Ibis."
   #favicon: logo.png
   search: false
@@ -27,5 +27,5 @@ website:
 # theme
 format:
   html:
-    theme: minty
+    theme: darkly
     toc: true

@@ -35,9 +35,38 @@ ibis.options.repr.interactive.max_columns = None
 px.defaults.template = "plotly_dark"
 ```
 
+
+```{python}
+import ibis
+import gcsfs
+import pandas as pd
+
+from deltalake import DeltaTable
+
+ibis.options.interactive = True
+```
+
+```{python}
+fs = gcsfs.GCSFileSystem(token="anon")
+ibis.get_backend().register_filesystem(fs)
+```
+
+```{python}
+t = DeltaTable("gs://ibis-analytics/penguins.delta")
+t.to_pyarrow_table()
+```
+
+```{python}
+ibis.read_delta("gs://ibis-analytics/penguins.delta")
+```
+
 ```{python}
 t = docs_t
 t
+```
+
+```{python}
+t.schema()
 ```
 
 ```{python}
