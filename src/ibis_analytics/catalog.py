@@ -28,7 +28,8 @@ def read_table(table_name: str) -> ibis.Table:
     else:
         table_path = delta_table_path(table_name)
 
-    return ibis.read_delta(table_path)
+    # TODO: remove parquet hack once https://github.com/delta-io/delta-rs/issues/2859 fixed
+    return ibis.read_parquet(f"{table_path}/data.parquet")
 
 
 def write_table(t: ibis.Table, table_name: str) -> None:
@@ -45,10 +46,12 @@ def write_table(t: ibis.Table, table_name: str) -> None:
     else:
         table_path = delta_table_path(table_name)
 
-    t.to_delta(
-        table_path,
-        mode="overwrite",
-        partition_by=["extracted_at"],
+    # TODO: remove parquet hack once https://github.com/delta-io/delta-rs/issues/2859 fixed
+    t.to_parquet(
+        f"{table_path}/data.parquet",
+        overwrite=True,
+        # mode="overwrite",
+        # partition_by=["extracted_at"],
     )
 
 
