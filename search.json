@@ -4,7 +4,14 @@
     "href": "index.html",
     "title": "Ibis analytics",
     "section": "",
-    "text": "Ibis analytics with Ibis.\nThis project uses:\nYou can mix and match execution engines and data storage via Ibis."
+    "text": "Ibis analytics with Ibis."
+  },
+  {
+    "objectID": "index.html#overview",
+    "href": "index.html#overview",
+    "title": "Ibis analytics",
+    "section": "Overview",
+    "text": "Overview\nWe use Ibis for analytics about Ibis.\n\n\n\nSource: Voltron Data Composable Codex\n\n\nThis project uses:\n\nUser interface: Ibis (Python dataframe code and/or SQL)\nExecution engine: DuckDB (local) and ClickHouse (remote)\nData storage: Delta Lake tables (local and/or cloud object storage) and ClickHouse tables (remote)\n\nYou can mix and match execution engines and data storage via Ibis."
   },
   {
     "objectID": "index.html#setup",

@@ -100,7 +100,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <nav id="TOC" role="doc-toc" class="toc-active">
     <h2 id="toc-title">On this page</h2>
   <ul>
-  <li><a href="#setup" id="toc-setup" class="nav-link active" data-scroll-target="#setup">Setup</a></li>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">Overview</a></li>
+  <li><a href="#setup" id="toc-setup" class="nav-link" data-scroll-target="#setup">Setup</a></li>
   <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage</a></li>
   <li><a href="#development-1" id="toc-development-1" class="nav-link" data-scroll-target="#development-1">Development</a></li>
   </ul>
@@ -129,6 +130,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <div class="about-contents"><main class="content" id="quarto-document-content">
 
 <p><strong><em>Ibis analytics with Ibis.</em></strong></p>
+<section id="overview" class="level2">
+<h2 data-anchor-id="overview">Overview</h2>
+<p>We use Ibis for analytics about Ibis.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="img/layers.png" class="img-fluid figure-img"></p>
@@ -139,9 +143,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <ol type="1">
 <li><strong>User interface</strong>: <a href="https://github.com/ibis-project/ibis">Ibis</a> (Python dataframe code and/or SQL)</li>
 <li><strong>Execution engine</strong>: <a href="https://github.com/duckdb/duckdb">DuckDB</a> (local) and <a href="https://github.com/clickhouse/clickhouse">ClickHouse</a> (remote)</li>
-<li><strong>Data storage</strong>: <a href="https://github.com/delta-io/delta">Delta Lake</a> tables (local and/or cloud object storage)</li>
+<li><strong>Data storage</strong>: <a href="https://github.com/delta-io/delta">Delta Lake</a> tables (local and/or cloud object storage) and ClickHouse tables (remote)</li>
 </ol>
 <p>You can mix and match execution engines and data storage via Ibis.</p>
+</section>
 <section id="setup" class="level2">
 <h2 data-anchor-id="setup">Setup</h2>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
