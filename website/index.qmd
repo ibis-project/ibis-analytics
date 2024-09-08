@@ -13,13 +13,17 @@ about:
 
 ***Ibis analytics with Ibis.***
 
+## Overview
+
+We use Ibis for analytics about Ibis.
+
 ![Source: [Voltron Data Composable Codex](https://voltrondata.com/codex)](img/layers.png)
 
 This project uses:
 
 1. **User interface**: [Ibis](https://github.com/ibis-project/ibis) (Python dataframe code and/or SQL)
 2. **Execution engine**: [DuckDB](https://github.com/duckdb/duckdb) (local) and [ClickHouse](https://github.com/clickhouse/clickhouse) (remote)
-3. **Data storage**: [Delta Lake](https://github.com/delta-io/delta) tables (local and/or cloud object storage)
+3. **Data storage**: [Delta Lake](https://github.com/delta-io/delta) tables (local and/or cloud object storage) and ClickHouse tables (remote)
 
 You can mix and match execution engines and data storage via Ibis.
 
