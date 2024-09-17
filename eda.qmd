@@ -35,6 +35,109 @@ ibis.options.repr.interactive.max_columns = None
 px.defaults.template = "plotly_dark"
 ```
 
+```{python}
+def lookback(t, days=None):
+    if days is None:
+        return t
+    return t.filter(t["timestamp"] > ibis.now() - ibis.interval(days=days))
+```
+
+```{python}
+t = docs_t
+t
+```
+
+```{python}
+t.filter(t["path"].startswith("/posts/"))
+```
+
+```{python}
+px.bar(
+    t.filter(t["path"].startswith("/posts/"))
+    .mutate(path=ibis._["path"].re_extract(r"^/posts/[^/]+", 0))
+    # .filter(t["path"].contains("ibis-version-"))
+    .group_by("path")
+    .agg(count=ibis._.count())
+    .order_by(ibis.desc("count"))
+    .limit(10),
+    x="path",
+    y="count",
+    log_y=True,
+)
+```
+
+```{python}
+c = px.line(
+    metrics.docs_rolling_by_path(
+        t.filter(t["path"].startswith("/posts/"))
+        .filter(~ibis._["path"].contains("ibis-version-"))
+        .mutate(path=ibis._["path"].re_extract(r"^/posts/[^/]+", 0)),
+        days=28,
+    ).pipe(lookback, days=None),
+    x="timestamp",
+    y="rolling_docs",
+    color="path",
+    log_y=True,
+)
+# no legend
+c.update_layout(showlegend=False)
+```
+
+
+---
+
+```{python}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ```{python}
 import ibis

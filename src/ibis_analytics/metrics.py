@@ -92,7 +92,7 @@ def docs_rolling(t: ibis.Table, days: int = 28) -> ibis.Table:
         .over(
             ibis.window(
                 order_by="timestamp",
-                preceding=28,
+                preceding=days,
                 following=0,
             )
         ),
@@ -115,7 +115,7 @@ def docs_rolling_by_path(t: ibis.Table, days: int = 28) -> ibis.Table:
             ibis.window(
                 order_by="timestamp",
                 group_by="path",
-                preceding=28,
+                preceding=days,
                 following=0,
             )
         ),

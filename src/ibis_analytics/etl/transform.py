@@ -167,6 +167,8 @@ def docs(t):
 
     def transform(t):
         t = t.rename({"path": "2_path", "timestamp": "date"})
+        t = t.mutate(path=ibis._["path"].replace("/index.html", ""))
+        t = t.mutate(path=ibis._["path"].re_extract(r"^/posts/[^/]+", 0))
         return t
 
     docs = t.pipe(preprocess).pipe(transform).pipe(postprocess)
