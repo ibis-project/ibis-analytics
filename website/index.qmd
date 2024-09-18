@@ -8,7 +8,7 @@ about:
       href: https://github.com/ibis-project/ibis-analytics
     - icon: laptop
       text: dashboard
-      href: https://connect.posit.cloud/lostmygithubaccount/content/0191ce7f-f54a-40f7-a6d4-3e555a40128c
+      href: https://connect.posit.cloud/lostmygithubaccount/content/019202a8-c102-e635-0b7e-f8f769a1a982
 ---
 
 ***Ibis analytics with Ibis.***
