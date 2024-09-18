@@ -8,7 +8,7 @@ PYPI_PACKAGES = ["ibis-framework", "ibis-substrait", "ibis-ml", "ibis-analytics"
 ZULIP_URL = "https://ibis-project.zulipchat.com"
 DOCS_URL = "https://ibis.goatcounter.com"
 
-CLOUD_STORAGE = False
+CLOUD_STORAGE = True
 CLOUD_BUCKET = "ibis-analytics"
 
 DATA_DIR = "datalake"
