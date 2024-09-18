@@ -1,2 +1,2 @@
 #ibis-analytics==0.12.0
-ibis-analytics @ .
+ibis-analytics @ git+https://github.com/ibis-project/ibis-analytics
