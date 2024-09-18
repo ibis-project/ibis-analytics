@@ -1,5 +1,10 @@
-GH_REPO = "ibis-project/ibis"
-PYPI_PACKAGE = "ibis-framework"
+GH_REPOS = [
+    "ibis-project/ibis",
+    "ibis-project/ibis-substrait",
+    "ibis-project/ibis-ml",
+    "ibis-project/ibis-analytics",
+]
+PYPI_PACKAGES = ["ibis-framework", "ibis-substrait", "ibis-ml", "ibis-analytics"]
 ZULIP_URL = "https://ibis-project.zulipchat.com"
 DOCS_URL = "https://ibis.goatcounter.com"
 

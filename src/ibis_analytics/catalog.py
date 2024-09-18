@@ -45,6 +45,7 @@ def write_table(t: ibis.Table, table_name: str) -> None:
         table_path = f"gs://{CLOUD_BUCKET}/{delta_table_path(table_name)}"
     else:
         table_path = delta_table_path(table_name)
+        os.makedirs(table_path, exist_ok=True)
 
     # TODO: remove parquet hack once https://github.com/delta-io/delta-rs/issues/2859 fixed
     t.to_parquet(

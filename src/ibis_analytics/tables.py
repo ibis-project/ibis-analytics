@@ -2,7 +2,7 @@
 import ibis
 
 from ibis_analytics.config import (
-    PYPI_PACKAGE,
+    PYPI_PACKAGES,
     GH_PRS_TABLE,
     GH_FORKS_TABLE,
     GH_STARS_TABLE,
@@ -41,7 +41,7 @@ commits_t = catalog.table(GH_COMMITS_TABLE).cache().alias(GH_COMMITS_TABLE)
 watchers_t = catalog.table(GH_WATCHERS_TABLE).cache().alias(GH_WATCHERS_TABLE)
 downloads_t = ch_con.table(
     "pypi_downloads_per_day_by_version_by_system_by_country"
-).filter(ibis._["project"] == PYPI_PACKAGE)
+).filter(ibis._["project"].isin(PYPI_PACKAGES))
 docs_t = catalog.table(DOCS_TABLE).cache().alias(DOCS_TABLE)
 zulip_members_t = catalog.table(ZULIP_MEMBERS_TABLE).cache().alias(ZULIP_MEMBERS_TABLE)
 zulip_messages_t = (
