@@ -48,6 +48,10 @@ t
 ```
 
 ```{python}
+t.sql("select path, count(*) as count from docs group by all order by count desc")
+```
+
+```{python}
 t.filter(t["path"].startswith("/posts/"))
 ```
 

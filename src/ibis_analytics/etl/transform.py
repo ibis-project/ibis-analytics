@@ -7,8 +7,9 @@ import ibis.selectors as s
 def preprocess(t):
     """Common preprocessing steps."""
 
-    # ensure unique records
+    # ensure consistent column casing
     t = t.rename("snake_case")
+    # ensure unique records
     t = t.distinct(on=~s.c("extracted_at"), keep="first").order_by("extracted_at")
 
     return t
@@ -31,6 +32,14 @@ def gh_commits(gh_commits):
         t = t.unpack("node").unpack("author").rename("snake_case")
         t = t.order_by(ibis._["committed_date"].desc())
         t = t.mutate(total_commits=ibis._.count().over(rows=(0, None)))
+        # TODO: verify this works and switch to it; other places as well
+        # t = t.mutate(
+        #     total_commits=ibis._.count().over(
+        #         ibis.window(
+        #             preceding=None, following=0, order_by="committed_date"
+        #         )
+        #     )
+        # )
         return t
 
     gh_commits = gh_commits.pipe(preprocess).pipe(transform).pipe(postprocess)

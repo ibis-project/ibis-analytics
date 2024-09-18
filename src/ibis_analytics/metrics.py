@@ -4,7 +4,7 @@ import ibis
 
 # define metrics
 def get_categories(t: ibis.Table, column: str) -> list:
-    return t.distinct(on=column)[column].to_pandas().tolist()
+    return t.select(column).distinct()[column].to_pyarrow().to_pylist()
 
 
 def total(t: ibis.Table) -> int:
@@ -39,7 +39,7 @@ def downloads_rolling(t: ibis.Table, days: int = 28) -> ibis.Table:
         .over(
             ibis.window(
                 order_by="timestamp",
-                preceding=28,
+                preceding=days,
                 following=0,
             )
         ),
@@ -71,7 +71,7 @@ def downloads_rolling_by_version(
             ibis.window(
                 order_by="timestamp",
                 group_by="version",
-                preceding=28,
+                preceding=days,
                 following=0,
             )
         ),

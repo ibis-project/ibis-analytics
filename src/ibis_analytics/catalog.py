@@ -2,7 +2,7 @@
 import os
 import ibis
 
-from ibis_analytics.config import CLOUD, BUCKET, DATA_DIR
+from ibis_analytics.config import CLOUD_STORAGE, CLOUD_BUCKET, DATA_DIR
 
 
 # functions
@@ -15,7 +15,7 @@ def delta_table_path(table_name: str) -> str:
 
 
 def read_table(table_name: str) -> ibis.Table:
-    if CLOUD:
+    if CLOUD_STORAGE:
         import gcsfs
         import warnings
 
@@ -24,7 +24,7 @@ def read_table(table_name: str) -> ibis.Table:
         fs = gcsfs.GCSFileSystem(token="anon")
         ibis.get_backend().register_filesystem(fs)
 
-        table_path = f"gs://{BUCKET}/{delta_table_path(table_name)}"
+        table_path = f"gs://{CLOUD_BUCKET}/{delta_table_path(table_name)}"
     else:
         table_path = delta_table_path(table_name)
 
@@ -33,7 +33,7 @@ def read_table(table_name: str) -> ibis.Table:
 
 
 def write_table(t: ibis.Table, table_name: str) -> None:
-    if CLOUD:
+    if CLOUD_STORAGE:
         import gcsfs
         import warnings
 
@@ -42,7 +42,7 @@ def write_table(t: ibis.Table, table_name: str) -> None:
         fs = gcsfs.GCSFileSystem()
         ibis.get_backend().register_filesystem(fs)
 
-        table_path = f"gs://{BUCKET}/{delta_table_path(table_name)}"
+        table_path = f"gs://{CLOUD_BUCKET}/{delta_table_path(table_name)}"
     else:
         table_path = delta_table_path(table_name)
 
