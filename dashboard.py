@@ -22,8 +22,9 @@ from ibis_analytics.tables import (
     zulip_members_t,
     zulip_messages_t,
 )
-from ibis_analytics.config import GH_REPO, PYPI_PACKAGE
+from ibis_analytics.config import GH_REPOS, PYPI_PACKAGES
 
+gh_repos = [gh_repo.split("/")[1] for gh_repo in GH_REPOS]
 
 # dark themes
 px.defaults.template = "plotly_dark"
@@ -64,7 +65,14 @@ with ui.sidebar(open="desktop"):
 
 
 with ui.nav_panel("GitHub metrics"):
-    f"GitHub repo: {GH_REPO}"
+    with ui.layout_columns():
+        ui.input_select(
+            "repo_name",
+            "Repo:",
+            gh_repos,
+            selected=gh_repos[0],
+        )
+
     with ui.layout_columns():
         with ui.value_box():
             "Total stars"
@@ -117,8 +125,10 @@ with ui.nav_panel("GitHub metrics"):
             @render_plotly
             def stars_roll():
                 start_date, end_date = input.date_range()
+                repo_name = input.repo_name()
 
                 t = stars_t
+                t = t.filter(t["repo_name"] == repo_name)
                 t = metrics.stars_rolling(t, days=28)
                 t = t.filter(t["timestamp"] >= start_date, t["timestamp"] <= end_date)
 
@@ -175,7 +185,13 @@ with ui.nav_panel("GitHub metrics"):
 
 
 with ui.nav_panel("PyPI metrics"):
-    f"PyPI package: {PYPI_PACKAGE}"
+    with ui.layout_columns():
+        ui.input_select(
+            "package_name",
+            "Package:",
+            PYPI_PACKAGES,
+            selected=PYPI_PACKAGES[0],
+        )
     with ui.layout_columns():
         with ui.value_box(full_screen=True):
             "Total downloads"
@@ -218,7 +234,10 @@ with ui.nav_panel("PyPI metrics"):
 
             @render_plotly
             def downloads_roll():
+                package_name = input.package_name()
+
                 t = downloads_t
+                t = t.filter(t["project"] == package_name)
                 min_date, max_date = input.date_range()
 
                 t = metrics.downloads_rolling(t, days=28)
@@ -250,10 +269,12 @@ with ui.nav_panel("PyPI metrics"):
 
             @render_plotly
             def downloads_by_version_roll():
+                package_name = input.package_name()
                 version_style = input.version_style()
                 min_date, max_date = input.date_range()
 
                 t = downloads_t
+                t = t.filter(t["project"] == package_name)
 
                 t = metrics.downloads_rolling_by_version(
                     t, version_style=version_style, days=28
@@ -530,10 +551,11 @@ def date_range():
 @reactive.calc
 def stars_data(stars_t=stars_t):
     start_date, end_date = input.date_range()
+    repo_name = input.repo_name()
 
     t = stars_t.filter(
         stars_t["starred_at"] >= start_date, stars_t["starred_at"] <= end_date
-    )
+    ).filter(stars_t["repo_name"] == repo_name)
 
     return t
 
@@ -541,10 +563,11 @@ def stars_data(stars_t=stars_t):
 @reactive.calc
 def pulls_data(pulls_t=pulls_t):
     start_date, end_date = input.date_range()
+    repo_name = input.repo_name()
 
     t = pulls_t.filter(
         pulls_t["created_at"] >= start_date, pulls_t["created_at"] <= end_date
-    )
+    ).filter(pulls_t["repo_name"] == repo_name)
 
     return t
 
@@ -552,10 +575,11 @@ def pulls_data(pulls_t=pulls_t):
 @reactive.calc
 def forks_data(forks_t=forks_t):
     start_date, end_date = input.date_range()
+    repo_name = input.repo_name()
 
     t = forks_t.filter(
         forks_t["created_at"] >= start_date, forks_t["created_at"] <= end_date
-    )
+    ).filter(forks_t["repo_name"] == repo_name)
 
     return t
 
@@ -563,10 +587,15 @@ def forks_data(forks_t=forks_t):
 @reactive.calc
 def downloads_data(downloads_t=downloads_t):
     start_date, end_date = input.date_range()
+    package_name = input.package_name()
 
-    t = downloads_t.filter(
-        downloads_t["date"] >= start_date, downloads_t["date"] <= end_date
-    ).mutate(system=ibis.ifelse(ibis._["system"] == "", "unknown", ibis._["system"]))
+    t = (
+        downloads_t.filter(
+            downloads_t["date"] >= start_date, downloads_t["date"] <= end_date
+        )
+        .filter(downloads_t["project"] == package_name)
+        .mutate(system=ibis.ifelse(ibis._["system"] == "", "unknown", ibis._["system"]))
+    )
 
     return t
 
@@ -585,10 +614,11 @@ def docs_data(docs_t=docs_t):
 @reactive.calc
 def issues_data(issues_t=issues_t):
     start_date, end_date = input.date_range()
+    repo_name = input.repo_name()
 
     t = issues_t.filter(
         issues_t["created_at"] >= start_date, issues_t["created_at"] <= end_date
-    )
+    ).filter(issues_t["repo_name"] == repo_name)
 
     return t
 
@@ -596,11 +626,12 @@ def issues_data(issues_t=issues_t):
 @reactive.calc
 def commits_data(commits_t=commits_t):
     start_date, end_date = input.date_range()
+    repo_name = input.repo_name()
 
     t = commits_t.filter(
         commits_t["committed_date"] >= start_date,
         commits_t["committed_date"] <= end_date,
-    )
+    ).filter(commits_t["repo_name"] == repo_name)
 
     return t
 

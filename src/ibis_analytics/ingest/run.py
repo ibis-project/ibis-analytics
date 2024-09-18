@@ -12,7 +12,7 @@ import logging as log
 from dotenv import load_dotenv
 
 from ibis_analytics.config import (
-    GH_REPO,
+    GH_REPOS,
     ZULIP_URL,
     DOCS_URL,
     DATA_DIR,
@@ -45,7 +45,7 @@ def main(gh: bool, zulip: bool, docs: bool):
     # ingest data
     if gh:
         typer.echo("Ingesting GitHub data...")
-        ingest_gh(gh_repo=GH_REPO)
+        ingest_gh(gh_repos=GH_REPOS)
     if zulip:
         typer.echo("Ingesting Zulip data...")
         ingest_zulip(zulip_url=ZULIP_URL)
@@ -62,7 +62,7 @@ def write_json(data, filename):
 
 
 # ingest functions
-def ingest_gh(gh_repo):
+def ingest_gh(gh_repos):
     """
     Ingest GitHub data.
     """
@@ -199,7 +199,7 @@ def ingest_gh(gh_repo):
 
     # create a requests session
     with requests.Session() as client:
-        for repo in [gh_repo]:
+        for repo in gh_repos:
             log.info(f"Fetching data for {repo}...")
             for query in queries:
                 owner, repo_name = repo.split("/")
@@ -207,6 +207,7 @@ def ingest_gh(gh_repo):
                     DATA_DIR,
                     RAW_DATA_DIR,
                     RAW_DATA_GH_DIR,
+                    f"repo_name={repo_name}",
                 )
                 os.makedirs(output_dir, exist_ok=True)
                 log.info(f"\tFetching data for {owner}/{repo_name} {query}...")

@@ -38,7 +38,9 @@ def gh_commits():
     """Extract GitHub commits data."""
 
     # read in raw data
-    data_glob = os.path.join(DATA_DIR, RAW_DATA_DIR, RAW_DATA_GH_DIR, "commits.*.json")
+    data_glob = os.path.join(
+        DATA_DIR, RAW_DATA_DIR, RAW_DATA_GH_DIR, "repo_name=*", "commits.*.json"
+    )
     gh_commits = ibis.read_json(data_glob)
 
     # add extracted_at column
@@ -51,7 +53,9 @@ def gh_issues():
     """Extract GitHub issues data."""
 
     # read in raw data
-    data_glob = os.path.join(DATA_DIR, RAW_DATA_DIR, RAW_DATA_GH_DIR, "issues.*.json")
+    data_glob = os.path.join(
+        DATA_DIR, RAW_DATA_DIR, RAW_DATA_GH_DIR, "repo_name=*", "issues.*.json"
+    )
     gh_issues = ibis.read_json(data_glob)
 
     # add extracted_at column
@@ -65,7 +69,7 @@ def gh_prs():
 
     # read in raw data
     data_glob = os.path.join(
-        DATA_DIR, RAW_DATA_DIR, RAW_DATA_GH_DIR, "pullRequests.*.json"
+        DATA_DIR, RAW_DATA_DIR, RAW_DATA_GH_DIR, "repo_name=*", "pullRequests.*.json"
     )
     gh_prs = ibis.read_json(data_glob)
 
@@ -79,7 +83,9 @@ def gh_forks():
     """Extract GitHub forks data."""
 
     # read in raw data
-    data_glob = os.path.join(DATA_DIR, RAW_DATA_DIR, RAW_DATA_GH_DIR, "forks.*.json")
+    data_glob = os.path.join(
+        DATA_DIR, RAW_DATA_DIR, RAW_DATA_GH_DIR, "repo_name=*", "forks.*.json"
+    )
     gh_forks = ibis.read_json(data_glob)
 
     # add extracted_at column
@@ -93,7 +99,7 @@ def gh_stars():
 
     # read in raw data
     data_glob = os.path.join(
-        DATA_DIR, RAW_DATA_DIR, RAW_DATA_GH_DIR, "stargazers.*.json"
+        DATA_DIR, RAW_DATA_DIR, RAW_DATA_GH_DIR, "repo_name=*", "stargazers.*.json"
     )
     gh_stars = ibis.read_json(data_glob)
 
@@ -107,7 +113,9 @@ def gh_watchers():
     """Extract GitHub watchers data."""
 
     # read in raw data
-    data_glob = os.path.join(DATA_DIR, RAW_DATA_DIR, RAW_DATA_GH_DIR, "watchers.*.json")
+    data_glob = os.path.join(
+        DATA_DIR, RAW_DATA_DIR, RAW_DATA_GH_DIR, "repo_name=*", "watchers.*.json"
+    )
     gh_watchers = ibis.read_json(data_glob)
 
     # add extracted_at column

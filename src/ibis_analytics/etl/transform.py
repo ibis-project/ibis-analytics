@@ -31,15 +31,16 @@ def gh_commits(gh_commits):
     def transform(t):
         t = t.unpack("node").unpack("author").rename("snake_case")
         t = t.order_by(ibis._["committed_date"].desc())
-        t = t.mutate(total_commits=ibis._.count().over(rows=(0, None)))
-        # TODO: verify this works and switch to it; other places as well
-        # t = t.mutate(
-        #     total_commits=ibis._.count().over(
-        #         ibis.window(
-        #             preceding=None, following=0, order_by="committed_date"
-        #         )
-        #     )
-        # )
+        t = t.mutate(
+            total_commits=ibis._.count().over(
+                ibis.window(
+                    preceding=None,
+                    following=0,
+                    group_by="repo_name",
+                    order_by="committed_date",
+                )
+            )
+        )
         return t
 
     gh_commits = gh_commits.pipe(preprocess).pipe(transform).pipe(postprocess)
@@ -55,21 +56,31 @@ def gh_issues(gh_issues):
         )
 
         t = t.unpack("node").unpack("author").rename("snake_case")
-        t = t.order_by(ibis._["created_at"].desc())
         t = t.mutate(is_closed=(ibis._["closed_at"] != None))
-        t = t.mutate(total_issues=ibis._.count().over(rows=(0, None)))
+        t = t.mutate(
+            total_issues=ibis._.count().over(
+                ibis.window(
+                    preceding=None,
+                    following=0,
+                    group_by=["login", "repo_name"],
+                    order_by="created_at",
+                )
+            )
+        )
         t = t.mutate(state=issue_state)
         t = (
             t.mutate(
                 is_first_issue=(
                     ibis.row_number().over(
-                        ibis.window(group_by="login", order_by=t["created_at"])
+                        ibis.window(
+                            group_by=["login", "repo_name"], order_by="created_at"
+                        )
                     )
                     == 0
                 )
             )
-            .relocate("is_first_issue", "login", "created_at")
-            .order_by(t["created_at"].desc())
+            .relocate("repo_name", "login", "created_at")
+            .order_by(ibis.asc("repo_name"), t["created_at"].desc())
         )
         return t
 
@@ -90,10 +101,18 @@ def gh_prs(gh_prs):
         )
 
         t = t.unpack("node").unpack("author").rename("snake_case")
-        t = t.order_by(ibis._["created_at"].desc())
         t = t.mutate(is_merged=(ibis._["merged_at"] != None))
         t = t.mutate(is_closed=(ibis._["closed_at"] != None))
-        t = t.mutate(total_pulls=ibis._.count().over(rows=(0, None)))
+        t = t.mutate(
+            total_pulls=ibis._.count().over(
+                ibis.window(
+                    preceding=None,
+                    following=0,
+                    group_by=["login", "repo_name"],
+                    order_by="created_at",
+                )
+            )
+        )
         # to remove bots
         # t = t.filter(
         #    ~(
@@ -112,13 +131,15 @@ def gh_prs(gh_prs):
             t.mutate(
                 is_first_pull=(
                     ibis.row_number().over(
-                        ibis.window(group_by="login", order_by=t["created_at"])
+                        ibis.window(
+                            group_by=["login", "repo_name"], order_by="created_at"
+                        )
                     )
                     == 0
                 )
             )
-            .relocate("is_first_pull", "login", "created_at")
-            .order_by(t["created_at"].desc())
+            .relocate("repo_name", "login", "created_at")
+            .order_by(ibis.asc("repo_name"), t["created_at"].desc())
         )
         return t
 
@@ -131,8 +152,16 @@ def gh_forks(gh_forks):
 
     def transform(t):
         t = t.unpack("node").unpack("owner").rename("snake_case")
-        t = t.order_by(ibis._["created_at"].desc())
-        t = t.mutate(total_forks=ibis._.count().over(rows=(0, None)))
+        t = t.mutate(
+            total_forks=ibis._.count().over(
+                ibis.window(
+                    preceding=None,
+                    following=0,
+                    group_by="repo_name",
+                    order_by="created_at",
+                )
+            )
+        )
         return t
 
     gh_forks = gh_forks.pipe(preprocess).pipe(transform).pipe(postprocess)
@@ -144,10 +173,17 @@ def gh_stars(gh_stars):
 
     def transform(t):
         t = t.unpack("node").rename("snake_case")
-        # TODO: fix
-        t = t.order_by(ibis._["starred_at"].desc())
         t = t.mutate(company=ibis._["company"].fill_null("Unknown"))
-        t = t.mutate(total_stars=ibis._.count().over(rows=(0, None)))
+        t = t.mutate(
+            total_stars=ibis._.count().over(
+                ibis.window(
+                    preceding=None,
+                    following=0,
+                    group_by="repo_name",
+                    order_by="starred_at",
+                )
+            )
+        )
         return t
 
     gh_stars = gh_stars.pipe(preprocess).pipe(transform).pipe(postprocess)
@@ -159,9 +195,16 @@ def gh_watchers(gh_watchers):
 
     def transform(t):
         t = t.unpack("node").rename("snake_case")
-        # TODO: fix this
-        t = t.order_by(ibis._["updated_at"].desc())
-        t = t.mutate(total_t=ibis._.count().over(rows=(0, None)))
+        t = t.mutate(
+            total_watchers=ibis._.count().over(
+                ibis.window(
+                    preceding=None,
+                    following=0,
+                    group_by="repo_name",
+                    order_by="updated_at",
+                )
+            )
+        )
         t = t.order_by(ibis._["updated_at"].desc())
         return t
 
