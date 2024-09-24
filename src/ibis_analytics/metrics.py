@@ -23,7 +23,7 @@ def _densify(t: ibis.Table, ts_col: str, agg_col: str) -> ibis.Table:
         .as_table()
     )
 
-    return t.join(ts, ts_col, how="outer").select(
+    return t.join(ts, ts_col, how="right").select(
         **{ts_col: f"{ts_col}_right", agg_col: ibis._[agg_col].fill_null(0)},
     )
 
