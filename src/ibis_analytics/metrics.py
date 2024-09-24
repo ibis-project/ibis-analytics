@@ -11,12 +11,30 @@ def total(t: ibis.Table) -> int:
     return t.count().to_pyarrow().as_py()
 
 
+def _densify(t: ibis.Table, ts_col: str, agg_col: str) -> ibis.Table:
+    ts = (
+        ibis.range(
+            t[ts_col].min().as_scalar(),
+            ibis.now().truncate("D"),
+            step=ibis.interval(days=1),
+        )
+        .unnest()
+        .name(ts_col)
+        .as_table()
+    )
+
+    return t.join(ts, ts_col, how="outer").select(
+        **{ts_col: f"{ts_col}_right", agg_col: ibis._[agg_col].fill_null(0)},
+    )
+
+
 def stars_rolling(t: ibis.Table, days: int = 28) -> ibis.Table:
     t = (
         t.mutate(starred_at=t["starred_at"].truncate("D"))
         .group_by("starred_at")
         .agg(stars=ibis._.count())
     )
+    t = _densify(t, "starred_at", "stars")
     t = t.select(
         timestamp="starred_at",
         rolling_stars=ibis._["stars"]
